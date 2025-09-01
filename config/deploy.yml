@@ -1,4 +1,5 @@
 # Name of your application. Used to uniquely configure containers.
+# <% require "dotenv"; Dotenv.load(".env") %>
 service: hardcover-rss
 
 # Name of the container image.

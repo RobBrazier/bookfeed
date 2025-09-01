@@ -156,7 +156,7 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 func newCache() *otter.Cache[string, feeds.Feed] {
 	return otter.Must(&otter.Options[string, feeds.Feed]{
 		MaximumSize:      10_000,
-		ExpiryCalculator: otter.ExpiryAccessing[string, feeds.Feed](2 * time.Minute),
+		ExpiryCalculator: otter.ExpiryAccessing[string, feeds.Feed](6 * time.Hour),
 	})
 }
 
