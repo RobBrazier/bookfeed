@@ -1,0 +1,18 @@
+schema: schema.gql
+operations:
+  - queries.gql
+generated: ../hardcover/generated.go
+bindings:
+  citext:
+    type: string
+  timestamp:
+    type: time.Time
+  date:
+    type: time.Time
+    marshaler: hardcover-rss/internal/hardcover.MarshalHardcoverDate
+    unmarshaler: hardcover-rss/internal/hardcover.UnmarshalHardcoverDate
+  numeric:
+    type: int
+  float8:
+    type: float32
+# client_getter: github.com/RobBrazier/readflow/target/hardcover.GetClient

@@ -1,0 +1,117 @@
+fragment Book on books {
+  title
+  id
+  slug
+  releaseDate: release_date
+  usersCount: users_count
+  description
+  contributions {
+    author {
+      name
+    }
+  }
+  compilation
+  image {
+    url
+    width
+    height
+    ratio
+  }
+  bookSeries: book_series(
+    where: {
+      _or: [
+        {featured: {_eq: true}},
+        {series: {slug: {_eq: $slug}}}
+      ]
+    }
+  ) {
+    series {
+      name
+      slug
+    }
+    position
+  }
+}
+
+query RecentReleases($now: date, $lastMonth: date, $slug: String = "") {
+  # @genqlient(flatten: true)
+  books(
+    order_by: {users_count: desc_nulls_last}
+    where: {
+      release_date: {_lte: $now, _gte: $lastMonth}
+    }
+    limit: 25
+  ) {
+    ...Book
+  }
+}
+
+query RecentSeriesReleases($now: date, $slug: String, $language: String = "eng", $compilations: Boolean = false) {
+  series(where: { slug: {_eq: $slug} }) {
+    name
+    slug
+  }
+  bookSeries: book_series(
+    where: {
+      series: {
+        slug: {_eq: $slug}
+      },
+      book: {
+        release_date: {_lte: $now},
+        book_mappings: {id: {_is_null: false}}
+        _or: [
+          {default_physical_edition: {language: {code3: {_eq: $language}}}},
+          {default_cover_edition: {language: {code3: {_eq: $language}}}},
+          {default_ebook_edition: {language: {code3: {_eq: $language}}}},
+          {default_audio_edition: {language: {code3: {_eq: $language}}}},
+        ],
+        compilation: {
+          _in: [$compilations, false]
+        }
+      }
+    }
+    order_by: {book: {release_date: desc_nulls_last}}
+    limit: 25
+  ) {
+    series {
+      name
+    }
+    # @genqlient(flatten: true)
+    book {
+      ...Book
+    }
+  }
+}
+
+query RecentAuthorReleases($now: date, $slug: String, $language: String = "eng", $compilations: Boolean = false) {
+  contributions(
+    where: {
+      author: {
+        slug: {_eq: $slug}
+      },
+      book: {
+        release_date: {_lte: $now},
+        book_mappings: {id: {_is_null: false}},
+        _or: [
+          {default_physical_edition: {language: {code3: {_eq: $language}}}},
+          {default_cover_edition: {language: {code3: {_eq: $language}}}},
+          {default_ebook_edition: {language: {code3: {_eq: $language}}}},
+          {default_audio_edition: {language: {code3: {_eq: $language}}}},
+        ],
+        compilation: {
+          _in: [$compilations, false]
+        }
+      }
+    }
+    order_by: {book: {release_date: desc_nulls_last}}
+    limit: 25
+  ) {
+    author {
+      name
+    }
+    # @genqlient(flatten: true)
+    book {
+      ...Book
+    }
+  }
+}

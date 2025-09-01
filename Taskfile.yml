@@ -1,0 +1,31 @@
+version: "3"
+
+dotenv:
+  - .env
+
+tasks:
+  download-schema:
+    cmds:
+      - "go tool gquil introspection generate-sdl https://api.hardcover.app/v1/graphql -H 'Authorization: {{ .HARDCOVER_TOKEN }}' > internal/schema/schema.gql"
+    requires:
+      vars: [HARDCOVER_TOKEN]
+
+  clean:
+    cmd: rm -r {{ .ROOT_DIR }}/dist
+    status:
+      - "! test -d {{ .ROOT_DIR }}/dist"
+
+  generate:
+    cmd: go generate ./...
+
+  build:
+    cmd: go build -o dist/hardcover-rss cmd/api/main.go
+
+  run:
+    cmd: go run cmd/api/main.go
+
+  dev:
+    cmd: air
+
+  test:
+    cmd: go test ./... -v

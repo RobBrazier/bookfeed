@@ -1,0 +1,5 @@
+[tools]
+air = "latest"
+go = "latest"
+hurl = "latest"
+task = "latest"
