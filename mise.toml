@@ -1,5 +1,6 @@
 [tools]
 air = "latest"
+doppler = "latest"
 go = "latest"
 hurl = "latest"
 task = "latest"
