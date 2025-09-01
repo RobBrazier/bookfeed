@@ -1,53 +1,142 @@
-# Project hardcover-rss
+# Hardcover RSS
 
-One Paragraph of project description goes here
+A Go application that generates RSS feeds for Hardcover.app, a book tracking and review platform. This service provides RSS feeds for recent book releases, author releases, and series releases in multiple formats (RSS, Atom, and JSON).
+
+## Features
+
+- Recent book releases feed
+- Author-specific releases feed
+- Series-specific releases feed
+- Multiple output formats: RSS, Atom, and JSON
+- Rate-limited API endpoints for public access
+
+## Prerequisites
+
+- Go 1.22+
+- Hardcover API token (for development)
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine.
 
-## MakeFile
+### Environment Setup
 
-Run build make command with tests
+Copy the example environment file and configure your settings:
+
 ```bash
-make all
+cp .env.example .env
 ```
 
-Build the application
+Edit the `.env` file to set your configuration:
+- `PORT`: The port to run the server on (default: 8000)
+- `HARDCOVER_TOKEN`: Your Hardcover API token (required for development)
+
+### Installation
+
+Install dependencies:
+
 ```bash
-make build
+go mod tidy
 ```
 
-Run the application
+### Running the Application
+
+Run directly with Go:
+
 ```bash
-make run
-```
-Create DB container
-```bash
-make docker-run
+go run cmd/api/main.go
 ```
 
-Shutdown DB Container
+Or use Task (if installed):
+
 ```bash
-make docker-down
+task run
 ```
 
-DB Integrations Test:
+For development with live reload:
+
 ```bash
-make itest
+task dev
 ```
 
-Live reload the application:
+### Building
+
+To build a binary:
+
 ```bash
-make watch
+go build -o dist/hardcover-rss cmd/api/main.go
 ```
 
-Run the test suite:
+Or with Task:
+
 ```bash
-make test
+task build
 ```
 
-Clean up binary from the last build:
+### Testing
+
+Run tests:
+
 ```bash
-make clean
+go test ./... -v
+```
+
+Or with Task:
+
+```bash
+task test
+```
+
+## Usage
+
+Once running, the application exposes the following endpoints:
+
+### Recent Releases
+- `GET /recent` - Recent releases in RSS format
+- `GET /recent.rss` - Recent releases in RSS format
+- `GET /recent.atom` - Recent releases in Atom format
+- `GET /recent.json` - Recent releases in JSON format
+
+### Author Releases
+- `GET /author/{author}` - Specific author's releases in RSS format
+- `GET /author/{author}/rss` - Specific author's releases in RSS format
+- `GET /author/{author}/atom` - Specific author's releases in Atom format
+- `GET /author/{author}/json` - Specific author's releases in JSON format
+
+### Series Releases
+- `GET /series/{series}` - Specific series' releases in RSS format
+- `GET /series/{series}/rss` - Specific series' releases in RSS format
+- `GET /series/{series}/atom` - Specific series' releases in Atom format
+- `GET /series/{series}/json` - Specific series' releases in JSON format
+
+### Development Tasks
+
+Update the GraphQL schema from the Hardcover API:
+
+```bash
+task download-schema
+```
+
+Generate Go code from GraphQL schema:
+
+```bash
+task generate
+```
+
+## Deployment
+
+The application can be deployed as a standalone binary or Docker container. It requires the `PORT` environment variable to be set.
+
+### Docker
+
+Build the Docker image:
+
+```bash
+docker build -t hardcover-rss .
+```
+
+Run with Docker:
+
+```bash
+docker run -p 8000:8000 hardcover-rss
 ```
