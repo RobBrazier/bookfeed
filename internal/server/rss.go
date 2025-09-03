@@ -27,7 +27,6 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 		w.Write([]byte("Not Found"))
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 
 	switch format {
 	case "atom":
