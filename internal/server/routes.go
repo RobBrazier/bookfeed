@@ -42,7 +42,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	r.Get("/", s.HelloWorldHandler)
+	MountStatic(r)
 
 	r.Group(func(r chi.Router) {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
