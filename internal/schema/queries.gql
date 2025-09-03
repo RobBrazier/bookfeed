@@ -46,7 +46,7 @@ query RecentReleases($now: date, $lastMonth: date, $slug: String = "") {
   }
 }
 
-query RecentSeriesReleases($now: date, $slug: String, $language: String = "eng", $compilations: Boolean = false) {
+query RecentSeriesReleases($now: date, $slug: String, $compilations: Boolean = false) {
   series(where: { slug: {_eq: $slug} }) {
     name
     slug
@@ -59,12 +59,6 @@ query RecentSeriesReleases($now: date, $slug: String, $language: String = "eng",
       book: {
         release_date: {_lte: $now},
         book_mappings: {id: {_is_null: false}}
-        _or: [
-          {default_physical_edition: {language: {code3: {_eq: $language}}}},
-          {default_cover_edition: {language: {code3: {_eq: $language}}}},
-          {default_ebook_edition: {language: {code3: {_eq: $language}}}},
-          {default_audio_edition: {language: {code3: {_eq: $language}}}},
-        ],
         compilation: {
           _in: [$compilations, false]
         }
@@ -83,7 +77,7 @@ query RecentSeriesReleases($now: date, $slug: String, $language: String = "eng",
   }
 }
 
-query RecentAuthorReleases($now: date, $slug: String, $language: String = "eng", $compilations: Boolean = false) {
+query RecentAuthorReleases($now: date, $slug: String, $compilations: Boolean = false) {
   contributions(
     where: {
       author: {
@@ -92,12 +86,6 @@ query RecentAuthorReleases($now: date, $slug: String, $language: String = "eng",
       book: {
         release_date: {_lte: $now},
         book_mappings: {id: {_is_null: false}},
-        _or: [
-          {default_physical_edition: {language: {code3: {_eq: $language}}}},
-          {default_cover_edition: {language: {code3: {_eq: $language}}}},
-          {default_ebook_edition: {language: {code3: {_eq: $language}}}},
-          {default_audio_edition: {language: {code3: {_eq: $language}}}},
-        ],
         compilation: {
           _in: [$compilations, false]
         }

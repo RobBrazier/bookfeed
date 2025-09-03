@@ -34,7 +34,6 @@ type builder struct {
 	client       graphql.Client
 	cache        *otter.Cache[string, feeds.Feed]
 	templates    *template.Template
-	language     string
 	compilations bool
 }
 
@@ -115,7 +114,7 @@ func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Fee
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		authorSlug := strings.Split(key, "/")[1]
-		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, slug, b.language, b.compilations)
+		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, slug, b.compilations)
 		if err != nil {
 			return feeds.Feed{}, err
 		}
@@ -137,7 +136,7 @@ func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Fee
 func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Feed, error) {
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
-		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, slug, b.language, b.compilations)
+		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, slug, b.compilations)
 		if err != nil {
 			return feeds.Feed{}, err
 		}
@@ -173,7 +172,6 @@ func NewBuilder() Builder {
 		templates: template.Must(
 			template.New("base").Funcs(sprig.FuncMap()).ParseFS(fs, "templates/*.tmpl"),
 		),
-		language:     "eng",
 		compilations: false,
 	}
 }

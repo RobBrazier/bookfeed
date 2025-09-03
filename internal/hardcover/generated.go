@@ -343,7 +343,6 @@ func (v *RecentSeriesReleasesSeries) GetSlug() string { return v.Slug }
 type __RecentAuthorReleasesInput struct {
 	Now          time.Time `json:"-"`
 	Slug         string    `json:"slug"`
-	Language     string    `json:"language"`
 	Compilations bool      `json:"compilations"`
 }
 
@@ -352,9 +351,6 @@ func (v *__RecentAuthorReleasesInput) GetNow() time.Time { return v.Now }
 
 // GetSlug returns __RecentAuthorReleasesInput.Slug, and is useful for accessing the field via an interface.
 func (v *__RecentAuthorReleasesInput) GetSlug() string { return v.Slug }
-
-// GetLanguage returns __RecentAuthorReleasesInput.Language, and is useful for accessing the field via an interface.
-func (v *__RecentAuthorReleasesInput) GetLanguage() string { return v.Language }
 
 // GetCompilations returns __RecentAuthorReleasesInput.Compilations, and is useful for accessing the field via an interface.
 func (v *__RecentAuthorReleasesInput) GetCompilations() bool { return v.Compilations }
@@ -397,8 +393,6 @@ type __premarshal__RecentAuthorReleasesInput struct {
 
 	Slug string `json:"slug"`
 
-	Language string `json:"language"`
-
 	Compilations bool `json:"compilations"`
 }
 
@@ -426,7 +420,6 @@ func (v *__RecentAuthorReleasesInput) __premarshalJSON() (*__premarshal__RecentA
 		}
 	}
 	retval.Slug = v.Slug
-	retval.Language = v.Language
 	retval.Compilations = v.Compilations
 	return &retval, nil
 }
@@ -545,7 +538,6 @@ func (v *__RecentReleasesInput) __premarshalJSON() (*__premarshal__RecentRelease
 type __RecentSeriesReleasesInput struct {
 	Now          time.Time `json:"-"`
 	Slug         string    `json:"slug"`
-	Language     string    `json:"language"`
 	Compilations bool      `json:"compilations"`
 }
 
@@ -554,9 +546,6 @@ func (v *__RecentSeriesReleasesInput) GetNow() time.Time { return v.Now }
 
 // GetSlug returns __RecentSeriesReleasesInput.Slug, and is useful for accessing the field via an interface.
 func (v *__RecentSeriesReleasesInput) GetSlug() string { return v.Slug }
-
-// GetLanguage returns __RecentSeriesReleasesInput.Language, and is useful for accessing the field via an interface.
-func (v *__RecentSeriesReleasesInput) GetLanguage() string { return v.Language }
 
 // GetCompilations returns __RecentSeriesReleasesInput.Compilations, and is useful for accessing the field via an interface.
 func (v *__RecentSeriesReleasesInput) GetCompilations() bool { return v.Compilations }
@@ -599,8 +588,6 @@ type __premarshal__RecentSeriesReleasesInput struct {
 
 	Slug string `json:"slug"`
 
-	Language string `json:"language"`
-
 	Compilations bool `json:"compilations"`
 }
 
@@ -628,15 +615,14 @@ func (v *__RecentSeriesReleasesInput) __premarshalJSON() (*__premarshal__RecentS
 		}
 	}
 	retval.Slug = v.Slug
-	retval.Language = v.Language
 	retval.Compilations = v.Compilations
 	return &retval, nil
 }
 
 // The query executed by RecentAuthorReleases.
 const RecentAuthorReleases_Operation = `
-query RecentAuthorReleases ($now: date, $slug: String, $language: String = "eng", $compilations: Boolean = false) {
-	contributions(where: {author:{slug:{_eq:$slug}},book:{release_date:{_lte:$now},book_mappings:{id:{_is_null:false}},_or:[{default_physical_edition:{language:{code3:{_eq:$language}}}},{default_cover_edition:{language:{code3:{_eq:$language}}}},{default_ebook_edition:{language:{code3:{_eq:$language}}}},{default_audio_edition:{language:{code3:{_eq:$language}}}}],compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+query RecentAuthorReleases ($now: date, $slug: String, $compilations: Boolean = false) {
+	contributions(where: {author:{slug:{_eq:$slug}},book:{release_date:{_lte:$now},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 		author {
 			name
 		}
@@ -679,7 +665,6 @@ func RecentAuthorReleases(
 	client_ graphql.Client,
 	now time.Time,
 	slug string,
-	language string,
 	compilations bool,
 ) (data_ *RecentAuthorReleasesResponse, err_ error) {
 	req_ := &graphql.Request{
@@ -688,7 +673,6 @@ func RecentAuthorReleases(
 		Variables: &__RecentAuthorReleasesInput{
 			Now:          now,
 			Slug:         slug,
-			Language:     language,
 			Compilations: compilations,
 		},
 	}
@@ -772,12 +756,12 @@ func RecentReleases(
 
 // The query executed by RecentSeriesReleases.
 const RecentSeriesReleases_Operation = `
-query RecentSeriesReleases ($now: date, $slug: String, $language: String = "eng", $compilations: Boolean = false) {
+query RecentSeriesReleases ($now: date, $slug: String, $compilations: Boolean = false) {
 	series(where: {slug:{_eq:$slug}}) {
 		name
 		slug
 	}
-	bookSeries: book_series(where: {series:{slug:{_eq:$slug}},book:{release_date:{_lte:$now},book_mappings:{id:{_is_null:false}},_or:[{default_physical_edition:{language:{code3:{_eq:$language}}}},{default_cover_edition:{language:{code3:{_eq:$language}}}},{default_ebook_edition:{language:{code3:{_eq:$language}}}},{default_audio_edition:{language:{code3:{_eq:$language}}}}],compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+	bookSeries: book_series(where: {series:{slug:{_eq:$slug}},book:{release_date:{_lte:$now},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 		series {
 			name
 		}
@@ -820,7 +804,6 @@ func RecentSeriesReleases(
 	client_ graphql.Client,
 	now time.Time,
 	slug string,
-	language string,
 	compilations bool,
 ) (data_ *RecentSeriesReleasesResponse, err_ error) {
 	req_ := &graphql.Request{
@@ -829,7 +812,6 @@ func RecentSeriesReleases(
 		Variables: &__RecentSeriesReleasesInput{
 			Now:          now,
 			Slug:         slug,
-			Language:     language,
 			Compilations: compilations,
 		},
 	}

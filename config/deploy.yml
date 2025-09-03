@@ -17,6 +17,7 @@ proxy:
   ssl: true
   host: hardcover-rss.robbrazier.com
   app_port: 8080
+  forward_headers: true
 
 # Credentials for your image host.
 registry:
