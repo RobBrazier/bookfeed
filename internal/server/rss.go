@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"mime"
 	"net/http"
-	"strings"
 
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/feeds"
 )
 
@@ -22,6 +22,13 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 	// This is shorter than our data cache (6 hours) to ensure freshness
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
+	if len(out.Items) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Not Found"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
 	switch format {
 	case "atom":
 		writeContentType("application/atom+xml", w)
@@ -36,7 +43,7 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 }
 
 func (s *Server) RecentHandler(w http.ResponseWriter, r *http.Request) {
-	format := strings.ToLower(r.PathValue("format"))
+	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	feed, err := s.builder.GetRecentReleases(r.Context())
 	if err != nil {
 		slog.Error("error retrieving recent", "err", err)
@@ -45,7 +52,7 @@ func (s *Server) RecentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
-	format := strings.ToLower(r.PathValue("format"))
+	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	author := r.PathValue("author")
 	feed, err := s.builder.GetAuthorReleases(r.Context(), author)
 
@@ -57,7 +64,7 @@ func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
-	format := strings.ToLower(r.PathValue("format"))
+	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	series := r.PathValue("series")
 	feed, err := s.builder.GetSeriesReleases(r.Context(), series)
 	if err != nil {
