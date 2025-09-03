@@ -12,7 +12,7 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 	// Set Cloudflare cache header for 1 hour (3600 seconds)
 	// This is shorter than our data cache (6 hours) to ensure freshness
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-	
+
 	switch format {
 	case "atom":
 		out.WriteAtom(w)
@@ -40,6 +40,7 @@ func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("error retrieving author", "err", err)
 	}
+
 	s.writeFeed(format, &feed, w)
 }
 

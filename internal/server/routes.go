@@ -3,20 +3,36 @@ package server
 import (
 	"encoding/json"
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/httplog/v3"
 	"github.com/go-chi/httprate"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
+	logFormat := httplog.SchemaOTEL.Concise(true)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		ReplaceAttr: logFormat.ReplaceAttr,
+	}))
+
+	slog.SetDefault(logger)
+	slog.SetLogLoggerLevel(slog.LevelInfo)
+
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
+	r.Use(httplog.RequestLogger(logger, &httplog.Options{
+		Level:         slog.LevelInfo,
+		Schema:        httplog.SchemaOTEL,
+		RecoverPanics: true,
+	}))
+	r.Use(middleware.Heartbeat("/up"))
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -27,7 +43,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	r.Get("/", s.HelloWorldHandler)
-	r.Get("/up", s.HelloWorldHandler)
 
 	r.Group(func(r chi.Router) {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))

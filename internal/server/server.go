@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"hardcover-rss/internal/feed"
-	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,7 +18,6 @@ type Server struct {
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	NewServer := &Server{
 		port:    port,
