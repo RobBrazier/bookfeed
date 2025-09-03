@@ -15,9 +15,8 @@ func MountStatic(r *chi.Mux) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	r.Group(func(r chi.Router) {
-		r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(staticRoot)))
-	})
+
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(staticRoot)))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
