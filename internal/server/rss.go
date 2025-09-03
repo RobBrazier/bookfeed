@@ -9,6 +9,10 @@ import (
 )
 
 func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter) {
+	// Set Cloudflare cache header for 1 hour (3600 seconds)
+	// This is shorter than our data cache (6 hours) to ensure freshness
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	
 	switch format {
 	case "atom":
 		out.WriteAtom(w)

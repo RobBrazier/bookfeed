@@ -17,7 +17,6 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/gorilla/feeds"
 	"github.com/maypok86/otter/v2"
-	"resenje.org/singleflight"
 )
 
 //go:embed templates/*
@@ -32,7 +31,6 @@ type LoaderFunc = otter.LoaderFunc[string, feeds.Feed]
 
 type builder struct {
 	client       graphql.Client
-	group        singleflight.Group[string, BookContext]
 	cache        *otter.Cache[string, feeds.Feed]
 	templates    *template.Template
 	language     string
@@ -156,7 +154,7 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 func newCache() *otter.Cache[string, feeds.Feed] {
 	return otter.Must(&otter.Options[string, feeds.Feed]{
 		MaximumSize:      10_000,
-		ExpiryCalculator: otter.ExpiryAccessing[string, feeds.Feed](6 * time.Hour),
+		ExpiryCalculator: otter.ExpiryCreating[string, feeds.Feed](6 * time.Hour),
 	})
 }
 

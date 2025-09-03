@@ -12,7 +12,6 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/joho/godotenv v1.5.1
 	github.com/maypok86/otter/v2 v2.2.1
-	resenje.org/singleflight v0.4.3
 )
 
 require (
