@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"hardcover-rss/internal/hardcover"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -43,6 +44,11 @@ type Builder interface {
 	GetSeriesReleases(ctx context.Context, series string) (feeds.Feed, error)
 }
 
+func cdnUrl(image hardcover.BookImageImages) string {
+	url := url.QueryEscape(image.Url)
+	return fmt.Sprintf("https://img.hardcover.app/enlarge?url=%s&width=%d&height=%d&type=webp", url, image.Width, image.Height)
+}
+
 func (b *builder) buildFeed(title, link string, books []hardcover.Book) (feeds.Feed, error) {
 	feed := &feeds.Feed{
 		Title:   title,
@@ -56,10 +62,10 @@ func (b *builder) buildFeed(title, link string, books []hardcover.Book) (feeds.F
 			authorName = book.Contributions[0].Author.Name
 		}
 		var enclosure *feeds.Enclosure
-		if book.Image.Url != "" {
+		if url := book.Image.Url; url != "" {
 			enclosure = &feeds.Enclosure{
-				Url:  book.Image.Url,
-				Type: "image/jpeg",
+				Url:  cdnUrl(book.Image),
+				Type: "image/webp",
 			}
 		}
 
@@ -84,7 +90,7 @@ func (b *builder) renderContent(book hardcover.Book) string {
 		book.Image.Ratio = float32(book.Image.Width) / float32(book.Image.Height)
 		book.Image.Width = int(500 * book.Image.Ratio)
 		book.Image.Height = 500
-		book.Image.Url = fmt.Sprintf("https://img.hardcover.app/enlarge?url=%s&width=%d&height=%d&type=jpeg", book.Image.Url, book.Image.Width, book.Image.Height)
+		book.Image.Url = cdnUrl(book.Image)
 	}
 	b.templates.ExecuteTemplate(&buffer, "content.tmpl", book)
 	return buffer.String()
