@@ -2,11 +2,20 @@ package server
 
 import (
 	"log/slog"
+	"mime"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/feeds"
 )
+
+func writeContentType(mediaType string, w http.ResponseWriter) {
+	params := map[string]string{
+		"charset": "utf-8",
+	}
+	contentType := mime.FormatMediaType(mediaType, params)
+	w.Header().Set("Content-Type", contentType)
+}
 
 func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter) {
 	// Set Cloudflare cache header for 1 hour (3600 seconds)
@@ -15,10 +24,13 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 
 	switch format {
 	case "atom":
+		writeContentType("application/atom+xml", w)
 		out.WriteAtom(w)
 	case "json":
+		writeContentType("application/json", w)
 		out.WriteJSON(w)
 	default:
+		writeContentType("application/rss+xml", w)
 		out.WriteRss(w)
 	}
 }
