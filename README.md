@@ -1,21 +1,30 @@
-# Hardcover RSS
+# BookFeed
 
-A Go application that generates feeds for Hardcover.app, a book tracking and review platform.
-This service provides feeds for recent book releases, author releases, series releases, and personalized user feeds in multiple formats (RSS, Atom, and JSON).
+A Go application that generates standardized RSS/Atom/JSON feeds for book tracking and review platforms.
+
+## Supported Providers
+
+### Hardcover.app (Current)
+This service provides feeds for recent book releases, author releases, series releases, and personalized user feeds from Hardcover.app.
+
+### Future Provider Support
+The application is architected to potentially support additional book tracking platforms in the future.
 
 ## Features
 
+- Multiple output formats: RSS, Atom, and JSON
+- Rate-limited API endpoints for public access
+
+### Hardcover
 - Recent book releases feed
 - Author-specific releases feed
 - Series-specific releases feed
 - Personalized user feeds based on reading history
-- Multiple output formats: RSS, Atom, and JSON
-- Rate-limited API endpoints for public access
 
 ## Prerequisites
 
 - Go 1.25+
-- Hardcover API token (for development)
+- Provider API token (for development - Hardcover token currently required)
 
 ## Getting Started
 
@@ -66,7 +75,8 @@ task dev
 To build a binary:
 
 ```bash
-go build -o dist/hardcover-feed cmd/api/main.go
+mkdir dist
+go build -o dist/bookfeed cmd/api/main.go
 ```
 
 Or with Task:
@@ -94,26 +104,26 @@ task test
 Once running, the application exposes the following endpoints:
 
 ### Recent Releases
-- `GET /recent.atom` - Recent releases in Atom format
-- `GET /recent.rss` - Recent releases in RSS format
-- `GET /recent.json` - Recent releases in JSON format
+- `GET /hc/recent.atom` - Recent releases in Atom format
+- `GET /hc/recent.rss` - Recent releases in RSS format
+- `GET /hc/recent.json` - Recent releases in JSON format
 
 ### Author Releases
-- `GET /author/{author}.atom` - Specific author's releases in Atom format
-- `GET /author/{author}.rss` - Specific author's releases in RSS format
-- `GET /author/{author}.json` - Specific author's releases in JSON format
+- `GET /hc/author/{author}.atom` - Specific author's releases in Atom format
+- `GET /hc/author/{author}.rss` - Specific author's releases in RSS format
+- `GET /hc/author/{author}.json` - Specific author's releases in JSON format
 
 ### Series Releases
-- `GET /series/{series}.atom` - Specific series' releases in Atom format
-- `GET /series/{series}.rss` - Specific series' releases in RSS format
-- `GET /series/{series}.json` - Specific series' releases in JSON format
+- `GET /hc/series/{series}.atom` - Specific series' releases in Atom format
+- `GET /hc/series/{series}.rss` - Specific series' releases in RSS format
+- `GET /hc/series/{series}.json` - Specific series' releases in JSON format
 
 ### Personalized User Feeds
-- `GET /me/{username}.atom` - Personalized releases based on user's reading history in Atom format
-- `GET /me/{username}.rss` - Personalized releases based on user's reading history in RSS format
-- `GET /me/{username}.json` - Personalized releases based on user's reading history in JSON format
-- `GET /me/{username}.atom?filter=author` - Filter to only show author releases
-- `GET /me/{username}.atom?filter=series` - Filter to only show series releases
+- `GET /hc/me/{username}.atom` - Personalized releases based on user's reading history in Atom format
+- `GET /hc/me/{username}.rss` - Personalized releases based on user's reading history in RSS format
+- `GET /hc/me/{username}.json` - Personalized releases based on user's reading history in JSON format
+- `GET /hc/me/{username}.atom?filter=author` - Filter to only show author releases
+- `GET /hc/me/{username}.atom?filter=series` - Filter to only show series releases
 
 ### Development Tasks
 
@@ -138,11 +148,11 @@ The application can be deployed as a standalone binary or Docker container. It r
 Build the Docker image:
 
 ```bash
-docker build -t hardcover-feed .
+docker build -t bookfeed .
 ```
 
 Run with Docker:
 
 ```bash
-docker run -p 8000:8000 hardcover-feed
+docker run -p 8000:8000 bookfeed
 ```

@@ -1,9 +1,9 @@
 # Name of your application. Used to uniquely configure containers.
 # <% require "dotenv"; Dotenv.load(".env") %>
-service: hardcover-feed
+service: bookfeed
 
 # Name of the container image.
-image: robbrazier/hardcover-feed
+image: robbrazier/bookfeed
 
 # Deploy to these servers.
 servers:

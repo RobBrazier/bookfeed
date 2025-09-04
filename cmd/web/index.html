@@ -7,9 +7,22 @@
 	<link rel="stylesheet" href="/static/style.css">
 	<script src="/static/alpine.min.js" defer></script>
 	<link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+	<script>
+		function showNotification() {
+			const notification = document.getElementById('notification');
+			notification.classList.add('show');
+			setTimeout(() => notification.classList.remove('show'), 2000);
+		}
+	</script>
 </head>
 
-<body>
+<body x-data="{ 
+	showNotification() {
+		const notification = document.getElementById('notification');
+		notification.classList.add('show');
+		setTimeout(() => notification.classList.remove('show'), 2000);
+	}
+}">
 	<header class="header">
 		<div class="container">
 			<h1>Hardcover Feeds</h1>
@@ -17,7 +30,14 @@
 		</div>
 	</header>
 	<main class="main container">
-		<section class="card">
+		<section class="card" x-data="{ 
+			getUrl(format) { return `${window.location.origin}/hc/recent.${format}`; },
+			showNotification() {
+				const notification = document.getElementById('notification');
+				notification.classList.add('show');
+				setTimeout(() => notification.classList.remove('show'), 2000);
+			}
+		}">
 			<h2>Recent Releases</h2>
 			<p>
 				Equivalent to the list on
@@ -27,14 +47,11 @@
 				on Hardcover.app
 			</p>
 			<div class="space-y-3">
-				<template x-data x-for="format in ['rss', 'atom', 'json']" :key="format">
+				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
 					<div class="input-group">
-						<input type="text" readonly x-bind:value="`${window.location.origin}/recent.${format}`"
+						<input type="text" readonly x-bind:value="getUrl(format)"
 							:id="`recent-${format}`" @click="$event.target.select()" class="form-input">
-						<button class="btn copy-btn" @click="navigator.clipboard.writeText(`${window.location.origin}/recent.${format}`).then(() => { 
-									document.getElementById('notification').classList.add('show'); 
-									setTimeout(() => document.getElementById('notification').classList.remove('show'), 2000);
-								})">
+						<button class="btn copy-btn" @click="navigator.clipboard.writeText(getUrl(format)).then(() => showNotification())">
 							Copy <span x-text="format.toUpperCase()"></span>
 						</button>
 					</div>
@@ -42,7 +59,15 @@
 			</div>
 		</section>
 
-		<section class="card" x-data="{ author: '' }">
+		<section class="card" x-data="{ 
+			author: '', 
+			getUrl(format) { return this.author ? `${window.location.origin}/hc/author/${this.author}.${format}` : ''; },
+			showNotification() {
+				const notification = document.getElementById('notification');
+				notification.classList.add('show');
+				setTimeout(() => notification.classList.remove('show'), 2000);
+			}
+		}">
 			<h2>Author Releases</h2>
 			<p x-show="author">
 				View on Hardcover:
@@ -59,12 +84,9 @@
 				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
 					<div class="input-group">
 						<input type="text" readonly
-							x-bind:value="author ? `${window.location.origin}/author/${author}.${format}` : ''"
+							x-bind:value="getUrl(format)"
 							:id="`author-${format}`" @click="$event.target.select()" class="form-input">
-						<button class="btn copy-btn" @click="navigator.clipboard.writeText(author ? `${window.location.origin}/author/${author}.${format}` : '').then(() => { 
-									document.getElementById('notification').classList.add('show'); 
-									setTimeout(() => document.getElementById('notification').classList.remove('show'), 2000);
-								})">
+						<button class="btn copy-btn" @click="navigator.clipboard.writeText(getUrl(format)).then(() => showNotification())">
 							Copy <span x-text="format.toUpperCase()"></span>
 						</button>
 					</div>
@@ -72,7 +94,15 @@
 			</div>
 		</section>
 
-		<section class="card" x-data="{ series: '' }">
+		<section class="card" x-data="{ 
+			series: '', 
+			getUrl(format) { return this.series ? `${window.location.origin}/hc/series/${this.series}.${format}` : ''; },
+			showNotification() {
+				const notification = document.getElementById('notification');
+				notification.classList.add('show');
+				setTimeout(() => notification.classList.remove('show'), 2000);
+			}
+		}">
 			<h2>Series Releases</h2>
 			<p x-show="series">
 				View on Hardcover:
@@ -89,12 +119,9 @@
 				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
 					<div class="input-group">
 						<input type="text" readonly
-							x-bind:value="series ? `${window.location.origin}/series/${series}.${format}` : ''"
+							x-bind:value="getUrl(format)"
 							:id="`series-${format}`" @click="$event.target.select()" class="form-input">
-						<button class="btn copy-btn" @click="navigator.clipboard.writeText(series ? `${window.location.origin}/series/${series}.${format}` : '').then(() => { 
-									document.getElementById('notification').classList.add('show'); 
-									setTimeout(() => document.getElementById('notification').classList.remove('show'), 2000);
-								})">
+						<button class="btn copy-btn" @click="navigator.clipboard.writeText(getUrl(format)).then(() => showNotification())">
 							Copy <span x-text="format.toUpperCase()"></span>
 						</button>
 					</div>
@@ -102,7 +129,16 @@
 			</div>
 		</section>
 
-		<section class="card" x-data="{ username: '' }">
+		<section class="card" x-data="{ 
+			username: '', 
+			getUrl(format) { return this.username ? `${window.location.origin}/hc/me/${this.username}.${format}` : ''; },
+			getFilterUrl(filter) { return `${window.location.origin}/hc/me/${this.username}?filter=${filter}`; },
+			showNotification() {
+				const notification = document.getElementById('notification');
+				notification.classList.add('show');
+				setTimeout(() => notification.classList.remove('show'), 2000);
+			}
+		}">
 			<h2>My Releases</h2>
 			<p x-show="username">
 				View on Hardcover:
@@ -123,12 +159,9 @@
 				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
 					<div class="input-group">
 						<input type="text" readonly
-							x-bind:value="username ? `${window.location.origin}/me/${username}.${format}` : ''"
+							x-bind:value="getUrl(format)"
 							:id="`user-${format}`" @click="$event.target.select()" class="form-input">
-						<button class="btn copy-btn" @click="navigator.clipboard.writeText(username ? `${window.location.origin}/me/${username}.${format}` : '').then(() => { 
-									document.getElementById('notification').classList.add('show'); 
-									setTimeout(() => document.getElementById('notification').classList.remove('show'), 2000);
-								})">
+						<button class="btn copy-btn" @click="navigator.clipboard.writeText(getUrl(format)).then(() => showNotification())">
 							Copy <span x-text="format.toUpperCase()"></span>
 						</button>
 					</div>
@@ -136,9 +169,9 @@
 				<div class="form-group">
 					<label>Filter Options:</label>
 					<div class="filter-options">
-						<a :href="`${window.location.origin}/me/${username}?filter=author`" target="_blank"
+						<a :href="getFilterUrl('author')" target="_blank"
 							class="link">Author Only</a> |
-						<a :href="`${window.location.origin}/me/${username}?filter=series`" target="_blank"
+						<a :href="getFilterUrl('series')" target="_blank"
 							class="link">Series Only</a>
 					</div>
 				</div>

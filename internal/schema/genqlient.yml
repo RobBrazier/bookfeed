@@ -9,8 +9,8 @@ bindings:
     type: time.Time
   date:
     type: time.Time
-    marshaler: hardcover-feed/internal/hardcover.MarshalHardcoverDate
-    unmarshaler: hardcover-feed/internal/hardcover.UnmarshalHardcoverDate
+    marshaler: bookfeed/internal/hardcover.MarshalHardcoverDate
+    unmarshaler: bookfeed/internal/hardcover.UnmarshalHardcoverDate
   numeric:
     type: int
   float8:

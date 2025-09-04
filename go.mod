@@ -1,4 +1,4 @@
-module hardcover-feed
+module bookfeed
 
 go 1.25.0
 

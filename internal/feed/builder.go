@@ -3,7 +3,7 @@ package feed
 import (
 	"context"
 	"fmt"
-	"hardcover-feed/internal/hardcover"
+	"bookfeed/internal/hardcover"
 	"log/slog"
 	"maps"
 	"net/url"

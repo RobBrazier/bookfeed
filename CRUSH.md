@@ -7,7 +7,7 @@
 go mod tidy
 
 # Build application
-go build -o dist/hardcover-feed cmd/api/main.go
+go build -o dist/bookfeed cmd/api/main.go
 task build
 
 # Run application

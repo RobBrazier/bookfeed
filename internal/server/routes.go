@@ -38,10 +38,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
 
-		r.Get("/recent", s.RecentHandler)
-		r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
-		r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
-		r.Get("/me/{username:[a-zA-Z0-9-]+}", s.MeHandler)
+		r.Route("/hc", func(r chi.Router) {
+			r.Get("/recent", s.RecentHandler)
+			r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
+			r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
+			r.Get("/me/{username:[a-zA-Z0-9-]+}", s.MeHandler)
+		})
 	})
 
 	return r
