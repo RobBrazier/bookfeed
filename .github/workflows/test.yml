@@ -1,5 +1,11 @@
 name: Go Test
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -16,3 +22,7 @@ jobs:
     needs: build
     if: github.ref_name == 'main'
     uses: ./.github/workflows/deploy.yml
+    secrets:
+      DOPPLER_SECRET_DEV: ${{ secrets.DOPPLER_SECRET_DEV }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SERVER_IPS: ${{ secrets.SERVER_IPS }}
