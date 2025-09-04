@@ -52,7 +52,7 @@
 			<div class="form-group">
 				<label for="author">Author Slug</label>
 				<input type="text" id="author" placeholder="e.g. brandon-sanderson" x-model="author"
-					class="form-control" x-on:input="author = author.replace(/[^a-z0-9-]/g, '')">
+					class="form-control" x-on:input="author = author.replace(/[^a-zA-Z0-9-]/g, '')">
 			</div>
 			<div class="space-y-3" x-show="author">
 				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
@@ -82,7 +82,7 @@
 			<div class="form-group">
 				<label for="series">Series Slug</label>
 				<input type="text" id="series" placeholder="e.g. dungeon-crawler-carl" x-model="series"
-					class="form-control" x-on:input="series = series.replace(/[^a-z0-9-]/g, '')">
+					class="form-control" x-on:input="series = series.replace(/[^a-zA-Z0-9-]/g, '')">
 			</div>
 			<div class="space-y-3" x-show="series">
 				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
@@ -115,7 +115,7 @@
 			</p>
 			<div class="form-group">
 				<label for="username">Username</label>
-				<input type="text" id="username" placeholder="e.g. jules" x-model="username" class="form-control" x-on:input="username = username.replace(/[^a-z0-9-]/g, '')">
+				<input type="text" id="username" placeholder="e.g. jules" x-model="username" class="form-control" x-on:input="username = username.replace(/[^a-zA-Z0-9-]/g, '')">
 			</div>
 			<div class="space-y-3" x-show="username">
 				<template x-for="format in ['rss', 'atom', 'json']" :key="format">
