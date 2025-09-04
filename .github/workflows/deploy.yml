@@ -2,6 +2,13 @@ name: deploy
 
 on:
   workflow_call:
+    secrets:
+      DOPPLER_SECRET_DEV:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
+      SERVER_IPS:
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
