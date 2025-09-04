@@ -21,7 +21,10 @@ type Book struct {
 	Slug        string    `json:"slug"`
 	ReleaseDate time.Time `json:"-"`
 	UsersCount  int       `json:"usersCount"`
+	Headline    string    `json:"headline"`
 	Description string    `json:"description"`
+	// An array relationship
+	Genres []BookGenresTaggings `json:"genres"`
 	// An array relationship
 	Contributions []BookContributions `json:"contributions"`
 	Compilation   bool                `json:"compilation"`
@@ -46,8 +49,14 @@ func (v *Book) GetReleaseDate() time.Time { return v.ReleaseDate }
 // GetUsersCount returns Book.UsersCount, and is useful for accessing the field via an interface.
 func (v *Book) GetUsersCount() int { return v.UsersCount }
 
+// GetHeadline returns Book.Headline, and is useful for accessing the field via an interface.
+func (v *Book) GetHeadline() string { return v.Headline }
+
 // GetDescription returns Book.Description, and is useful for accessing the field via an interface.
 func (v *Book) GetDescription() string { return v.Description }
+
+// GetGenres returns Book.Genres, and is useful for accessing the field via an interface.
+func (v *Book) GetGenres() []BookGenresTaggings { return v.Genres }
 
 // GetContributions returns Book.Contributions, and is useful for accessing the field via an interface.
 func (v *Book) GetContributions() []BookContributions { return v.Contributions }
@@ -105,7 +114,11 @@ type __premarshalBook struct {
 
 	UsersCount int `json:"usersCount"`
 
+	Headline string `json:"headline"`
+
 	Description string `json:"description"`
+
+	Genres []BookGenresTaggings `json:"genres"`
 
 	Contributions []BookContributions `json:"contributions"`
 
@@ -143,7 +156,9 @@ func (v *Book) __premarshalJSON() (*__premarshalBook, error) {
 		}
 	}
 	retval.UsersCount = v.UsersCount
+	retval.Headline = v.Headline
 	retval.Description = v.Description
+	retval.Genres = v.Genres
 	retval.Contributions = v.Contributions
 	retval.Compilation = v.Compilation
 	retval.Image = v.Image
@@ -204,6 +219,29 @@ type BookContributionsAuthorAuthors struct {
 
 // GetName returns BookContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
 func (v *BookContributionsAuthorAuthors) GetName() string { return v.Name }
+
+// BookGenresTaggings includes the requested fields of the GraphQL type taggings.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "taggings"
+type BookGenresTaggings struct {
+	// An object relationship
+	Tag BookGenresTaggingsTagTags `json:"tag"`
+}
+
+// GetTag returns BookGenresTaggings.Tag, and is useful for accessing the field via an interface.
+func (v *BookGenresTaggings) GetTag() BookGenresTaggingsTagTags { return v.Tag }
+
+// BookGenresTaggingsTagTags includes the requested fields of the GraphQL type tags.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "tags"
+type BookGenresTaggingsTagTags struct {
+	Name string `json:"name"`
+}
+
+// GetName returns BookGenresTaggingsTagTags.Name, and is useful for accessing the field via an interface.
+func (v *BookGenresTaggingsTagTags) GetName() string { return v.Name }
 
 // BookImageImages includes the requested fields of the GraphQL type images.
 // The GraphQL type's documentation follows.
@@ -933,7 +971,13 @@ fragment Book on books {
 	slug
 	releaseDate: release_date
 	usersCount: users_count
+	headline
 	description
+	genres: taggings(where: {tag:{tag_category_id:{_eq:1},count:{_gt:100}}}, order_by: {tag_id:asc_nulls_last}, distinct_on: tag_id) {
+		tag {
+			name: tag
+		}
+	}
 	contributions {
 		author {
 			name
@@ -1000,7 +1044,13 @@ fragment Book on books {
 	slug
 	releaseDate: release_date
 	usersCount: users_count
+	headline
 	description
+	genres: taggings(where: {tag:{tag_category_id:{_eq:1},count:{_gt:100}}}, order_by: {tag_id:asc_nulls_last}, distinct_on: tag_id) {
+		tag {
+			name: tag
+		}
+	}
 	contributions {
 		author {
 			name
@@ -1074,7 +1124,13 @@ fragment Book on books {
 	slug
 	releaseDate: release_date
 	usersCount: users_count
+	headline
 	description
+	genres: taggings(where: {tag:{tag_category_id:{_eq:1},count:{_gt:100}}}, order_by: {tag_id:asc_nulls_last}, distinct_on: tag_id) {
+		tag {
+			name: tag
+		}
+	}
 	contributions {
 		author {
 			name

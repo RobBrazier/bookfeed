@@ -4,7 +4,24 @@ fragment Book on books {
   slug
   releaseDate: release_date
   usersCount: users_count
+  headline
   description
+  genres: taggings(
+    where: { 
+      tag: {
+        tag_category_id: {_eq: 1},
+        count: { _gt: 100 }
+      },
+    }
+    order_by: {
+      tag_id: asc_nulls_last
+    }
+    distinct_on: tag_id
+  ) {
+    tag {
+      name: tag
+    }
+  }
   contributions {
     author {
       name
