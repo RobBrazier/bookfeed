@@ -93,30 +93,26 @@ task test
 Once running, the application exposes the following endpoints:
 
 ### Recent Releases
-- `GET /recent` - Recent releases in RSS format
-- `GET /recent.rss` - Recent releases in RSS format
 - `GET /recent.atom` - Recent releases in Atom format
+- `GET /recent.rss` - Recent releases in RSS format
 - `GET /recent.json` - Recent releases in JSON format
 
 ### Author Releases
-- `GET /author/{author}` - Specific author's releases in RSS format
-- `GET /author/{author}.rss` - Specific author's releases in RSS format
 - `GET /author/{author}.atom` - Specific author's releases in Atom format
+- `GET /author/{author}.rss` - Specific author's releases in RSS format
 - `GET /author/{author}.json` - Specific author's releases in JSON format
 
 ### Series Releases
-- `GET /series/{series}` - Specific series' releases in RSS format
-- `GET /series/{series}.rss` - Specific series' releases in RSS format
 - `GET /series/{series}.atom` - Specific series' releases in Atom format
+- `GET /series/{series}.rss` - Specific series' releases in RSS format
 - `GET /series/{series}.json` - Specific series' releases in JSON format
 
 ### Personalized User Feeds
-- `GET /me/{username}` - Personalized releases based on user's reading history in RSS format
-- `GET /me/{username}.rss` - Personalized releases based on user's reading history in RSS format
 - `GET /me/{username}.atom` - Personalized releases based on user's reading history in Atom format
+- `GET /me/{username}.rss` - Personalized releases based on user's reading history in RSS format
 - `GET /me/{username}.json` - Personalized releases based on user's reading history in JSON format
-- `GET /me/{username}?filter=author` - Filter to only show author releases
-- `GET /me/{username}?filter=series` - Filter to only show series releases
+- `GET /me/{username}.atom?filter=author` - Filter to only show author releases
+- `GET /me/{username}.atom?filter=series` - Filter to only show series releases
 
 ### Development Tasks
 
