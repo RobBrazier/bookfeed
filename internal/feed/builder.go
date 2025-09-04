@@ -85,6 +85,9 @@ func (b *builder) buildFeed(title, link, description string, books []hardcover.B
 		}
 		feed.Add(item)
 	}
+	feed.Sort(func(a, b *feeds.Item) bool {
+		return b.Created.Before(a.Created)
+	})
 
 	return *feed, nil
 }
