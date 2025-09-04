@@ -1,6 +1,7 @@
 # Hardcover RSS
 
-A Go application that generates RSS feeds for Hardcover.app, a book tracking and review platform. This service provides RSS feeds for recent book releases, author releases, series releases, and personalized user feeds in multiple formats (RSS, Atom, and JSON).
+A Go application that generates feeds for Hardcover.app, a book tracking and review platform.
+This service provides feeds for recent book releases, author releases, series releases, and personalized user feeds in multiple formats (RSS, Atom, and JSON).
 
 ## Features
 

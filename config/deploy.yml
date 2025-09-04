@@ -15,27 +15,21 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  hosts:
-    - hardcover-rss.robbrazier.com
-    - hardcover-feed.robb.dev
+  hosts: <%= ENV.fetch('PROXY_HOSTS').split(' ') %>
   app_port: 8080
   forward_headers: true
 
-# Credentials for your image host.
 registry:
   server: ghcr.io
   username: robbrazier
-
-  # Always use an access token rather than real password (pulled from .kamal/secrets).
   password:
     - KAMAL_REGISTRY_PASSWORD
 
 # Configure builder setup.
 builder:
   arch: amd64
-  # Pass in additional build args needed for your Dockerfile.
-  # args:
-  #   RUBY_VERSION: <%= ENV["RBENV_VERSION"] || ENV["rvm_ruby_string"] || "#{RUBY_ENGINE}-#{RUBY_ENGINE_VERSION}" %>
+  cache:
+    type: gha
 
 env:
   clear:
