@@ -1,0 +1,53 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		":approveMajorUpdates",
+		":rebaseStalePrs",
+		":maintainLockFilesWeekly",
+		":automergePatch",
+		":automergeRequireAllStatusChecks",
+		"helpers:pinGitHubActionDigestsToSemver",
+		"schedule:weekends",
+		":prConcurrentLimit10",
+		":prHourlyLimit2"
+	],
+	"labels": [
+		"dependencies"
+	],
+	"packageRules": [
+		{
+			"matchManagers": [
+				"dockerfile"
+			],
+			"addLabels": [
+				"docker"
+			]
+		},
+		{
+			"groupName": "Github Actions",
+			"matchManagers": [
+				"github-actions"
+			],
+			"addLabels": [
+				"github-actions"
+			]
+		},
+		{
+			"matchManagers": [
+				"gomod"
+			],
+			"addLabels": [
+				"go"
+			]
+		},
+		{
+			"matchManagers": [
+				"mise"
+			],
+			"addLabels": [
+				"mise"
+			]
+		}
+	]
+}
