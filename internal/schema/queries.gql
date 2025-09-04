@@ -21,7 +21,7 @@ fragment Book on books {
     where: {
       _or: [
         {featured: {_eq: true}},
-        {series: {slug: {_eq: $slug}}}
+        {series: {slug: {_in: $slug}}}
       ]
     }
   ) {
@@ -33,7 +33,7 @@ fragment Book on books {
   }
 }
 
-query RecentReleases($now: date, $lastMonth: date, $slug: String = "") {
+query RecentReleases($now: date, $lastMonth: date, $slug: [String!] = []) {
   # @genqlient(flatten: true)
   books(
     order_by: {users_count: desc_nulls_last}
@@ -46,18 +46,18 @@ query RecentReleases($now: date, $lastMonth: date, $slug: String = "") {
   }
 }
 
-query RecentSeriesReleases($now: date, $slug: String, $compilations: Boolean = false) {
-  series(where: { slug: {_eq: $slug} }) {
+query RecentSeriesReleases($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
+  series(where: { slug: {_in: $slug} }) {
     name
     slug
   }
   bookSeries: book_series(
     where: {
       series: {
-        slug: {_eq: $slug}
+        slug: {_in: $slug}
       },
       book: {
-        release_date: {_lte: $now},
+        release_date: {_lte: $now, _gte: $lastMonth},
         book_mappings: {id: {_is_null: false}}
         compilation: {
           _in: [$compilations, false]
@@ -77,14 +77,14 @@ query RecentSeriesReleases($now: date, $slug: String, $compilations: Boolean = f
   }
 }
 
-query RecentAuthorReleases($now: date, $slug: String, $compilations: Boolean = false) {
+query RecentAuthorReleases($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
   contributions(
     where: {
       author: {
-        slug: {_eq: $slug}
+        slug: {_in: $slug}
       },
       book: {
-        release_date: {_lte: $now},
+        release_date: {_lte: $now, _gte: $lastMonth},
         book_mappings: {id: {_is_null: false}},
         compilation: {
           _in: [$compilations, false]
@@ -100,6 +100,48 @@ query RecentAuthorReleases($now: date, $slug: String, $compilations: Boolean = f
     # @genqlient(flatten: true)
     book {
       ...Book
+    }
+  }
+}
+
+query UserInterests($username: citext) {
+  userBooks: user_books(
+    where: { 
+      user: { username: {_eq: $username}}, 
+      status_id: {_eq: 3} # status.READ
+    }
+  ) {
+    book {
+      slug
+      contributions(
+        where: {
+          contribution: {_is_null: true}, # only get Authors
+          author: {death_date: {_is_null: true}}
+        }
+        limit: 1
+      ) {
+        author {
+          slug
+          name
+        }
+      }
+      bookSeries: book_series(
+        where: {
+          featured: {_eq: true},
+          series: {
+            _or: [ # skip completed Series
+              {is_completed: {_eq: false}},
+              {is_completed: {_is_null: true}}
+            ]
+          }
+        }
+        limit: 1
+      ) {
+        series {
+          name
+          slug
+        }
+      }
     }
   }
 }

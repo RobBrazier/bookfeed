@@ -71,3 +71,14 @@ func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	s.writeFeed(format, &feed, w)
 }
+
+func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
+	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
+	series := r.PathValue("username")
+	filter := r.URL.Query().Get("filter")
+	feed, err := s.builder.GetUserReleases(r.Context(), series, filter)
+	if err != nil {
+		slog.Error("error retrieving series", "err", err)
+	}
+	s.writeFeed(format, &feed, w)
+}

@@ -1,18 +1,19 @@
 # Hardcover RSS
 
-A Go application that generates RSS feeds for Hardcover.app, a book tracking and review platform. This service provides RSS feeds for recent book releases, author releases, and series releases in multiple formats (RSS, Atom, and JSON).
+A Go application that generates RSS feeds for Hardcover.app, a book tracking and review platform. This service provides RSS feeds for recent book releases, author releases, series releases, and personalized user feeds in multiple formats (RSS, Atom, and JSON).
 
 ## Features
 
 - Recent book releases feed
 - Author-specific releases feed
 - Series-specific releases feed
+- Personalized user feeds based on reading history
 - Multiple output formats: RSS, Atom, and JSON
 - Rate-limited API endpoints for public access
 
 ## Prerequisites
 
-- Go 1.22+
+- Go 1.25+
 - Hardcover API token (for development)
 
 ## Getting Started
@@ -99,15 +100,23 @@ Once running, the application exposes the following endpoints:
 
 ### Author Releases
 - `GET /author/{author}` - Specific author's releases in RSS format
-- `GET /author/{author}/rss` - Specific author's releases in RSS format
-- `GET /author/{author}/atom` - Specific author's releases in Atom format
-- `GET /author/{author}/json` - Specific author's releases in JSON format
+- `GET /author/{author}.rss` - Specific author's releases in RSS format
+- `GET /author/{author}.atom` - Specific author's releases in Atom format
+- `GET /author/{author}.json` - Specific author's releases in JSON format
 
 ### Series Releases
 - `GET /series/{series}` - Specific series' releases in RSS format
-- `GET /series/{series}/rss` - Specific series' releases in RSS format
-- `GET /series/{series}/atom` - Specific series' releases in Atom format
-- `GET /series/{series}/json` - Specific series' releases in JSON format
+- `GET /series/{series}.rss` - Specific series' releases in RSS format
+- `GET /series/{series}.atom` - Specific series' releases in Atom format
+- `GET /series/{series}.json` - Specific series' releases in JSON format
+
+### Personalized User Feeds
+- `GET /me/{username}` - Personalized releases based on user's reading history in RSS format
+- `GET /me/{username}.rss` - Personalized releases based on user's reading history in RSS format
+- `GET /me/{username}.atom` - Personalized releases based on user's reading history in Atom format
+- `GET /me/{username}.json` - Personalized releases based on user's reading history in JSON format
+- `GET /me/{username}?filter=author` - Filter to only show author releases
+- `GET /me/{username}?filter=series` - Filter to only show series releases
 
 ### Development Tasks
 

@@ -5,8 +5,11 @@ import (
 	"context"
 	"fmt"
 	"hardcover-rss/internal/hardcover"
+	"log/slog"
+	"maps"
 	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -23,16 +26,17 @@ import (
 //go:embed templates/*
 var fs embed.FS
 
-type BookContext struct {
-	Title string
-	Books []hardcover.Book
-}
-
 type LoaderFunc = otter.LoaderFunc[string, feeds.Feed]
+
+type UserInterests struct {
+	Authors []string
+	Series  []string
+}
 
 type builder struct {
 	client       graphql.Client
-	cache        *otter.Cache[string, feeds.Feed]
+	feed         *otter.Cache[string, feeds.Feed]
+	user         *otter.Cache[string, UserInterests]
 	templates    *template.Template
 	compilations bool
 }
@@ -41,6 +45,7 @@ type Builder interface {
 	GetRecentReleases(ctx context.Context) (feeds.Feed, error)
 	GetAuthorReleases(ctx context.Context, author string) (feeds.Feed, error)
 	GetSeriesReleases(ctx context.Context, series string) (feeds.Feed, error)
+	GetUserReleases(ctx context.Context, username, filter string) (feeds.Feed, error)
 }
 
 func cdnUrl(image hardcover.BookImageImages) string {
@@ -48,12 +53,13 @@ func cdnUrl(image hardcover.BookImageImages) string {
 	return fmt.Sprintf("https://img.hardcover.app/enlarge?url=%s&width=%d&height=%d&type=webp", url, image.Width, image.Height)
 }
 
-func (b *builder) buildFeed(title, link string, books []hardcover.Book) (feeds.Feed, error) {
+func (b *builder) buildFeed(title, link, description string, books []hardcover.Book) (feeds.Feed, error) {
 	feed := &feeds.Feed{
-		Title:   title,
-		Link:    &feeds.Link{Href: link},
-		Created: time.Now(),
-		Updated: time.Now(),
+		Title:       title,
+		Link:        &feeds.Link{Href: link},
+		Created:     time.Now(),
+		Description: description,
+		Updated:     time.Now(),
 	}
 	for _, book := range books {
 		var authorName string
@@ -99,22 +105,23 @@ func (b *builder) GetRecentReleases(ctx context.Context) (feeds.Feed, error) {
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastMonth := now.AddDate(0, -1, 0)
-		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth, "")
+		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth, []string{})
 		if err != nil {
 			return feeds.Feed{}, err
 		}
 		title := "Hardcover: Recent Releases"
 		url := "https://hardcover.app/upcoming/recent"
-		return b.buildFeed(title, url, data.Books)
+		return b.buildFeed(title, url, "", data.Books)
 	})
-	return b.cache.Get(ctx, "releases", loader)
+	return b.feed.Get(ctx, "releases", loader)
 }
 
 func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Feed, error) {
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
+		lastYear := now.AddDate(-1, 0, 0)
 		authorSlug := strings.Split(key, "/")[1]
-		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, slug, b.compilations)
+		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
 		if err != nil {
 			return feeds.Feed{}, err
 		}
@@ -128,15 +135,16 @@ func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Fee
 		}
 		title := fmt.Sprintf("Hardcover Author Releases: %s", authorName)
 		url := fmt.Sprintf("https://hardcover.app/authors/%s", authorSlug)
-		return b.buildFeed(title, url, books)
+		return b.buildFeed(title, url, "", books)
 	})
-	return b.cache.Get(ctx, fmt.Sprintf("author/%s", slug), loader)
+	return b.feed.Get(ctx, fmt.Sprintf("author/%s", slug), loader)
 }
 
 func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Feed, error) {
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
-		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, slug, b.compilations)
+		lastYear := now.AddDate(-1, 0, 0)
+		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
 		if err != nil {
 			return feeds.Feed{}, err
 		}
@@ -151,15 +159,113 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 
 		title := fmt.Sprintf("Hardcover Series Releases: %s", seriesName)
 		url := fmt.Sprintf("https://hardcover.app/series/%s", slug)
-		return b.buildFeed(title, url, books)
+		return b.buildFeed(title, url, "", books)
 	})
-	return b.cache.Get(ctx, fmt.Sprintf("series/%s", slug), loader)
+	return b.feed.Get(ctx, fmt.Sprintf("series/%s", slug), loader)
 }
 
-func newCache() *otter.Cache[string, feeds.Feed] {
+func (b *builder) getUserInterests(ctx context.Context, username string) (UserInterests, error) {
+	loader := otter.LoaderFunc[string, UserInterests](func(ctx context.Context, key string) (UserInterests, error) {
+		data, err := hardcover.UserInterests(ctx, b.client, username)
+		if err != nil {
+			return UserInterests{}, err
+		}
+		authorCount := make(map[string]int)
+		seriesCount := make(map[string]int)
+		for _, book := range data.UserBooks {
+			for _, contribution := range book.Book.Contributions {
+				authorCount[contribution.Author.Slug]++
+			}
+			for _, series := range book.Book.BookSeries {
+				seriesCount[series.Series.Slug]++
+			}
+		}
+		var authors []string
+		var series []string
+
+		// only check feeds for authors that have > 1 book read
+		for slug, count := range authorCount {
+			if count > 1 {
+				authors = append(authors, slug)
+			}
+		}
+		for slug, count := range seriesCount {
+			if count > 1 {
+				series = append(series, slug)
+			}
+		}
+
+		return UserInterests{
+			Series:  series,
+			Authors: authors,
+		}, nil
+	})
+	return b.user.Get(ctx, fmt.Sprintf("user/%s", username), loader)
+}
+
+func (b *builder) GetUserReleases(ctx context.Context, username, filter string) (feeds.Feed, error) {
+	interests, err := b.getUserInterests(ctx, username)
+	if err != nil {
+		return feeds.Feed{}, nil
+	}
+
+	slog.Info("user interests", "authors", interests.Authors, "series", interests.Series)
+
+	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
+		now := time.Now()
+		lastMonth := now.AddDate(0, -6, 0)
+		bookMap := make(map[int]hardcover.Book)
+		if slices.Contains([]string{"", "series"}, filter) {
+			series, err := hardcover.RecentSeriesReleases(ctx, b.client, now, lastMonth, interests.Series, b.compilations)
+			if err != nil {
+				return feeds.Feed{}, err
+			}
+			for _, book := range series.BookSeries {
+				if _, ok := bookMap[book.Book.Id]; !ok {
+					bookMap[book.Book.Id] = book.Book
+				}
+			}
+		}
+		if slices.Contains([]string{"", "author"}, filter) {
+			author, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastMonth, interests.Authors, b.compilations)
+			if err != nil {
+				return feeds.Feed{}, err
+			}
+			for _, book := range author.Contributions {
+				if _, ok := bookMap[book.Book.Id]; !ok {
+					bookMap[book.Book.Id] = book.Book
+				}
+			}
+		}
+
+		books := slices.Collect(maps.Values(bookMap))
+
+		title := fmt.Sprintf("Hardcover User Releases: %s", username)
+		url := fmt.Sprintf("https://hardcover.app/@%s", username)
+		var descBuffer bytes.Buffer
+		descBuffer.WriteString("Includes New Releases from:\n")
+		if filter == "" || filter == "author" {
+			descBuffer.WriteString(fmt.Sprintf("Authors: %s\n", strings.Join(interests.Authors, ", ")))
+		}
+		if filter == "" || filter == "series" {
+			descBuffer.WriteString(fmt.Sprintf("Series: %s\n", strings.Join(interests.Series, ", ")))
+		}
+		return b.buildFeed(title, url, descBuffer.String(), books)
+	})
+	return b.feed.Get(ctx, fmt.Sprintf("user/%s/%s", username, filter), loader)
+}
+
+func feedCache() *otter.Cache[string, feeds.Feed] {
 	return otter.Must(&otter.Options[string, feeds.Feed]{
 		MaximumSize:      10_000,
 		ExpiryCalculator: otter.ExpiryCreating[string, feeds.Feed](6 * time.Hour),
+	})
+}
+
+func userCache() *otter.Cache[string, UserInterests] {
+	return otter.Must(&otter.Options[string, UserInterests]{
+		MaximumSize:      10_000,
+		ExpiryCalculator: otter.ExpiryCreating[string, UserInterests](12 * time.Hour),
 	})
 }
 
@@ -168,7 +274,8 @@ func NewBuilder() Builder {
 	client := hardcover.GetClient(token)
 	return &builder{
 		client: client,
-		cache:  newCache(),
+		feed:   feedCache(),
+		user:   userCache(),
 		templates: template.Must(
 			template.New("base").Funcs(sprig.FuncMap()).ParseFS(fs, "templates/*.tmpl"),
 		),

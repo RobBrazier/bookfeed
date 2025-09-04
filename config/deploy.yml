@@ -15,7 +15,9 @@ servers:
 # Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  host: hardcover-rss.robbrazier.com
+  hosts:
+    - hardcover-rss.robbrazier.com
+    - hardcover-rss.robb.dev
   app_port: 8080
   forward_headers: true
 
