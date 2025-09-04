@@ -1,4 +1,4 @@
-name: Go-test
+name: Go Test
 on: [push, pull_request]
 
 jobs:
@@ -11,3 +11,8 @@ jobs:
         run: task build
       - name: Test
         run: task test
+
+  deploy:
+    needs: build
+    if: github.ref_name == 'main'
+    uses: ./.github/workflows/deploy.yml
