@@ -228,46 +228,66 @@ func (v *BookImageImages) GetHeight() int { return v.Height }
 // GetRatio returns BookImageImages.Ratio, and is useful for accessing the field via an interface.
 func (v *BookImageImages) GetRatio() float32 { return v.Ratio }
 
-// RecentAuthorReleasesContributions includes the requested fields of the GraphQL type contributions.
+// RecentAuthorReleasesAuthors includes the requested fields of the GraphQL type authors.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "authors"
+type RecentAuthorReleasesAuthors struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+	// An array relationship
+	Contributions []RecentAuthorReleasesAuthorsContributions `json:"contributions"`
+}
+
+// GetName returns RecentAuthorReleasesAuthors.Name, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesAuthors) GetName() string { return v.Name }
+
+// GetSlug returns RecentAuthorReleasesAuthors.Slug, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesAuthors) GetSlug() string { return v.Slug }
+
+// GetContributions returns RecentAuthorReleasesAuthors.Contributions, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesAuthors) GetContributions() []RecentAuthorReleasesAuthorsContributions {
+	return v.Contributions
+}
+
+// RecentAuthorReleasesAuthorsContributions includes the requested fields of the GraphQL type contributions.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "contributions"
-type RecentAuthorReleasesContributions struct {
+type RecentAuthorReleasesAuthorsContributions struct {
 	// An object relationship
-	Author RecentAuthorReleasesContributionsAuthorAuthors `json:"author"`
+	Author RecentAuthorReleasesAuthorsContributionsAuthorAuthors `json:"author"`
 	// An object relationship
 	Book Book `json:"book"`
 }
 
-// GetAuthor returns RecentAuthorReleasesContributions.Author, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesContributions) GetAuthor() RecentAuthorReleasesContributionsAuthorAuthors {
+// GetAuthor returns RecentAuthorReleasesAuthorsContributions.Author, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesAuthorsContributions) GetAuthor() RecentAuthorReleasesAuthorsContributionsAuthorAuthors {
 	return v.Author
 }
 
-// GetBook returns RecentAuthorReleasesContributions.Book, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesContributions) GetBook() Book { return v.Book }
+// GetBook returns RecentAuthorReleasesAuthorsContributions.Book, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesAuthorsContributions) GetBook() Book { return v.Book }
 
-// RecentAuthorReleasesContributionsAuthorAuthors includes the requested fields of the GraphQL type authors.
+// RecentAuthorReleasesAuthorsContributionsAuthorAuthors includes the requested fields of the GraphQL type authors.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "authors"
-type RecentAuthorReleasesContributionsAuthorAuthors struct {
+type RecentAuthorReleasesAuthorsContributionsAuthorAuthors struct {
 	Name string `json:"name"`
 }
 
-// GetName returns RecentAuthorReleasesContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesContributionsAuthorAuthors) GetName() string { return v.Name }
+// GetName returns RecentAuthorReleasesAuthorsContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesAuthorsContributionsAuthorAuthors) GetName() string { return v.Name }
 
 // RecentAuthorReleasesResponse is returned by RecentAuthorReleases on success.
 type RecentAuthorReleasesResponse struct {
-	// An array relationship
-	Contributions []RecentAuthorReleasesContributions `json:"contributions"`
+	// fetch data from the table: "authors"
+	Authors []RecentAuthorReleasesAuthors `json:"authors"`
 }
 
-// GetContributions returns RecentAuthorReleasesResponse.Contributions, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesResponse) GetContributions() []RecentAuthorReleasesContributions {
-	return v.Contributions
-}
+// GetAuthors returns RecentAuthorReleasesResponse.Authors, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesResponse) GetAuthors() []RecentAuthorReleasesAuthors { return v.Authors }
 
 // RecentReleasesResponse is returned by RecentReleases on success.
 type RecentReleasesResponse struct {
@@ -342,8 +362,13 @@ func (v *RecentSeriesReleasesSeries) GetSlug() string { return v.Slug }
 // UserInterestsResponse is returned by UserInterests on success.
 type UserInterestsResponse struct {
 	// An array relationship
+	Users []UserInterestsUsers `json:"users"`
+	// An array relationship
 	UserBooks []UserInterestsUserBooksUser_books `json:"userBooks"`
 }
+
+// GetUsers returns UserInterestsResponse.Users, and is useful for accessing the field via an interface.
+func (v *UserInterestsResponse) GetUsers() []UserInterestsUsers { return v.Users }
 
 // GetUserBooks returns UserInterestsResponse.UserBooks, and is useful for accessing the field via an interface.
 func (v *UserInterestsResponse) GetUserBooks() []UserInterestsUserBooksUser_books { return v.UserBooks }
@@ -452,6 +477,17 @@ func (v *UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors) Ge
 func (v *UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors) GetName() string {
 	return v.Name
 }
+
+// UserInterestsUsers includes the requested fields of the GraphQL type users.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "users"
+type UserInterestsUsers struct {
+	Username string `json:"username"`
+}
+
+// GetUsername returns UserInterestsUsers.Username, and is useful for accessing the field via an interface.
+func (v *UserInterestsUsers) GetUsername() string { return v.Username }
 
 // __RecentAuthorReleasesInput is used internally by genqlient
 type __RecentAuthorReleasesInput struct {
@@ -878,12 +914,16 @@ func (v *__UserInterestsInput) __premarshalJSON() (*__premarshal__UserInterestsI
 // The query executed by RecentAuthorReleases.
 const RecentAuthorReleases_Operation = `
 query RecentAuthorReleases ($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
-	contributions(where: {author:{slug:{_in:$slug}},book:{release_date:{_lte:$now,_gte:$lastMonth},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
-		author {
-			name
-		}
-		book {
-			... Book
+	authors(where: {slug:{_in:$slug}}) {
+		name
+		slug
+		contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$now,_gte:$lastMonth},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+			author {
+				name
+			}
+			book {
+				... Book
+			}
 		}
 	}
 }
@@ -1091,6 +1131,9 @@ func RecentSeriesReleases(
 // The query executed by UserInterests.
 const UserInterests_Operation = `
 query UserInterests ($username: citext, $earliest: date) {
+	users(where: {username:{_eq:$username}}) {
+		username
+	}
 	userBooks: user_books(where: {user:{username:{_eq:$username}},status_id:{_eq:3},last_read_date:{_gt:$earliest}}) {
 		book {
 			slug

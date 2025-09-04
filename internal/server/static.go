@@ -1,7 +1,7 @@
 package server
 
 import (
-	"hardcover-rss/cmd/web"
+	"hardcover-feed/cmd/web"
 	"io/fs"
 	"log"
 	"net/http"

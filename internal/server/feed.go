@@ -18,16 +18,16 @@ func writeContentType(mediaType string, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", contentType)
 }
 
+func (s *Server) notFound(err error, w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte(err.Error()))
+}
+
 func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter) {
 	// Set Cloudflare cache header for 1 hour (3600 seconds)
 	// This is shorter than our data cache (6 hours) to ensure freshness
 	w.Header().Set("Cache-Control", "public, max-age=3600")
-
-	if len(out.Items) == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Not Found"))
-		return
-	}
 
 	switch format {
 	case "atom":
@@ -58,6 +58,8 @@ func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		slog.Error("error retrieving author", "err", err)
+		s.notFound(err, w)
+		return
 	}
 
 	s.writeFeed(format, &feed, w)
@@ -69,6 +71,8 @@ func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
 	feed, err := s.builder.GetSeriesReleases(r.Context(), series)
 	if err != nil {
 		slog.Error("error retrieving series", "err", err)
+		s.notFound(err, w)
+		return
 	}
 	s.writeFeed(format, &feed, w)
 }
@@ -80,6 +84,8 @@ func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	feed, err := s.builder.GetUserReleases(r.Context(), series, filter)
 	if err != nil {
 		slog.Error("error retrieving series", "err", err)
+		s.notFound(err, w)
+		return
 	}
 	s.writeFeed(format, &feed, w)
 }

@@ -1,10 +1,9 @@
 package feed
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"hardcover-rss/internal/hardcover"
+	"hardcover-feed/internal/hardcover"
 	"log/slog"
 	"maps"
 	"net/url"
@@ -93,15 +92,15 @@ func (b *builder) buildFeed(title, link, description string, books []hardcover.B
 }
 
 func (b *builder) renderContent(book hardcover.Book) string {
-	var buffer bytes.Buffer
+	var builder strings.Builder
 	if book.Image.Width != 0 && book.Image.Height != 0 {
 		book.Image.Ratio = float32(book.Image.Width) / float32(book.Image.Height)
 		book.Image.Width = int(500 * book.Image.Ratio)
 		book.Image.Height = 500
 		book.Image.Url = cdnUrl(book.Image)
 	}
-	b.templates.ExecuteTemplate(&buffer, "content.tmpl", book)
-	return buffer.String()
+	b.templates.ExecuteTemplate(&builder, "content.tmpl", book)
+	return builder.String()
 }
 
 func (b *builder) GetRecentReleases(ctx context.Context) (feeds.Feed, error) {
@@ -123,21 +122,21 @@ func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Fee
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		authorSlug := strings.Split(key, "/")[1]
 		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
 		if err != nil {
 			return feeds.Feed{}, err
 		}
 		var books []hardcover.Book
-		var authorName string
-		for _, contribution := range data.Contributions {
-			if authorName == "" {
-				authorName = contribution.Author.Name
-			}
+		if len(data.Authors) == 0 {
+			return feeds.Feed{}, fmt.Errorf("Author not found")
+		}
+		author := data.Authors[0]
+		authorName := author.Name
+		for _, contribution := range author.Contributions {
 			books = append(books, contribution.Book)
 		}
 		title := fmt.Sprintf("Hardcover Author Releases: %s", authorName)
-		url := fmt.Sprintf("https://hardcover.app/authors/%s", authorSlug)
+		url := fmt.Sprintf("https://hardcover.app/authors/%s", slug)
 		return b.buildFeed(title, url, "", books)
 	})
 	return b.feed.Get(ctx, fmt.Sprintf("author/%s", slug), loader)
@@ -151,11 +150,11 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 		if err != nil {
 			return feeds.Feed{}, err
 		}
-		var books []hardcover.Book
-		var seriesName string
-		if len(data.Series) > 0 {
-			seriesName = data.Series[0].Name
+		if len(data.Series) == 0 {
+			return feeds.Feed{}, fmt.Errorf("Series not found")
 		}
+		var books []hardcover.Book
+		seriesName := data.Series[0].Name
 		for _, series := range data.BookSeries {
 			books = append(books, series.Book)
 		}
@@ -173,6 +172,9 @@ func (b *builder) getUserInterests(ctx context.Context, username string) (UserIn
 		data, err := hardcover.UserInterests(ctx, b.client, username, twoYearsAgo)
 		if err != nil {
 			return UserInterests{}, err
+		}
+		if len(data.Users) == 0 {
+			return UserInterests{}, fmt.Errorf("User not found")
 		}
 		authorCount := make(map[string]int)
 		seriesCount := make(map[string]int)
@@ -210,7 +212,7 @@ func (b *builder) getUserInterests(ctx context.Context, username string) (UserIn
 func (b *builder) GetUserReleases(ctx context.Context, username, filter string) (feeds.Feed, error) {
 	interests, err := b.getUserInterests(ctx, username)
 	if err != nil {
-		return feeds.Feed{}, nil
+		return feeds.Feed{}, err
 	}
 
 	slog.Info("user interests", "authors", interests.Authors, "series", interests.Series)
@@ -219,7 +221,7 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 		now := time.Now()
 		earliest := now.AddDate(0, -3, 0)
 		bookMap := make(map[int]hardcover.Book)
-		if slices.Contains([]string{"", "series"}, filter) {
+		if slices.Contains([]string{"", "series"}, filter) && len(interests.Series) > 0 {
 			series, err := hardcover.RecentSeriesReleases(ctx, b.client, now, earliest, interests.Series, b.compilations)
 			if err != nil {
 				return feeds.Feed{}, err
@@ -230,14 +232,16 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 				}
 			}
 		}
-		if slices.Contains([]string{"", "author"}, filter) {
+		if slices.Contains([]string{"", "author"}, filter) && len(interests.Authors) > 0 {
 			author, err := hardcover.RecentAuthorReleases(ctx, b.client, now, earliest, interests.Authors, b.compilations)
 			if err != nil {
 				return feeds.Feed{}, err
 			}
-			for _, book := range author.Contributions {
-				if _, ok := bookMap[book.Book.Id]; !ok {
-					bookMap[book.Book.Id] = book.Book
+			for _, author := range author.Authors {
+				for _, book := range author.Contributions {
+					if _, ok := bookMap[book.Book.Id]; !ok {
+						bookMap[book.Book.Id] = book.Book
+					}
 				}
 			}
 		}
@@ -246,15 +250,15 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 
 		title := fmt.Sprintf("Hardcover User Releases: %s", username)
 		url := fmt.Sprintf("https://hardcover.app/@%s", username)
-		var descBuffer bytes.Buffer
-		descBuffer.WriteString("Includes New Releases from:\n")
+		var builder strings.Builder
+		builder.WriteString("Includes New Releases from:\n")
 		if filter == "" || filter == "author" {
-			descBuffer.WriteString(fmt.Sprintf("Authors: %s\n", strings.Join(interests.Authors, ", ")))
+			builder.WriteString(fmt.Sprintf("Authors: %s\n", strings.Join(interests.Authors, ", ")))
 		}
 		if filter == "" || filter == "series" {
-			descBuffer.WriteString(fmt.Sprintf("Series: %s\n", strings.Join(interests.Series, ", ")))
+			builder.WriteString(fmt.Sprintf("Series: %s\n", strings.Join(interests.Series, ", ")))
 		}
-		return b.buildFeed(title, url, descBuffer.String(), books)
+		return b.buildFeed(title, url, builder.String(), books)
 	})
 	return b.feed.Get(ctx, fmt.Sprintf("user/%s/%s", username, filter), loader)
 }

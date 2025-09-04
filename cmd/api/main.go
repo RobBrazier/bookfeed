@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"hardcover-rss/internal/server"
+	"hardcover-feed/internal/server"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {

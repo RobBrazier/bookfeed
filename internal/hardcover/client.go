@@ -16,7 +16,7 @@ type authTransport struct {
 
 func (t *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", t.key)
-	req.Header.Set("User-Agent", fmt.Sprintf("hardcover-rss/%s (https://github.com/RobBrazier/hardcover-rss)", "0.0.0"))
+	req.Header.Set("User-Agent", fmt.Sprintf("hardcover-feed/%s (https://github.com/RobBrazier/hardcover-feed)", "0.0.0"))
 	return t.wrapped.RoundTrip(req)
 }
 

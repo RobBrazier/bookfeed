@@ -1,9 +1,9 @@
 # Name of your application. Used to uniquely configure containers.
 # <% require "dotenv"; Dotenv.load(".env") %>
-service: hardcover-rss
+service: hardcover-feed
 
 # Name of the container image.
-image: robbrazier/hardcover-rss
+image: robbrazier/hardcover-feed
 
 # Deploy to these servers.
 servers:
@@ -17,7 +17,7 @@ proxy:
   ssl: true
   hosts:
     - hardcover-rss.robbrazier.com
-    - hardcover-rss.robb.dev
+    - hardcover-feed.robb.dev
   app_port: 8080
   forward_headers: true
 

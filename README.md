@@ -65,7 +65,7 @@ task dev
 To build a binary:
 
 ```bash
-go build -o dist/hardcover-rss cmd/api/main.go
+go build -o dist/hardcover-feed cmd/api/main.go
 ```
 
 Or with Task:
@@ -141,11 +141,11 @@ The application can be deployed as a standalone binary or Docker container. It r
 Build the Docker image:
 
 ```bash
-docker build -t hardcover-rss .
+docker build -t hardcover-feed .
 ```
 
 Run with Docker:
 
 ```bash
-docker run -p 8000:8000 hardcover-rss
+docker run -p 8000:8000 hardcover-feed
 ```

@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"hardcover-rss/internal/feed"
+	"hardcover-feed/internal/feed"
 	"net/http"
 	"os"
 	"strconv"

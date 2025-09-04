@@ -19,7 +19,7 @@ tasks:
     cmd: go generate ./...
 
   build:
-    cmd: go build -o dist/hardcover-rss cmd/api/main.go
+    cmd: go build -o dist/hardcover-feed cmd/api/main.go
 
   run:
     cmd: go run cmd/api/main.go
