@@ -30,15 +30,15 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 
 	switch format {
-	case "atom":
-		writeContentType("application/atom+xml", w)
-		out.WriteAtom(w)
+	case "rss":
+		writeContentType("application/rss+xml", w)
+		out.WriteRss(w)
 	case "json":
 		writeContentType("application/json", w)
 		out.WriteJSON(w)
 	default:
-		writeContentType("application/rss+xml", w)
-		out.WriteRss(w)
+		writeContentType("application/atom+xml", w)
+		out.WriteAtom(w)
 	}
 }
 
