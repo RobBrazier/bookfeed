@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"mime"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/feeds"
@@ -52,7 +53,7 @@ func (s *Server) RecentHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
-	author := r.PathValue("author")
+	author := strings.ToLower(r.PathValue("author"))
 	feed, err := s.builder.GetAuthorReleases(r.Context(), author)
 
 	if err != nil {
@@ -64,7 +65,7 @@ func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
-	series := r.PathValue("series")
+	series := strings.ToLower(r.PathValue("series"))
 	feed, err := s.builder.GetSeriesReleases(r.Context(), series)
 	if err != nil {
 		slog.Error("error retrieving series", "err", err)
@@ -74,8 +75,8 @@ func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
-	series := r.PathValue("username")
-	filter := r.URL.Query().Get("filter")
+	series := strings.ToLower(r.PathValue("username"))
+	filter := strings.ToLower(r.URL.Query().Get("filter"))
 	feed, err := s.builder.GetUserReleases(r.Context(), series, filter)
 	if err != nil {
 		slog.Error("error retrieving series", "err", err)

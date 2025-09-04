@@ -38,9 +38,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
 
 		r.Get("/recent", s.RecentHandler)
-		r.Get("/author/{author:[a-z0-9-]+}", s.AuthorHandler)
-		r.Get("/series/{series:[a-z0-9-]+}", s.SeriesHandler)
-		r.Get("/me/{username:[a-z0-9-]+}", s.MeHandler)
+		r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
+		r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
+		r.Get("/me/{username:[a-zA-Z0-9-]+}", s.MeHandler)
 	})
 
 	return r
