@@ -166,7 +166,8 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 
 func (b *builder) getUserInterests(ctx context.Context, username string) (UserInterests, error) {
 	loader := otter.LoaderFunc[string, UserInterests](func(ctx context.Context, key string) (UserInterests, error) {
-		data, err := hardcover.UserInterests(ctx, b.client, username)
+		twoYearsAgo := time.Now().AddDate(-2, 0, 0)
+		data, err := hardcover.UserInterests(ctx, b.client, username, twoYearsAgo)
 		if err != nil {
 			return UserInterests{}, err
 		}
@@ -213,10 +214,10 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
-		lastMonth := now.AddDate(0, -6, 0)
+		earliest := now.AddDate(0, -3, 0)
 		bookMap := make(map[int]hardcover.Book)
 		if slices.Contains([]string{"", "series"}, filter) {
-			series, err := hardcover.RecentSeriesReleases(ctx, b.client, now, lastMonth, interests.Series, b.compilations)
+			series, err := hardcover.RecentSeriesReleases(ctx, b.client, now, earliest, interests.Series, b.compilations)
 			if err != nil {
 				return feeds.Feed{}, err
 			}
@@ -227,7 +228,7 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 			}
 		}
 		if slices.Contains([]string{"", "author"}, filter) {
-			author, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastMonth, interests.Authors, b.compilations)
+			author, err := hardcover.RecentAuthorReleases(ctx, b.client, now, earliest, interests.Authors, b.compilations)
 			if err != nil {
 				return feeds.Feed{}, err
 			}

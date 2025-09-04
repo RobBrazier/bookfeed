@@ -24,6 +24,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
+	r.Use(middleware.Timeout(30 * time.Second))
 	r.Use(httplog.RequestLogger(logger, &httplog.Options{
 		Level:         slog.LevelInfo,
 		Schema:        httplog.SchemaOTEL,

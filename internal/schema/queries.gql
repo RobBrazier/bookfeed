@@ -104,11 +104,12 @@ query RecentAuthorReleases($now: date, $lastMonth: date, $slug: [String!], $comp
   }
 }
 
-query UserInterests($username: citext) {
+query UserInterests($username: citext, $earliest: date) {
   userBooks: user_books(
     where: { 
       user: { username: {_eq: $username}}, 
-      status_id: {_eq: 3} # status.READ
+      status_id: {_eq: 3}, # status.READ
+      last_read_date: { _gt: $earliest}
     }
   ) {
     book {

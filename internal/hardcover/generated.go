@@ -799,11 +799,81 @@ func (v *__RecentSeriesReleasesInput) __premarshalJSON() (*__premarshal__RecentS
 
 // __UserInterestsInput is used internally by genqlient
 type __UserInterestsInput struct {
-	Username string `json:"username"`
+	Username string    `json:"username"`
+	Earliest time.Time `json:"-"`
 }
 
 // GetUsername returns __UserInterestsInput.Username, and is useful for accessing the field via an interface.
 func (v *__UserInterestsInput) GetUsername() string { return v.Username }
+
+// GetEarliest returns __UserInterestsInput.Earliest, and is useful for accessing the field via an interface.
+func (v *__UserInterestsInput) GetEarliest() time.Time { return v.Earliest }
+
+func (v *__UserInterestsInput) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*__UserInterestsInput
+		Earliest json.RawMessage `json:"earliest"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.__UserInterestsInput = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.Earliest
+		src := firstPass.Earliest
+		if len(src) != 0 && string(src) != "null" {
+			err = UnmarshalHardcoverDate(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal __UserInterestsInput.Earliest: %w", err)
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshal__UserInterestsInput struct {
+	Username string `json:"username"`
+
+	Earliest json.RawMessage `json:"earliest"`
+}
+
+func (v *__UserInterestsInput) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *__UserInterestsInput) __premarshalJSON() (*__premarshal__UserInterestsInput, error) {
+	var retval __premarshal__UserInterestsInput
+
+	retval.Username = v.Username
+	{
+
+		dst := &retval.Earliest
+		src := v.Earliest
+		var err error
+		*dst, err = MarshalHardcoverDate(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal __UserInterestsInput.Earliest: %w", err)
+		}
+	}
+	return &retval, nil
+}
 
 // The query executed by RecentAuthorReleases.
 const RecentAuthorReleases_Operation = `
@@ -1020,8 +1090,8 @@ func RecentSeriesReleases(
 
 // The query executed by UserInterests.
 const UserInterests_Operation = `
-query UserInterests ($username: citext) {
-	userBooks: user_books(where: {user:{username:{_eq:$username}},status_id:{_eq:3}}) {
+query UserInterests ($username: citext, $earliest: date) {
+	userBooks: user_books(where: {user:{username:{_eq:$username}},status_id:{_eq:3},last_read_date:{_gt:$earliest}}) {
 		book {
 			slug
 			contributions(where: {contribution:{_is_null:true},author:{death_date:{_is_null:true}}}, limit: 1) {
@@ -1045,12 +1115,14 @@ func UserInterests(
 	ctx_ context.Context,
 	client_ graphql.Client,
 	username string,
+	earliest time.Time,
 ) (data_ *UserInterestsResponse, err_ error) {
 	req_ := &graphql.Request{
 		OpName: "UserInterests",
 		Query:  UserInterests_Operation,
 		Variables: &__UserInterestsInput{
 			Username: username,
+			Earliest: earliest,
 		},
 	}
 
