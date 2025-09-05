@@ -266,14 +266,14 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 func feedCache() *otter.Cache[string, feeds.Feed] {
 	return otter.Must(&otter.Options[string, feeds.Feed]{
 		MaximumSize:      10_000,
-		ExpiryCalculator: otter.ExpiryCreating[string, feeds.Feed](6 * time.Hour),
+		ExpiryCalculator: otter.ExpiryCreating[string, feeds.Feed](12 * time.Hour),
 	})
 }
 
 func userCache() *otter.Cache[string, UserInterests] {
 	return otter.Must(&otter.Options[string, UserInterests]{
 		MaximumSize:      10_000,
-		ExpiryCalculator: otter.ExpiryCreating[string, UserInterests](12 * time.Hour),
+		ExpiryCalculator: otter.ExpiryCreating[string, UserInterests](24 * time.Hour),
 	})
 }
 
