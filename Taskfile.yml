@@ -10,6 +10,14 @@ tasks:
     requires:
       vars: [HARDCOVER_TOKEN]
 
+  install:
+    cmd: bun install
+    sources:
+      - package.json
+      - bun.lock
+    generates:
+      - node_modules/**/*
+
   clean:
     cmd: rm -r {{ .ROOT_DIR }}/dist
     status:
@@ -19,6 +27,8 @@ tasks:
     cmd: go tool templui {{.CLI_ARGS}}
 
   generate:
+    deps:
+      - install
     cmd: go generate ./...
 
   build:

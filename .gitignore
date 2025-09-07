@@ -25,6 +25,9 @@ tmp/
 # .env file
 .env
 
+# Taskfile
+.task/
+
 # Project build
 dist/
 cmd/web/static/
