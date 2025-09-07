@@ -1,0 +1,114 @@
+package feed
+
+import (
+	"bookfeed/cmd/web/components/tabs"
+	"bookfeed/cmd/web/components/form"
+	"bookfeed/cmd/web/components/input"
+	"bookfeed/cmd/web/components/button"
+	"bookfeed/cmd/web/utils"
+	"strings"
+	"fmt"
+)
+
+var formats = []string{"Atom", "RSS", "JSON"}
+
+templ FormatRadio() {
+	@tabs.Tabs() {
+		@tabs.List(tabs.ListProps{
+			Class: "w-full",
+		}) {
+			for _, format := range formats {
+				{{ value := strings.ToLower(format) }}
+				@tabs.Trigger(tabs.TriggerProps{
+					Value: value,
+					Attributes: templ.Attributes{
+						":data-tui-tabs-state": fmt.Sprintf("$data.format === '%s' ? 'active' : 'inactive'", value),
+						"@click":               fmt.Sprintf("$data.format = '%s'", value),
+					},
+				}) {
+					{ format }
+				}
+			}
+		}
+	}
+}
+
+templ Container(format string) {
+	<div class="flex flex-col gap-4" x-data={ fmt.Sprintf("{ output() { return `${window.location.origin}/%s` }, input: '' }", format) }>
+		{ children... }
+	</div>
+}
+
+type OutputProps struct {
+	RequiresInput bool
+}
+
+type InputProps struct {
+	Label       string
+	Placeholder string
+	MaskRegex   string
+}
+
+templ Input(props ...InputProps) {
+	{{ var p InputProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ id := utils.RandomID() }}
+	@form.Item() {
+		if p.Label != "" {
+			@form.Label(form.LabelProps{
+				For: id,
+			}) {
+				{ p.Label }
+			}
+		}
+		{{
+			inputAttributes := templ.Attributes{
+				"x-model": "input",
+			}
+		}}
+		if p.MaskRegex != "" {
+			{{ inputAttributes["x-on:input"] = fmt.Sprintf("input = input.replace(/%s/g, '')", p.MaskRegex) }}
+		}
+		@input.Input(input.Props{
+			ID:          id,
+			Type:        input.TypeText,
+			Attributes:  inputAttributes,
+			Placeholder: p.Placeholder,
+		})
+	}
+}
+
+templ Output(props ...OutputProps) {
+	{{ var p OutputProps }}
+	if len(props) > 0 {
+		{{ p = props[0] }}
+	}
+	{{ var itemProps form.ItemProps }}
+	if p.RequiresInput {
+		{{
+			itemProps.Attributes = templ.Attributes{
+				"x-show": "input != ''",
+			}
+		}}
+	}
+	@form.ItemFlex(itemProps) {
+		@input.Input(input.Props{
+			Type:     input.TypeText,
+			Readonly: true,
+			Attributes: templ.Attributes{
+				"@click.self": "$el.select()",
+				"x-ref":       "output",
+				"x-model":     "output",
+			},
+		})
+		@button.Button(button.Props{
+			Attributes: templ.Attributes{
+				"@click.self": "navigator.clipboard.writeText($refs.output.value).then($dispatch('feed-copied'))",
+			},
+		}) {
+			Copy Feed
+		}
+	}
+}

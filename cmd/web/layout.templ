@@ -1,0 +1,19 @@
+package web
+
+templ Layout() {
+	<!DOCTYPE html>
+	<html lang="en" class="h-screen">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width,initial-scale=1"/>
+			<title>BookFeed</title>
+			<link href="static/css/output.css" rel="stylesheet"/>
+			<script defer src="static/js/app.js"></script>
+		</head>
+		<body class="h-full">
+			<main class="container mx-auto px-4 py-8">
+				{ children... }
+			</main>
+		</body>
+	</html>
+}

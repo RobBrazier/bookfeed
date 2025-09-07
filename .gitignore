@@ -27,8 +27,11 @@ tmp/
 
 # Project build
 dist/
+cmd/web/static/
 *templ.go
 
 # OS X generated file
 .DS_Store
 
+# NodeJS :(
+node_modules/

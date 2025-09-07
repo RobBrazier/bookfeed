@@ -1,5 +1,6 @@
 [tools]
 air = "latest"
+bun = "latest"
 doppler = "latest"
 go = "latest"
 hurl = "latest"

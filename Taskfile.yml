@@ -15,10 +15,15 @@ tasks:
     status:
       - "! test -d {{ .ROOT_DIR }}/dist"
 
+  templui:
+    cmd: go tool templui {{.CLI_ARGS}}
+
   generate:
     cmd: go generate ./...
 
   build:
+    deps:
+      - generate
     cmd: go build -o dist/bookfeed cmd/api/main.go
 
   run:

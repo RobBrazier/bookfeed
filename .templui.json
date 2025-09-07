@@ -1,0 +1,7 @@
+{
+  "componentsDir": "cmd/web/components",
+  "utilsDir": "cmd/web/utils",
+  "moduleName": "bookfeed",
+  "jsDir": "cmd/web/assets/js",
+  "jsPublicPath": "/static/js"
+}

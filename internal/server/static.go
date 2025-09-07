@@ -19,8 +19,6 @@ func MountStatic(r *chi.Mux) {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(staticRoot)))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Header().Add("Content-Type", "text/html; charset=utf-8")
-		w.Write([]byte(web.Index))
+		web.Index().Render(r.Context(), w)
 	})
 }

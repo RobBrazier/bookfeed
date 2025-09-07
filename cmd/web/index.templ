@@ -1,0 +1,120 @@
+package web
+
+import (
+	"bookfeed/cmd/web/components/card"
+	"bookfeed/cmd/web/modules/feed"
+	"bookfeed/cmd/web/components/toast"
+)
+
+templ Index() {
+	@Layout() {
+		<div class="w-full">
+			<div class="mb-4 flex flex-col items-center justify-center gap-2">
+				<h1 class="text-4xl font-bold">
+					BookFeed
+				</h1>
+				<p class="mb-4 text-muted-foreground">
+					Generate RSS, Atom or JSON feeds for Hardcover.app releases
+				</p>
+			</div>
+		</div>
+		<div class="w-full max-w-2xl mx-auto flex flex-col gap-8" x-data="{format: 'atom'}">
+			@card.Card() {
+				@card.Header() {
+					@card.Title() {
+						Feed Format
+					}
+				}
+				@card.Content() {
+					@feed.FormatRadio()
+				}
+			}
+			@card.Card() {
+				@card.Header() {
+					@card.Title() {
+						Recent Releases
+					}
+					@card.Description() {
+						Equivalent to the list on upcoming/recent on Hardcover.app 
+					}
+				}
+				@card.Content() {
+					@feed.Container("hc/recent.${$data.format}") {
+						@feed.Output()
+					}
+				}
+			}
+			@card.Card() {
+				@card.Header() {
+					@card.Title() {
+						Author Releases
+					}
+				}
+				@card.Content() {
+					@feed.Container("hc/author/${$data.input}.${$data.format}") {
+						@feed.Input(feed.InputProps{
+							Label:       "Author Slug",
+							Placeholder: "e.g. brandon-sanderson",
+							MaskRegex:   "[^a-zA-Z0-9-]",
+						})
+						@feed.Output(feed.OutputProps{
+							RequiresInput: true,
+						})
+					}
+				}
+			}
+			@card.Card() {
+				@card.Header() {
+					@card.Title() {
+						Series Releases
+					}
+				}
+				@card.Content() {
+					@feed.Container("hc/series/${$data.input}.${$data.format}") {
+						@feed.Input(feed.InputProps{
+							Label:       "Series Slug",
+							Placeholder: "e.g. dungeon-crawler-carl",
+							MaskRegex:   "[^a-zA-Z0-9-]",
+						})
+						@feed.Output(feed.OutputProps{
+							RequiresInput: true,
+						})
+					}
+				}
+			}
+			@card.Card() {
+				@card.Header() {
+					@card.Title() {
+						My Releases
+					}
+					@card.Description() {
+						Generate feeds for authors and series you follow based on your Hardcover reading history (only authors or series with more than 1 book read will appear in this feed) 
+					}
+				}
+				@card.Content() {
+					@feed.Container("hc/me/${$data.input}.${$data.format}") {
+						@feed.Input(feed.InputProps{
+							Label:       "Username",
+							Placeholder: "e.g. jules",
+							MaskRegex:   "[^a-zA-Z0-9-]",
+						})
+						@feed.Output(feed.OutputProps{
+							RequiresInput: true,
+						})
+					}
+				}
+			}
+		</div>
+		<div id="toast-container" @feed-copied.window="copied = true" x-data="{copied: false}">
+			@toast.Toast(toast.Props{
+				Title:         "Copied to clipboard",
+				Variant:       toast.VariantSuccess,
+				ShowIndicator: true,
+				Attributes: templ.Attributes{
+					"x-show":   "copied",
+					"x-effect": "copied; setTimeout(() => copied = false, 5000)",
+				},
+			})
+		</div>
+	}
+}
