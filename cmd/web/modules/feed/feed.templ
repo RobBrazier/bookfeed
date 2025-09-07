@@ -89,7 +89,8 @@ templ Output(props ...OutputProps) {
 	if p.RequiresInput {
 		{{
 			itemProps.Attributes = templ.Attributes{
-				"x-show": "input != ''",
+				"x-show":  "input != ''",
+				"x-cloak": "",
 			}
 		}}
 	}

@@ -3,15 +3,12 @@
   "workspaces": {
     "": {
       "dependencies": {
-        "@alpinejs/mask": "^3.15.0",
         "@tailwindcss/cli": "^4.1.13",
         "alpinejs": "^3.15.0",
       },
     },
   },
   "packages": {
-    "@alpinejs/mask": ["@alpinejs/mask@3.15.0", "", {}, "sha512-BNM/nGpH5f+8ICdq+HK2h2cmwz+ZYHMNKmc6zNMzf9Bzzuq8li1jZmscbgT4vO0wJxAg/Rd0rgX5vr2Fgc8J2w=="],
-
     "@isaacs/fs-minipass": ["@isaacs/fs-minipass@4.0.1", "", { "dependencies": { "minipass": "^7.0.4" } }, "sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w=="],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
