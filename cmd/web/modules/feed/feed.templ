@@ -40,8 +40,15 @@ templ Container(format string) {
 }
 
 type OutputProps struct {
+	RequiresInput   bool
+	PreviewTemplate string
+	IsPreviewStatic bool
+}
+
+type PreviewProps struct {
 	RequiresInput bool
-	Preview       string
+	Template      string
+	IsStatic      bool
 }
 
 type InputProps struct {
@@ -90,25 +97,36 @@ templ Output(props ...OutputProps) {
 	if p.RequiresInput {
 		{{
 			itemProps.Attributes = templ.Attributes{
-				"x-show":  "input != ''",
-				"x-cloak": "",
+				"x-show":       "input != ''",
+				"x-transition": "",
+				"x-cloak":      "",
 			}
 		}}
 	}
-	if p.Preview != "" {
-		{{ previewString := fmt.Sprintf("`%s`", p.Preview) }}
-		<p { itemProps.Attributes... }>
-			<span class="text-sm">See on Hardcover:</span>
+	if p.PreviewTemplate != "" {
+		{{ var linkAttributes templ.Attributes }}
+		{{ previewString := fmt.Sprintf("`%s`", p.PreviewTemplate) }}
+		if !p.IsPreviewStatic {
+			{{
+				linkAttributes = templ.Attributes{
+					":href": previewString,
+				}
+			}}
+		}
+		<p { itemProps.Attributes... } class="text-sm text-muted-foreground">
+			See on Hardcover:
 			@button.Button(button.Props{
-				Variant: button.VariantLink,
-				Class:   "py-0 px-1 h-4",
-				Href:    p.Preview,
-				Attributes: templ.Attributes{
-					":href":  previewString,
-					"target": "_blank",
-				},
+				Variant:    button.VariantLink,
+				Class:      "py-0 px-1 h-4",
+				Href:       p.PreviewTemplate,
+				Target:     "_blank",
+				Attributes: linkAttributes,
 			}) {
-				<span x-text={ previewString }></span>
+				if p.IsPreviewStatic {
+					{ p.PreviewTemplate }
+				} else {
+					<span x-text={ previewString }></span>
+				}
 			}
 		</p>
 	}

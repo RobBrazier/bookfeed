@@ -22,7 +22,7 @@ templ Index() {
 			@card.Card() {
 				@card.Header() {
 					@card.Title() {
-						Feed Format
+						Feed Format 
 					}
 				}
 				@card.Content() {
@@ -41,7 +41,8 @@ templ Index() {
 				@card.Content() {
 					@feed.Container("hc/recent.${$data.format}") {
 						@feed.Output(feed.OutputProps{
-							Preview: "https://hardcover.app/upcoming/recent",
+							IsPreviewStatic: true,
+							PreviewTemplate: "https://hardcover.app/upcoming/recent",
 						})
 					}
 				}
@@ -60,8 +61,8 @@ templ Index() {
 							MaskRegex:   "[^a-zA-Z0-9-]",
 						})
 						@feed.Output(feed.OutputProps{
-							RequiresInput: true,
-							Preview:       "https://hardcover.app/authors/${$data.input}",
+							RequiresInput:   true,
+							PreviewTemplate: "https://hardcover.app/authors/${$data.input}",
 						})
 					}
 				}
@@ -80,8 +81,8 @@ templ Index() {
 							MaskRegex:   "[^a-zA-Z0-9-]",
 						})
 						@feed.Output(feed.OutputProps{
-							RequiresInput: true,
-							Preview:       "https://hardcover.app/series/${$data.input}",
+							RequiresInput:   true,
+							PreviewTemplate: "https://hardcover.app/series/${$data.input}",
 						})
 					}
 				}
@@ -103,8 +104,8 @@ templ Index() {
 							MaskRegex:   "[^a-zA-Z0-9-]",
 						})
 						@feed.Output(feed.OutputProps{
-							RequiresInput: true,
-							Preview:       "https://hardcover.app/@${$data.input}",
+							RequiresInput:   true,
+							PreviewTemplate: "https://hardcover.app/@${$data.input}",
 						})
 					}
 				}
@@ -116,9 +117,10 @@ templ Index() {
 				Variant:       toast.VariantSuccess,
 				ShowIndicator: true,
 				Attributes: templ.Attributes{
-					"x-show":   "copied",
-					"x-cloak":  "",
-					"x-effect": "copied; setTimeout(() => copied = false, 5000)",
+					"x-show":       "copied",
+					"x-cloak":      "",
+					"x-transition": "",
+					"x-effect":     "copied; setTimeout(() => copied = false, $el.dataset.tuiToastDuration)",
 				},
 			})
 		</div>
