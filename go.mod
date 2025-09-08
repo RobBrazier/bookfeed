@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/Khan/genqlient v0.8.1
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/Oudwins/tailwind-merge-go v0.2.0
+	github.com/Oudwins/tailwind-merge-go v0.2.1
 	github.com/a-h/templ v0.3.943
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/httplog/v3 v3.2.2
