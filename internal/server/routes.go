@@ -1,11 +1,13 @@
 package server
 
 import (
+	"bookfeed/cmd/web"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v3"
@@ -39,10 +41,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
 
 		r.Route("/hc", func(r chi.Router) {
+			r.Get("/", templ.Handler(web.Hardcover()).ServeHTTP)
 			r.Get("/recent", s.RecentHandler)
 			r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
 			r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
-			r.Get("/me/{username:[a-zA-Z0-9-]+}", s.MeHandler)
+			// r.Get("/me/{username:[a-zA-Z0-9-]+}", s.MeHandler)
+		})
+
+		r.Route("/jnc", func(r chi.Router) {
+			r.Get("/", templ.Handler(web.JNovelClub()).ServeHTTP)
 		})
 	})
 

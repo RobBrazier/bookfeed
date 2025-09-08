@@ -18,7 +18,5 @@ func MountStatic(r *chi.Mux) {
 
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(staticRoot)))
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		web.Index().Render(r.Context(), w)
-	})
+	r.Get("/", http.RedirectHandler("/hc", http.StatusTemporaryRedirect).ServeHTTP)
 }

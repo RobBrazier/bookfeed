@@ -1,0 +1,99 @@
+package web
+
+import (
+	"bookfeed/cmd/web/components/card"
+	"bookfeed/cmd/web/modules/feed"
+)
+
+var hardcoverProvider = ProviderData{
+	Title: "Hardcover",
+	URL:   "https://hardcover.app",
+}
+
+templ Hardcover() {
+	@Layout(hardcoverProvider) {
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Recent Releases
+				}
+				@card.Description() {
+					Equivalent to the list on upcoming/recent on Hardcover.app 
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/recent.${$data.format}") {
+					@feed.Output(feed.OutputProps{
+						IsPreviewStatic: true,
+						PreviewTemplate: "https://hardcover.app/upcoming/recent",
+					})
+				}
+			}
+		}
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Author Releases
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/author/${$data.input}.${$data.format}") {
+					@feed.Input(feed.InputProps{
+						Label:       "Author Slug",
+						Placeholder: "e.g. brandon-sanderson",
+						MaskRegex:   "[^a-zA-Z0-9-]",
+					})
+					@feed.Output(feed.OutputProps{
+						RequiresInput:   true,
+						PreviewTemplate: "https://hardcover.app/authors/${$data.input}",
+					})
+				}
+			}
+		}
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Series Releases
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/series/${$data.input}.${$data.format}") {
+					@feed.Input(feed.InputProps{
+						Label:       "Series Slug",
+						Placeholder: "e.g. dungeon-crawler-carl",
+						MaskRegex:   "[^a-zA-Z0-9-]",
+					})
+					@feed.Output(feed.OutputProps{
+						RequiresInput:   true,
+						PreviewTemplate: "https://hardcover.app/series/${$data.input}",
+					})
+				}
+			}
+		}
+		@card.Card(card.Props{
+			Class: "hidden",
+		}) {
+			@card.Header() {
+				@card.Title() {
+					My Releases
+				}
+				@card.Description() {
+					Generate feeds for authors and series you follow based on your Hardcover reading history (only authors or series with more than 1 book read will appear in this feed) 
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/me/${$data.input}.${$data.format}") {
+					@feed.Input(feed.InputProps{
+						Label:       "Username",
+						Placeholder: "e.g. jules",
+						MaskRegex:   "[^a-zA-Z0-9-]",
+					})
+					@feed.Output(feed.OutputProps{
+						RequiresInput:   true,
+						PreviewTemplate: "https://hardcover.app/@${$data.input}",
+					})
+				}
+			}
+		}
+	}
+}
