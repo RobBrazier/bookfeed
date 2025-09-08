@@ -34,15 +34,10 @@ jobs:
       - uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
       - run: kamal deploy
         env:
           SERVER_IPS: ${{ secrets.SERVER_IPS }}
           PROXY_HOSTS: ${{ vars.PROXY_HOSTS }}
           HARDCOVER_TOKEN: ${{ secrets.HARDCOVER_TOKEN }}
           KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
+          KAMAL_REGISTRY_PASSWORD: ${{ github.token }}
