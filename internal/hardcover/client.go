@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/hashicorp/go-retryablehttp"
@@ -15,9 +16,24 @@ type authTransport struct {
 }
 
 func (t *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	version := getVersion()
 	req.Header.Set("Authorization", t.key)
-	req.Header.Set("User-Agent", fmt.Sprintf("bookfeed/%s (https://github.com/RobBrazier/bookfeed)", "0.0.0"))
+	req.Header.Set("User-Agent", fmt.Sprintf("bookfeed/%s (https://github.com/RobBrazier/bookfeed)", version))
 	return t.wrapped.RoundTrip(req)
+}
+
+func getVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				if len(setting.Value) >= 7 {
+					return setting.Value[:7]
+				}
+				return setting.Value
+			}
+		}
+	}
+	return "unknown"
 }
 
 func GetClient(token string) graphql.Client {

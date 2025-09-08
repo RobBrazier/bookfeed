@@ -1,7 +1,7 @@
 package server
 
 import (
-	"bookfeed/cmd/web"
+	"github.com/RobBrazier/bookfeed/cmd/web"
 	"io/fs"
 	"log"
 	"net/http"

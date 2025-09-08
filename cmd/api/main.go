@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"bookfeed/internal/server"
+	"github.com/RobBrazier/bookfeed/internal/server"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {

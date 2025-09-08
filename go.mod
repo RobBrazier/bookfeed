@@ -1,4 +1,4 @@
-module bookfeed
+module github.com/RobBrazier/bookfeed
 
 go 1.25.0
 

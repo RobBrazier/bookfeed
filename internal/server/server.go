@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"bookfeed/internal/feed"
+	"github.com/RobBrazier/bookfeed/internal/feed"
 	"net/http"
 	"os"
 	"strconv"

@@ -2,10 +2,10 @@ package web
 
 import (
 	"fmt"
-	"bookfeed/cmd/web/components/toast"
-	"bookfeed/cmd/web/components/card"
-	"bookfeed/cmd/web/modules/feed"
-	"bookfeed/cmd/web/components/button"
+	"github.com/RobBrazier/bookfeed/cmd/web/components/toast"
+	"github.com/RobBrazier/bookfeed/cmd/web/components/card"
+	"github.com/RobBrazier/bookfeed/cmd/web/modules/feed"
+	"github.com/RobBrazier/bookfeed/cmd/web/components/button"
 )
 
 type ProviderData struct {
@@ -77,11 +77,11 @@ templ Layout(provider ProviderData) {
 				Source Code at
 				@button.Button(button.Props{
 					Variant: button.VariantLink,
-					Href:    "https://github.com/RobBrazier/bookfeed",
+					Href:    "https://github.com/RobBrazier/github.com/RobBrazier/bookfeed",
 					Class:   "px-1 py-0",
 					Target:  "_blank",
 				}) {
-					RobBrazier/bookfeed
+					RobBrazier/github.com/RobBrazier/bookfeed
 				}
 			</footer>
 		</body>
