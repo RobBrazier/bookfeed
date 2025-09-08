@@ -4,7 +4,7 @@ dotenv:
   - .env
 
 env:
-  CGO_ENABLED: 1
+  CGO_ENABLED: 0
 
 tasks:
   download-schema:
@@ -37,7 +37,7 @@ tasks:
   build:
     deps:
       - generate
-    cmd: go build -buildvcs=true -o dist/bookfeed ./cmd/api
+    cmd: go build -o dist/bookfeed ./cmd/api
 
   run:
     cmd: go run cmd/api/main.go

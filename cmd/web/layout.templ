@@ -2,7 +2,6 @@ package web
 
 import (
 	"fmt"
-	"bookfeed/cmd/web/utils"
 )
 
 templ Layout() {
@@ -13,8 +12,8 @@ templ Layout() {
 			<meta name="viewport" content="width=device-width,initial-scale=1"/>
 			<title>BookFeed</title>
 			<link rel="icon" href="data:image/png;base64,iVBORw0KGgo="/>
-			<link href={ templ.URL(fmt.Sprintf("/static/css/output.css?%s", utils.Version)) } rel="stylesheet"/>
-			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?%s", utils.Version)) }></script>
+			<link href={ templ.URL(fmt.Sprintf("/static/css/output.css?v=%s", AssetVersions["static/css/output.css"])) } rel="stylesheet"/>
+			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?v=%s", AssetVersions["static/js/app.js"])) }></script>
 			<style>[x-cloak] { display: none !important; }</style>
 		</head>
 		<body class="h-full">
