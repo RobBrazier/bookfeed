@@ -3,6 +3,9 @@ version: "3"
 dotenv:
   - .env
 
+env:
+  CGO_ENABLED: 1
+
 tasks:
   download-schema:
     cmds:
@@ -34,7 +37,7 @@ tasks:
   build:
     deps:
       - generate
-    cmd: go build -o dist/bookfeed cmd/api/main.go
+    cmd: go build -buildvcs=true -o dist/bookfeed cmd/api/main.go
 
   run:
     cmd: go run cmd/api/main.go

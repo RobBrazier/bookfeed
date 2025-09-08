@@ -19,7 +19,7 @@ RUN go mod download
 COPY . .
 
 RUN go generate ./... && \
-	go build -o main cmd/api/main.go
+	go build -buildvcs -o main cmd/api/main.go
 
 FROM alpine:3.22.1 AS prod
 WORKDIR /app

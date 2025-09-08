@@ -1,5 +1,10 @@
 package web
 
+import (
+	"fmt"
+	"bookfeed/cmd/web/utils"
+)
+
 templ Layout() {
 	<!DOCTYPE html>
 	<html lang="en" class="h-screen">
@@ -8,8 +13,8 @@ templ Layout() {
 			<meta name="viewport" content="width=device-width,initial-scale=1"/>
 			<title>BookFeed</title>
 			<link rel="icon" href="data:image/png;base64,iVBORw0KGgo="/>
-			<link href="static/css/output.css" rel="stylesheet"/>
-			<script defer src="static/js/app.js"></script>
+			<link href={ templ.URL(fmt.Sprintf("/static/css/output.css?%s", utils.Version)) } rel="stylesheet"/>
+			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?%s", utils.Version)) }></script>
 			<style>[x-cloak] { display: none !important; }</style>
 		</head>
 		<body class="h-full">
