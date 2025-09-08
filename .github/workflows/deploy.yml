@@ -39,4 +39,5 @@ jobs:
           SERVER_IPS: ${{ secrets.SERVER_IPS }}
           PROXY_HOSTS: ${{ vars.PROXY_HOSTS }}
           HARDCOVER_TOKEN: ${{ secrets.HARDCOVER_TOKEN }}
+          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
