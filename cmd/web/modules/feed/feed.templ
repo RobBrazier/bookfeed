@@ -41,6 +41,7 @@ templ Container(format string) {
 
 type OutputProps struct {
 	RequiresInput bool
+	Preview       string
 }
 
 type InputProps struct {
@@ -93,6 +94,23 @@ templ Output(props ...OutputProps) {
 				"x-cloak": "",
 			}
 		}}
+	}
+	if p.Preview != "" {
+		{{ previewString := fmt.Sprintf("`%s`", p.Preview) }}
+		<p { itemProps.Attributes... }>
+			<span class="text-sm">See on Hardcover:</span>
+			@button.Button(button.Props{
+				Variant: button.VariantLink,
+				Class:   "py-0 px-1 h-4",
+				Href:    p.Preview,
+				Attributes: templ.Attributes{
+					":href":  previewString,
+					"target": "_blank",
+				},
+			}) {
+				<span x-text={ previewString }></span>
+			}
+		</p>
 	}
 	@form.ItemFlex(itemProps) {
 		@input.Input(input.Props{

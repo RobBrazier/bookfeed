@@ -40,7 +40,9 @@ templ Index() {
 				}
 				@card.Content() {
 					@feed.Container("hc/recent.${$data.format}") {
-						@feed.Output()
+						@feed.Output(feed.OutputProps{
+							Preview: "https://hardcover.app/upcoming/recent",
+						})
 					}
 				}
 			}
@@ -59,6 +61,7 @@ templ Index() {
 						})
 						@feed.Output(feed.OutputProps{
 							RequiresInput: true,
+							Preview:       "https://hardcover.app/authors/${$data.input}",
 						})
 					}
 				}
@@ -78,6 +81,7 @@ templ Index() {
 						})
 						@feed.Output(feed.OutputProps{
 							RequiresInput: true,
+							Preview:       "https://hardcover.app/series/${$data.input}",
 						})
 					}
 				}
@@ -100,6 +104,7 @@ templ Index() {
 						})
 						@feed.Output(feed.OutputProps{
 							RequiresInput: true,
+							Preview:       "https://hardcover.app/@${$data.input}",
 						})
 					}
 				}
