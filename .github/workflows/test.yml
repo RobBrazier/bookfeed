@@ -23,7 +23,6 @@ jobs:
     if: github.ref_name == 'main'
     uses: ./.github/workflows/deploy.yml
     secrets:
-      DOPPLER_SECRET_DEV: ${{ secrets.DOPPLER_SECRET_DEV }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SERVER_IPS: ${{ secrets.SERVER_IPS }}
       HARDCOVER_TOKEN: ${{ secrets.HARDCOVER_TOKEN }}
