@@ -37,7 +37,7 @@ tasks:
   build:
     deps:
       - generate
-    cmd: go build -buildvcs=true -o dist/bookfeed cmd/api/main.go
+    cmd: go build -buildvcs=true -o dist/bookfeed ./cmd/api
 
   run:
     cmd: go run cmd/api/main.go
