@@ -45,12 +45,6 @@ type OutputProps struct {
 	IsPreviewStatic bool
 }
 
-type PreviewProps struct {
-	RequiresInput bool
-	Template      string
-	IsStatic      bool
-}
-
 type InputProps struct {
 	Label       string
 	Placeholder string
@@ -113,11 +107,11 @@ templ Output(props ...OutputProps) {
 				}
 			}}
 		}
-		<p { itemProps.Attributes... } class="text-sm text-muted-foreground">
-			See on Hardcover:
+		<p { itemProps.Attributes... } class="text-sm text-muted-foreground text-nowrap overflow-hidden flex flex-col md:flex-row items-start">
+			<span>See on Hardcover:</span>
 			@button.Button(button.Props{
 				Variant:    button.VariantLink,
-				Class:      "py-0 px-1 h-4",
+				Class:      "py-0 px-0 md:px-1 h-5",
 				Href:       p.PreviewTemplate,
 				Target:     "_blank",
 				Attributes: linkAttributes,
