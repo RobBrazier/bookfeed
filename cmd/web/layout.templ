@@ -19,7 +19,7 @@ templ Layout(provider ProviderData) {
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width,initial-scale=1"/>
-			<title>BookFeed</title>
+			<title>BookFeed: { provider.Title }</title>
 			<link rel="icon" href="data:image/png;base64,iVBORw0KGgo="/>
 			<link href={ templ.URL(fmt.Sprintf("/static/css/output.css?v=%s", AssetVersions["static/css/output.css"])) } rel="stylesheet"/>
 			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?v=%s", AssetVersions["static/js/app.js"])) }></script>
