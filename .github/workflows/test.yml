@@ -31,7 +31,6 @@ jobs:
     if: github.ref_name == 'main'
     permissions:
       packages: write
-      id-token: write
     uses: ./.github/workflows/deploy.yml
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
