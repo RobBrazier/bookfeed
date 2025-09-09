@@ -42,7 +42,9 @@ tasks:
   build:
     deps:
       - generate
-    cmd: go build -o dist/bookfeed ./cmd/api
+    vars:
+      OUT: '{{ .OUT | default "dist/bookfeed" }}'
+    cmd: go build -o {{ .OUT }} ./cmd/api
 
   run:
     cmd: go run cmd/api/main.go

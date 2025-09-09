@@ -1,6 +1,12 @@
 [build]
-bin = "./dist/bookfeed"
-cmd = "task build"
-exclude_dir = ["cmd/web/static", "tmp", "testdata", "node_modules"]
+cmd = "task build OUT=./tmp/main"
+delay = 1000
+include_dir = ["cmd", "internal"]
+exclude_dir = ["cmd/web/static"]
 exclude_regex = ["_test.go", "_templ.go", "generated.go"]
-include_ext = ["go", "tmpl", "templ", "css", "js"]
+
+[log]
+main_only = true
+
+[misc]
+clean_on_exit = true
