@@ -22,15 +22,12 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
-	github.com/alecthomas/kong v0.9.0 // indirect
 	github.com/alexflint/go-arg v1.5.1 // indirect
 	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
-	github.com/benweint/gquil v0.2.5 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cli/browser v1.3.0 // indirect
-	github.com/evanw/esbuild v0.25.9 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -44,7 +41,6 @@ require (
 	github.com/natefinch/atomic v1.0.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
-	github.com/templui/templui v0.96.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.30 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
@@ -59,7 +55,4 @@ require (
 tool (
 	github.com/Khan/genqlient
 	github.com/a-h/templ/cmd/templ
-	github.com/benweint/gquil/cmd/gquil
-	github.com/evanw/esbuild/cmd/esbuild
-	github.com/templui/templui/cmd/templui
 )

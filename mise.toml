@@ -2,4 +2,6 @@
 air = "latest"
 bun = "latest"
 go = "latest"
+"go:github.com/templui/templui/cmd/templui" = "latest"
 task = "latest"
+"ubi:benweint/gquil" = "latest"

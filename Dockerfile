@@ -1,17 +1,12 @@
-FROM oven/bun:alpine AS node
-
-COPY package.json .
-COPY bun.lock .
-
-RUN bun install
-
 FROM golang:1.25.1-alpine AS build
 
 WORKDIR /app
 
-RUN apk add --no-cache nodejs npm
+RUN apk add --no-cache nodejs npm && \
+	npm install -g bun
 
-COPY --from=node /home/bun/app/node_modules /app/node_modules
+COPY package.json bun.lock ./
+RUN bun install
 
 COPY go.mod go.sum ./
 RUN go mod download

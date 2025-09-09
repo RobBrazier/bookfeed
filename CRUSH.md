@@ -9,29 +9,36 @@ go mod tidy
 # Build application
 go build -o dist/bookfeed cmd/api/main.go
 task build
+mage build
 
 # Run application
 go run cmd/api/main.go
 task run
+mage run
 
 # Development with live reload
 task dev
+mage dev
 
 # Run all tests
 go test ./... -v
 task test
+mage test
 
 # Run a single test
 go test -v ./path/to/package -run TestName
 
 # Generate GraphQL code
 task generate
+mage generate
 
 # Download GraphQL schema
 task download-schema
+mage downloadSchema
 
 # Clean build artifacts
 task clean
+mage clean
 ```
 
 ## Code Style Guidelines

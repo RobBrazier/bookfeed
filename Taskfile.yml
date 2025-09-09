@@ -13,7 +13,15 @@ tasks:
     requires:
       vars: [HARDCOVER_TOKEN]
 
+  install-bun:
+    internal: true
+    cmd: npm install -g bun
+    status:
+      - which bun
+
   install:
+    deps:
+      - install-bun
     cmd: bun install
     sources:
       - package.json
@@ -42,7 +50,15 @@ tasks:
   run:
     cmd: go run cmd/api/main.go
 
+  install-air:
+    internal: true
+    cmd: go install github.com/air-verse/air@latest
+    status:
+      - which air
+
   dev:
+    deps:
+      - install-air
     cmd: air
 
   test:
