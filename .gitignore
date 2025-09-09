@@ -30,6 +30,7 @@ tmp/
 
 # Project build
 dist/
+tmp/
 cmd/web/static/
 *templ.go
 
