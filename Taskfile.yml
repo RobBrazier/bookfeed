@@ -57,3 +57,6 @@ tasks:
 
   test:
     cmd: go test ./... -v
+
+  templui:
+    cmd: go run github.com/templui/templui/cmd/templui@latest {{.CLI_ARGS}}
