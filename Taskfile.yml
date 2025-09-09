@@ -8,13 +8,13 @@ env:
 
 tasks:
   download-schema:
-    cmds:
-      - "go tool gquil introspection generate-sdl https://api.hardcover.app/v1/graphql -H 'Authorization: {{ .HARDCOVER_TOKEN }}' > internal/schema/schema.gql"
+    cmd: 'go run github.com/benweint/gquil/cmd/gquil@latest introspection generate-sdl https://api.hardcover.app/v1/graphql -H "Authorization: {{ .HARDCOVER_TOKEN }}" > internal/schema/schema.gql'
     requires:
       vars: [HARDCOVER_TOKEN]
 
   install-bun:
     internal: true
+    prompt: This project needs the bun package manager - Install (via npm)?
     cmd: npm install -g bun
     status:
       - which bun
@@ -34,9 +34,6 @@ tasks:
     status:
       - "! test -d {{ .ROOT_DIR }}/dist"
 
-  templui:
-    cmd: go tool templui {{.CLI_ARGS}}
-
   generate:
     deps:
       - install
@@ -50,16 +47,11 @@ tasks:
   run:
     cmd: go run cmd/api/main.go
 
-  install-air:
-    internal: true
-    cmd: go install github.com/air-verse/air@latest
-    status:
-      - which air
-
   dev:
-    deps:
-      - install-air
-    cmd: air
+    vars:
+      AIR_CMD:
+        sh: which air 2>/dev/null || echo "go run github.com/air-verse/air@latest"
+    cmd: '{{ .AIR_CMD }}'
 
   test:
     cmd: go test ./... -v
