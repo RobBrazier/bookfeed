@@ -30,3 +30,6 @@ env:
 
 ssh:
   user: deploy
+
+logging:
+  driver: json-file

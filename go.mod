@@ -10,6 +10,8 @@ require (
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/httplog/v3 v3.2.2
 	github.com/go-chi/httprate v0.15.0
+	github.com/go-chi/traceid v0.3.0
+	github.com/golang-cz/devslog v0.0.15
 	github.com/gorilla/feeds v1.2.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/joho/godotenv v1.5.1

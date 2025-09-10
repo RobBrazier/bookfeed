@@ -12,24 +12,55 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v3"
 	"github.com/go-chi/httprate"
+	"github.com/go-chi/traceid"
+	"github.com/golang-cz/devslog"
 )
+
+func getLogger(isLocal bool) (*slog.Logger, *httplog.Schema) {
+	format := httplog.SchemaOTEL.Concise(isLocal)
+	handlerOpts := &slog.HandlerOptions{
+		AddSource:   !isLocal,
+		ReplaceAttr: format.ReplaceAttr,
+	}
+	var handler slog.Handler
+	if isLocal {
+		handler = devslog.NewHandler(os.Stdout, &devslog.Options{
+			SortKeys:           true,
+			MaxErrorStackTrace: 5,
+			MaxSlicePrintSize:  20,
+			HandlerOptions:     handlerOpts,
+		})
+	} else {
+		handler = traceid.LogHandler(
+			slog.NewJSONHandler(os.Stdout, handlerOpts),
+		)
+	}
+
+	logger := slog.New(handler)
+
+	if !isLocal {
+		logger = logger.With(slog.String("service.name", "bookfeed"))
+		if hostname, err := os.Hostname(); err == nil {
+			logger = logger.With(slog.String("host.name", hostname))
+		}
+	}
+	return logger, format
+}
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
-	logFormat := httplog.SchemaOTEL.Concise(true)
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		ReplaceAttr: logFormat.ReplaceAttr,
-	}))
+	isLocal := os.Getenv("APP_ENV") == "local"
+	logger, format := getLogger(isLocal)
 
 	slog.SetDefault(logger)
 	slog.SetLogLoggerLevel(slog.LevelInfo)
 
-	r.Use(middleware.RequestID)
+	r.Use(traceid.Middleware)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Timeout(30 * time.Second))
 	r.Use(httplog.RequestLogger(logger, &httplog.Options{
 		Level:         slog.LevelInfo,
-		Schema:        httplog.SchemaOTEL,
+		Schema:        format,
 		RecoverPanics: true,
 	}))
 	r.Use(middleware.Heartbeat("/up"))
