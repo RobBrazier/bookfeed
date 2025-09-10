@@ -30,6 +30,3 @@ env:
 
 ssh:
   user: deploy
-
-logging:
-  driver: local

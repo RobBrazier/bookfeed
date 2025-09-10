@@ -40,9 +40,6 @@ func getLogger(isLocal bool) (*slog.Logger, *httplog.Schema) {
 
 	if !isLocal {
 		logger = logger.With(slog.String("service.name", "bookfeed"))
-		if hostname, err := os.Hostname(); err == nil {
-			logger = logger.With(slog.String("host.name", hostname))
-		}
 	}
 	return logger, format
 }

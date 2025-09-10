@@ -107,7 +107,7 @@ func (b *builder) GetRecentReleases(ctx context.Context) (feeds.Feed, error) {
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastMonth := now.AddDate(0, -1, 0)
-		slog.Info("Fetching recent releases", "now", now, "lastMonth", lastMonth)
+		slog.Info("Fetching recent releases", "now", now, "earliest", lastMonth)
 		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth, []string{})
 		slog.Info("Retrieved recent releases data", "elapsed", time.Since(now))
 		if err != nil {
@@ -124,9 +124,9 @@ func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Fee
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		slog.Info("Fetching author releases", "author", slug, "now", now, "lastYear", lastYear)
+		slog.Info("Fetching releases", "author", slug, "now", now, "earliest", lastYear)
 		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
-		slog.Info("Retrieved author data", "elapsed", time.Since(now))
+		slog.Info("Retrieved author data", "author", slug, "elapsed", time.Since(now))
 		if err != nil {
 			return feeds.Feed{}, err
 		}
@@ -150,9 +150,9 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		slog.Info("Fetching series releases", "series", slug, "now", now, "lastYear", lastYear)
+		slog.Info("Fetching releases", "series", slug, "now", now, "earliest", lastYear)
 		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
-		slog.Info("Retrieved series data", "elapsed", time.Since(now))
+		slog.Info("Retrieved series data", "series", slug, "elapsed", time.Since(now))
 		if err != nil {
 			return feeds.Feed{}, err
 		}
