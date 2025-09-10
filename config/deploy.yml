@@ -32,4 +32,4 @@ ssh:
   user: deploy
 
 logging:
-  driver: json-file
+  driver: local
