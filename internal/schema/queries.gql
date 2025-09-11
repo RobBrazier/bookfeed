@@ -1,9 +1,8 @@
 fragment Book on books {
-  title
   id
   slug
+  title
   releaseDate: release_date
-  usersCount: users_count
   headline
   description
   # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookGenre")
@@ -106,35 +105,10 @@ query UserInterests($username: citext, $earliest: date) {
   ) {
     book {
       slug
-      contributions(
-        where: {
-          contribution: {_is_null: true}, # only get Authors
-          author: {death_date: {_is_null: true}}
-        }
-        limit: 1
-      ) {
-        author {
-          slug
-          name
-        }
-      }
-      bookSeries: book_series(
-        where: {
-          featured: {_eq: true},
-          series: {
-            _or: [ # skip completed Series
-              {is_completed: {_eq: false}},
-              {is_completed: {_is_null: true}}
-            ]
-          }
-        }
-        limit: 1
-      ) {
-        series {
-          name
-          slug
-        }
-      }
+      # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookContributor")
+      contributors: cached_contributors
+      # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookFeaturedSeries")
+      featuredSeries: cached_featured_series
     }
   }
 }

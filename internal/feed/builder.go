@@ -53,12 +53,16 @@ func cdnUrl(image hardcover.BookImage) string {
 }
 
 func (b *builder) buildFeed(title, link, description string, books []hardcover.Book) (feeds.Feed, error) {
+	created := time.Now()
+	if description != "" {
+		description = "\n" + description
+	}
 	feed := &feeds.Feed{
 		Title:       title,
 		Link:        &feeds.Link{Href: link},
-		Created:     time.Now(),
-		Description: description,
-		Updated:     time.Now(),
+		Created:     created,
+		Description: fmt.Sprintf("Generated on %s%s", created.Format("02 Jan 2006 15:04:05 (-0700)"), description),
+		Updated:     created,
 	}
 	for _, book := range books {
 		var authorName string
@@ -174,8 +178,8 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 
 func (b *builder) getUserInterests(ctx context.Context, username string) (UserInterests, error) {
 	loader := otter.LoaderFunc[string, UserInterests](func(ctx context.Context, key string) (UserInterests, error) {
-		twoYearsAgo := time.Now().AddDate(-2, 0, 0)
-		data, err := hardcover.UserInterests(ctx, b.client, username, twoYearsAgo)
+		earliest := time.Now().AddDate(-2, 0, 0)
+		data, err := hardcover.UserInterests(ctx, b.client, username, earliest)
 		if err != nil {
 			return UserInterests{}, err
 		}
@@ -185,11 +189,13 @@ func (b *builder) getUserInterests(ctx context.Context, username string) (UserIn
 		authorCount := make(map[string]int)
 		seriesCount := make(map[string]int)
 		for _, book := range data.UserBooks {
-			for _, contribution := range book.Book.Contributions {
-				authorCount[contribution.Author.Slug]++
+			for _, contribution := range book.Book.Contributors {
+				if slices.Contains([]string{"author", ""}, strings.ToLower(contribution.Contribution)) {
+					authorCount[contribution.Author.Slug]++
+				}
 			}
-			for _, series := range book.Book.BookSeries {
-				seriesCount[series.Series.Slug]++
+			if slug := book.Book.FeaturedSeries.Series.Slug; slug != "" {
+				seriesCount[slug]++
 			}
 		}
 		var authors []string

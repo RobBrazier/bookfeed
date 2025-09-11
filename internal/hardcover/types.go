@@ -22,3 +22,13 @@ type BookFeaturedSeries struct {
 	Series   BookSeries
 	Position float32
 }
+
+type BookAuthor struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+type BookContributor struct {
+	Author       BookAuthor `json:"author"`
+	Contribution string     `json:"contribution"`
+}

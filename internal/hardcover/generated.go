@@ -16,11 +16,10 @@ import (
 //
 // columns and relationships of "books"
 type Book struct {
-	Title       string      `json:"title"`
 	Id          int         `json:"id"`
 	Slug        string      `json:"slug"`
+	Title       string      `json:"title"`
 	ReleaseDate time.Time   `json:"-"`
-	UsersCount  int         `json:"usersCount"`
 	Headline    string      `json:"headline"`
 	Description string      `json:"description"`
 	Genres      []BookGenre `json:"genres"`
@@ -31,20 +30,17 @@ type Book struct {
 	FeaturedSeries BookFeaturedSeries  `json:"featuredSeries"`
 }
 
-// GetTitle returns Book.Title, and is useful for accessing the field via an interface.
-func (v *Book) GetTitle() string { return v.Title }
-
 // GetId returns Book.Id, and is useful for accessing the field via an interface.
 func (v *Book) GetId() int { return v.Id }
 
 // GetSlug returns Book.Slug, and is useful for accessing the field via an interface.
 func (v *Book) GetSlug() string { return v.Slug }
 
+// GetTitle returns Book.Title, and is useful for accessing the field via an interface.
+func (v *Book) GetTitle() string { return v.Title }
+
 // GetReleaseDate returns Book.ReleaseDate, and is useful for accessing the field via an interface.
 func (v *Book) GetReleaseDate() time.Time { return v.ReleaseDate }
-
-// GetUsersCount returns Book.UsersCount, and is useful for accessing the field via an interface.
-func (v *Book) GetUsersCount() int { return v.UsersCount }
 
 // GetHeadline returns Book.Headline, and is useful for accessing the field via an interface.
 func (v *Book) GetHeadline() string { return v.Headline }
@@ -101,15 +97,13 @@ func (v *Book) UnmarshalJSON(b []byte) error {
 }
 
 type __premarshalBook struct {
-	Title string `json:"title"`
-
 	Id int `json:"id"`
 
 	Slug string `json:"slug"`
 
-	ReleaseDate json.RawMessage `json:"releaseDate"`
+	Title string `json:"title"`
 
-	UsersCount int `json:"usersCount"`
+	ReleaseDate json.RawMessage `json:"releaseDate"`
 
 	Headline string `json:"headline"`
 
@@ -137,9 +131,9 @@ func (v *Book) MarshalJSON() ([]byte, error) {
 func (v *Book) __premarshalJSON() (*__premarshalBook, error) {
 	var retval __premarshalBook
 
-	retval.Title = v.Title
 	retval.Id = v.Id
 	retval.Slug = v.Slug
+	retval.Title = v.Title
 	{
 
 		dst := &retval.ReleaseDate
@@ -152,7 +146,6 @@ func (v *Book) __premarshalJSON() (*__premarshalBook, error) {
 				"unable to marshal Book.ReleaseDate: %w", err)
 		}
 	}
-	retval.UsersCount = v.UsersCount
 	retval.Headline = v.Headline
 	retval.Description = v.Description
 	retval.Genres = v.Genres
@@ -350,90 +343,22 @@ func (v *UserInterestsUserBooksUser_books) GetBook() UserInterestsUserBooksUser_
 //
 // columns and relationships of "books"
 type UserInterestsUserBooksUser_booksBookBooks struct {
-	Slug string `json:"slug"`
-	// An array relationship
-	Contributions []UserInterestsUserBooksUser_booksBookBooksContributions `json:"contributions"`
-	// An array relationship
-	BookSeries []UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_series `json:"bookSeries"`
+	Slug           string             `json:"slug"`
+	Contributors   []BookContributor  `json:"contributors"`
+	FeaturedSeries BookFeaturedSeries `json:"featuredSeries"`
 }
 
 // GetSlug returns UserInterestsUserBooksUser_booksBookBooks.Slug, and is useful for accessing the field via an interface.
 func (v *UserInterestsUserBooksUser_booksBookBooks) GetSlug() string { return v.Slug }
 
-// GetContributions returns UserInterestsUserBooksUser_booksBookBooks.Contributions, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooks) GetContributions() []UserInterestsUserBooksUser_booksBookBooksContributions {
-	return v.Contributions
+// GetContributors returns UserInterestsUserBooksUser_booksBookBooks.Contributors, and is useful for accessing the field via an interface.
+func (v *UserInterestsUserBooksUser_booksBookBooks) GetContributors() []BookContributor {
+	return v.Contributors
 }
 
-// GetBookSeries returns UserInterestsUserBooksUser_booksBookBooks.BookSeries, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooks) GetBookSeries() []UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_series {
-	return v.BookSeries
-}
-
-// UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_series includes the requested fields of the GraphQL type book_series.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "book_series"
-type UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_series struct {
-	// An object relationship
-	Series UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries `json:"series"`
-}
-
-// GetSeries returns UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_series.Series, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_series) GetSeries() UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries {
-	return v.Series
-}
-
-// UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries includes the requested fields of the GraphQL type series.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "series"
-type UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries struct {
-	Name string `json:"name"`
-	Slug string `json:"slug"`
-}
-
-// GetName returns UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries.Name, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries) GetName() string {
-	return v.Name
-}
-
-// GetSlug returns UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries.Slug, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooksBookSeriesBook_seriesSeries) GetSlug() string {
-	return v.Slug
-}
-
-// UserInterestsUserBooksUser_booksBookBooksContributions includes the requested fields of the GraphQL type contributions.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "contributions"
-type UserInterestsUserBooksUser_booksBookBooksContributions struct {
-	// An object relationship
-	Author UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors `json:"author"`
-}
-
-// GetAuthor returns UserInterestsUserBooksUser_booksBookBooksContributions.Author, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooksContributions) GetAuthor() UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors {
-	return v.Author
-}
-
-// UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors includes the requested fields of the GraphQL type authors.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "authors"
-type UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors struct {
-	Slug string `json:"slug"`
-	Name string `json:"name"`
-}
-
-// GetSlug returns UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors.Slug, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors) GetSlug() string {
-	return v.Slug
-}
-
-// GetName returns UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
-func (v *UserInterestsUserBooksUser_booksBookBooksContributionsAuthorAuthors) GetName() string {
-	return v.Name
+// GetFeaturedSeries returns UserInterestsUserBooksUser_booksBookBooks.FeaturedSeries, and is useful for accessing the field via an interface.
+func (v *UserInterestsUserBooksUser_booksBookBooks) GetFeaturedSeries() BookFeaturedSeries {
+	return v.FeaturedSeries
 }
 
 // UserInterestsUsers includes the requested fields of the GraphQL type users.
@@ -879,11 +804,10 @@ query RecentAuthorReleases ($now: date, $earliest: date, $slug: [String!], $comp
 	}
 }
 fragment Book on books {
-	title
 	id
 	slug
+	title
 	releaseDate: release_date
-	usersCount: users_count
 	headline
 	description
 	genres: cached_tags(path: "Genre")
@@ -937,11 +861,10 @@ query RecentReleases ($now: date, $earliest: date) {
 	}
 }
 fragment Book on books {
-	title
 	id
 	slug
+	title
 	releaseDate: release_date
-	usersCount: users_count
 	headline
 	description
 	genres: cached_tags(path: "Genre")
@@ -1000,11 +923,10 @@ query RecentSeriesReleases ($now: date, $earliest: date, $slug: [String!], $comp
 	}
 }
 fragment Book on books {
-	title
 	id
 	slug
+	title
 	releaseDate: release_date
-	usersCount: users_count
 	headline
 	description
 	genres: cached_tags(path: "Genre")
@@ -1059,18 +981,8 @@ query UserInterests ($username: citext, $earliest: date) {
 	userBooks: user_books(where: {user:{username:{_eq:$username}},status_id:{_eq:3},last_read_date:{_gt:$earliest}}) {
 		book {
 			slug
-			contributions(where: {contribution:{_is_null:true},author:{death_date:{_is_null:true}}}, limit: 1) {
-				author {
-					slug
-					name
-				}
-			}
-			bookSeries: book_series(where: {featured:{_eq:true},series:{_or:[{is_completed:{_eq:false}},{is_completed:{_is_null:true}}]}}, limit: 1) {
-				series {
-					name
-					slug
-				}
-			}
+			contributors: cached_contributors
+			featuredSeries: cached_featured_series
 		}
 	}
 }
