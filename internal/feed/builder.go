@@ -111,7 +111,7 @@ func (b *builder) GetRecentReleases(ctx context.Context) (feeds.Feed, error) {
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastMonth := now.AddDate(0, -1, 0)
-		slog.Info("Fetching recent releases", "now", now, "earliest", lastMonth)
+		slog.Info("Fetching recent releases")
 		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth)
 		slog.Info("Retrieved recent releases data", "elapsed", time.Since(now))
 		if err != nil {
@@ -128,7 +128,7 @@ func (b *builder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Fee
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		slog.Info("Fetching releases", "author", slug, "now", now, "earliest", lastYear)
+		slog.Info("Fetching releases", "author", slug)
 		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
 		slog.Info("Retrieved author data", "author", slug, "elapsed", time.Since(now))
 		if err != nil {
@@ -154,7 +154,7 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		slog.Info("Fetching releases", "series", slug, "now", now, "earliest", lastYear)
+		slog.Info("Fetching releases", "series", slug)
 		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
 		slog.Info("Retrieved series data", "series", slug, "elapsed", time.Since(now))
 		if err != nil {
@@ -178,8 +178,11 @@ func (b *builder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Fee
 
 func (b *builder) getUserInterests(ctx context.Context, username string) (UserInterests, error) {
 	loader := otter.LoaderFunc[string, UserInterests](func(ctx context.Context, key string) (UserInterests, error) {
-		earliest := time.Now().AddDate(-2, 0, 0)
+		now := time.Now()
+		earliest := now.AddDate(-2, 0, 0)
+		slog.Info("Fetching user interests", "user", username)
 		data, err := hardcover.UserInterests(ctx, b.client, username, earliest)
+		slog.Info("Retrieved user interests", "user", username, "elapsed", time.Since(now))
 		if err != nil {
 			return UserInterests{}, err
 		}
@@ -227,14 +230,15 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 		return feeds.Feed{}, err
 	}
 
-	slog.Info("user interests", "authors", interests.Authors, "series", interests.Series)
-
 	loader := LoaderFunc(func(ctx context.Context, key string) (feeds.Feed, error) {
 		now := time.Now()
 		earliest := now.AddDate(0, -3, 0)
 		bookMap := make(map[int]hardcover.Book)
 		if slices.Contains([]string{"", "series"}, filter) && len(interests.Series) > 0 {
+			slog.Info("Fetching releases", "series", interests.Series, "user", username)
+			start := time.Now()
 			series, err := hardcover.RecentSeriesReleases(ctx, b.client, now, earliest, interests.Series, b.compilations)
+			slog.Info("Retrieved series data", "series", interests.Series, "user", username, "elapsed", time.Since(start))
 			if err != nil {
 				return feeds.Feed{}, err
 			}
@@ -245,7 +249,10 @@ func (b *builder) GetUserReleases(ctx context.Context, username, filter string) 
 			}
 		}
 		if slices.Contains([]string{"", "author"}, filter) && len(interests.Authors) > 0 {
+			slog.Info("Fetching releases", "author", interests.Authors, "user", username)
+			start := time.Now()
 			author, err := hardcover.RecentAuthorReleases(ctx, b.client, now, earliest, interests.Authors, b.compilations)
+			slog.Info("Retrieved author data", "authors", interests.Authors, "user", username, "elapsed", time.Since(start))
 			if err != nil {
 				return feeds.Feed{}, err
 			}
