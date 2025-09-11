@@ -4,20 +4,16 @@
 
 <h4>Book Information</h4>
 <p>
-<strong>Release Date: </strong>{{ .ReleaseDate | date "2 January 2006" }}
-<br/>
+<strong>Release Date: </strong>{{ .ReleaseDate | date "2 January 2006" }} <br/>
 {{- if .Compilation -}}
-<strong>NOTE: </strong>This is a Compilation
-<br />
+<strong>NOTE: </strong>This is a Compilation <br />
 {{- end -}}
-<strong>{{ len .Contributions | plural "Author" "Authors" }}: </strong>{{ range $i, $e := .Contributions }}{{ if $i }}, {{ end }}{{ $e.Author.Name }}{{ end }}
-<br/>
-{{- range .BookSeries -}}
-<strong>Series:</strong> {{ .Series.Name }} {{ with .Position }}#{{ . }}{{ end }}
-<br />
+<strong>{{ len .Contributions | plural "Author" "Authors" }}: </strong>{{ range $i, $e := .Contributions }}{{ if $i }}, {{ end }}{{ $e.Author.Name }}{{ end }} <br/>
+{{- if .FeaturedSeries.Series.Name -}}
+<strong>Series:</strong> {{ .FeaturedSeries.Series.Name }} {{ with .FeaturedSeries.Position }}#{{ . }}{{ end }} <br />
 {{- end -}}
 {{- if .Genres -}}
-<strong>{{ len .Genres | plural "Genre" "Genres" }}: </strong>{{ range $i, $e := .Genres }}{{ if $i }}, {{ end }}{{ $e.Tag.Name }}{{ end }}
+<strong>{{ len .Genres | plural "Genre" "Genres" }}: </strong>{{ range $i, $e := .Genres }}{{ if $i }}, {{ end }}{{ $e.Tag }}{{ end }}
 {{- end -}}
 </p>
 

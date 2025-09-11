@@ -15,4 +15,3 @@ bindings:
     type: int
   float8:
     type: float32
-# client_getter: github.com/RobBrazier/readflow/target/hardcover.GetClient

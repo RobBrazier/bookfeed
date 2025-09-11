@@ -16,22 +16,19 @@ import (
 //
 // columns and relationships of "books"
 type Book struct {
-	Title       string    `json:"title"`
-	Id          int       `json:"id"`
-	Slug        string    `json:"slug"`
-	ReleaseDate time.Time `json:"-"`
-	UsersCount  int       `json:"usersCount"`
-	Headline    string    `json:"headline"`
-	Description string    `json:"description"`
+	Title       string      `json:"title"`
+	Id          int         `json:"id"`
+	Slug        string      `json:"slug"`
+	ReleaseDate time.Time   `json:"-"`
+	UsersCount  int         `json:"usersCount"`
+	Headline    string      `json:"headline"`
+	Description string      `json:"description"`
+	Genres      []BookGenre `json:"genres"`
 	// An array relationship
-	Genres []BookGenresTaggings `json:"genres"`
-	// An array relationship
-	Contributions []BookContributions `json:"contributions"`
-	Compilation   bool                `json:"compilation"`
-	// An object relationship
-	Image BookImageImages `json:"image"`
-	// An array relationship
-	BookSeries []BookBookSeriesBook_series `json:"bookSeries"`
+	Contributions  []BookContributions `json:"contributions"`
+	Compilation    bool                `json:"compilation"`
+	Image          BookImage           `json:"image"`
+	FeaturedSeries BookFeaturedSeries  `json:"featuredSeries"`
 }
 
 // GetTitle returns Book.Title, and is useful for accessing the field via an interface.
@@ -56,7 +53,7 @@ func (v *Book) GetHeadline() string { return v.Headline }
 func (v *Book) GetDescription() string { return v.Description }
 
 // GetGenres returns Book.Genres, and is useful for accessing the field via an interface.
-func (v *Book) GetGenres() []BookGenresTaggings { return v.Genres }
+func (v *Book) GetGenres() []BookGenre { return v.Genres }
 
 // GetContributions returns Book.Contributions, and is useful for accessing the field via an interface.
 func (v *Book) GetContributions() []BookContributions { return v.Contributions }
@@ -65,10 +62,10 @@ func (v *Book) GetContributions() []BookContributions { return v.Contributions }
 func (v *Book) GetCompilation() bool { return v.Compilation }
 
 // GetImage returns Book.Image, and is useful for accessing the field via an interface.
-func (v *Book) GetImage() BookImageImages { return v.Image }
+func (v *Book) GetImage() BookImage { return v.Image }
 
-// GetBookSeries returns Book.BookSeries, and is useful for accessing the field via an interface.
-func (v *Book) GetBookSeries() []BookBookSeriesBook_series { return v.BookSeries }
+// GetFeaturedSeries returns Book.FeaturedSeries, and is useful for accessing the field via an interface.
+func (v *Book) GetFeaturedSeries() BookFeaturedSeries { return v.FeaturedSeries }
 
 func (v *Book) UnmarshalJSON(b []byte) error {
 
@@ -118,15 +115,15 @@ type __premarshalBook struct {
 
 	Description string `json:"description"`
 
-	Genres []BookGenresTaggings `json:"genres"`
+	Genres []BookGenre `json:"genres"`
 
 	Contributions []BookContributions `json:"contributions"`
 
 	Compilation bool `json:"compilation"`
 
-	Image BookImageImages `json:"image"`
+	Image BookImage `json:"image"`
 
-	BookSeries []BookBookSeriesBook_series `json:"bookSeries"`
+	FeaturedSeries BookFeaturedSeries `json:"featuredSeries"`
 }
 
 func (v *Book) MarshalJSON() ([]byte, error) {
@@ -162,40 +159,9 @@ func (v *Book) __premarshalJSON() (*__premarshalBook, error) {
 	retval.Contributions = v.Contributions
 	retval.Compilation = v.Compilation
 	retval.Image = v.Image
-	retval.BookSeries = v.BookSeries
+	retval.FeaturedSeries = v.FeaturedSeries
 	return &retval, nil
 }
-
-// BookBookSeriesBook_series includes the requested fields of the GraphQL type book_series.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "book_series"
-type BookBookSeriesBook_series struct {
-	// An object relationship
-	Series   BookBookSeriesBook_seriesSeries `json:"series"`
-	Position float32                         `json:"position"`
-}
-
-// GetSeries returns BookBookSeriesBook_series.Series, and is useful for accessing the field via an interface.
-func (v *BookBookSeriesBook_series) GetSeries() BookBookSeriesBook_seriesSeries { return v.Series }
-
-// GetPosition returns BookBookSeriesBook_series.Position, and is useful for accessing the field via an interface.
-func (v *BookBookSeriesBook_series) GetPosition() float32 { return v.Position }
-
-// BookBookSeriesBook_seriesSeries includes the requested fields of the GraphQL type series.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "series"
-type BookBookSeriesBook_seriesSeries struct {
-	Name string `json:"name"`
-	Slug string `json:"slug"`
-}
-
-// GetName returns BookBookSeriesBook_seriesSeries.Name, and is useful for accessing the field via an interface.
-func (v *BookBookSeriesBook_seriesSeries) GetName() string { return v.Name }
-
-// GetSlug returns BookBookSeriesBook_seriesSeries.Slug, and is useful for accessing the field via an interface.
-func (v *BookBookSeriesBook_seriesSeries) GetSlug() string { return v.Slug }
 
 // BookContributions includes the requested fields of the GraphQL type contributions.
 // The GraphQL type's documentation follows.
@@ -219,52 +185,6 @@ type BookContributionsAuthorAuthors struct {
 
 // GetName returns BookContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
 func (v *BookContributionsAuthorAuthors) GetName() string { return v.Name }
-
-// BookGenresTaggings includes the requested fields of the GraphQL type taggings.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "taggings"
-type BookGenresTaggings struct {
-	// An object relationship
-	Tag BookGenresTaggingsTagTags `json:"tag"`
-}
-
-// GetTag returns BookGenresTaggings.Tag, and is useful for accessing the field via an interface.
-func (v *BookGenresTaggings) GetTag() BookGenresTaggingsTagTags { return v.Tag }
-
-// BookGenresTaggingsTagTags includes the requested fields of the GraphQL type tags.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "tags"
-type BookGenresTaggingsTagTags struct {
-	Name string `json:"name"`
-}
-
-// GetName returns BookGenresTaggingsTagTags.Name, and is useful for accessing the field via an interface.
-func (v *BookGenresTaggingsTagTags) GetName() string { return v.Name }
-
-// BookImageImages includes the requested fields of the GraphQL type images.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "images"
-type BookImageImages struct {
-	Url    string  `json:"url"`
-	Width  int     `json:"width"`
-	Height int     `json:"height"`
-	Ratio  float32 `json:"ratio"`
-}
-
-// GetUrl returns BookImageImages.Url, and is useful for accessing the field via an interface.
-func (v *BookImageImages) GetUrl() string { return v.Url }
-
-// GetWidth returns BookImageImages.Width, and is useful for accessing the field via an interface.
-func (v *BookImageImages) GetWidth() int { return v.Width }
-
-// GetHeight returns BookImageImages.Height, and is useful for accessing the field via an interface.
-func (v *BookImageImages) GetHeight() int { return v.Height }
-
-// GetRatio returns BookImageImages.Ratio, and is useful for accessing the field via an interface.
-func (v *BookImageImages) GetRatio() float32 { return v.Ratio }
 
 // RecentAuthorReleasesAuthors includes the requested fields of the GraphQL type authors.
 // The GraphQL type's documentation follows.
@@ -530,7 +450,7 @@ func (v *UserInterestsUsers) GetUsername() string { return v.Username }
 // __RecentAuthorReleasesInput is used internally by genqlient
 type __RecentAuthorReleasesInput struct {
 	Now          time.Time `json:"-"`
-	LastMonth    time.Time `json:"-"`
+	Earliest     time.Time `json:"-"`
 	Slug         []string  `json:"slug"`
 	Compilations bool      `json:"compilations"`
 }
@@ -538,8 +458,8 @@ type __RecentAuthorReleasesInput struct {
 // GetNow returns __RecentAuthorReleasesInput.Now, and is useful for accessing the field via an interface.
 func (v *__RecentAuthorReleasesInput) GetNow() time.Time { return v.Now }
 
-// GetLastMonth returns __RecentAuthorReleasesInput.LastMonth, and is useful for accessing the field via an interface.
-func (v *__RecentAuthorReleasesInput) GetLastMonth() time.Time { return v.LastMonth }
+// GetEarliest returns __RecentAuthorReleasesInput.Earliest, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesInput) GetEarliest() time.Time { return v.Earliest }
 
 // GetSlug returns __RecentAuthorReleasesInput.Slug, and is useful for accessing the field via an interface.
 func (v *__RecentAuthorReleasesInput) GetSlug() []string { return v.Slug }
@@ -555,8 +475,8 @@ func (v *__RecentAuthorReleasesInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__RecentAuthorReleasesInput
-		Now       json.RawMessage `json:"now"`
-		LastMonth json.RawMessage `json:"lastMonth"`
+		Now      json.RawMessage `json:"now"`
+		Earliest json.RawMessage `json:"earliest"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__RecentAuthorReleasesInput = v
@@ -580,14 +500,14 @@ func (v *__RecentAuthorReleasesInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.LastMonth
-		src := firstPass.LastMonth
+		dst := &v.Earliest
+		src := firstPass.Earliest
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentAuthorReleasesInput.LastMonth: %w", err)
+					"unable to unmarshal __RecentAuthorReleasesInput.Earliest: %w", err)
 			}
 		}
 	}
@@ -597,7 +517,7 @@ func (v *__RecentAuthorReleasesInput) UnmarshalJSON(b []byte) error {
 type __premarshal__RecentAuthorReleasesInput struct {
 	Now json.RawMessage `json:"now"`
 
-	LastMonth json.RawMessage `json:"lastMonth"`
+	Earliest json.RawMessage `json:"earliest"`
 
 	Slug []string `json:"slug"`
 
@@ -629,14 +549,14 @@ func (v *__RecentAuthorReleasesInput) __premarshalJSON() (*__premarshal__RecentA
 	}
 	{
 
-		dst := &retval.LastMonth
-		src := v.LastMonth
+		dst := &retval.Earliest
+		src := v.Earliest
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentAuthorReleasesInput.LastMonth: %w", err)
+				"unable to marshal __RecentAuthorReleasesInput.Earliest: %w", err)
 		}
 	}
 	retval.Slug = v.Slug
@@ -646,19 +566,15 @@ func (v *__RecentAuthorReleasesInput) __premarshalJSON() (*__premarshal__RecentA
 
 // __RecentReleasesInput is used internally by genqlient
 type __RecentReleasesInput struct {
-	Now       time.Time `json:"-"`
-	LastMonth time.Time `json:"-"`
-	Slug      []string  `json:"slug"`
+	Now      time.Time `json:"-"`
+	Earliest time.Time `json:"-"`
 }
 
 // GetNow returns __RecentReleasesInput.Now, and is useful for accessing the field via an interface.
 func (v *__RecentReleasesInput) GetNow() time.Time { return v.Now }
 
-// GetLastMonth returns __RecentReleasesInput.LastMonth, and is useful for accessing the field via an interface.
-func (v *__RecentReleasesInput) GetLastMonth() time.Time { return v.LastMonth }
-
-// GetSlug returns __RecentReleasesInput.Slug, and is useful for accessing the field via an interface.
-func (v *__RecentReleasesInput) GetSlug() []string { return v.Slug }
+// GetEarliest returns __RecentReleasesInput.Earliest, and is useful for accessing the field via an interface.
+func (v *__RecentReleasesInput) GetEarliest() time.Time { return v.Earliest }
 
 func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 
@@ -668,8 +584,8 @@ func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__RecentReleasesInput
-		Now       json.RawMessage `json:"now"`
-		LastMonth json.RawMessage `json:"lastMonth"`
+		Now      json.RawMessage `json:"now"`
+		Earliest json.RawMessage `json:"earliest"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__RecentReleasesInput = v
@@ -693,14 +609,14 @@ func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.LastMonth
-		src := firstPass.LastMonth
+		dst := &v.Earliest
+		src := firstPass.Earliest
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentReleasesInput.LastMonth: %w", err)
+					"unable to unmarshal __RecentReleasesInput.Earliest: %w", err)
 			}
 		}
 	}
@@ -710,9 +626,7 @@ func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 type __premarshal__RecentReleasesInput struct {
 	Now json.RawMessage `json:"now"`
 
-	LastMonth json.RawMessage `json:"lastMonth"`
-
-	Slug []string `json:"slug"`
+	Earliest json.RawMessage `json:"earliest"`
 }
 
 func (v *__RecentReleasesInput) MarshalJSON() ([]byte, error) {
@@ -740,24 +654,23 @@ func (v *__RecentReleasesInput) __premarshalJSON() (*__premarshal__RecentRelease
 	}
 	{
 
-		dst := &retval.LastMonth
-		src := v.LastMonth
+		dst := &retval.Earliest
+		src := v.Earliest
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentReleasesInput.LastMonth: %w", err)
+				"unable to marshal __RecentReleasesInput.Earliest: %w", err)
 		}
 	}
-	retval.Slug = v.Slug
 	return &retval, nil
 }
 
 // __RecentSeriesReleasesInput is used internally by genqlient
 type __RecentSeriesReleasesInput struct {
 	Now          time.Time `json:"-"`
-	LastMonth    time.Time `json:"-"`
+	Earliest     time.Time `json:"-"`
 	Slug         []string  `json:"slug"`
 	Compilations bool      `json:"compilations"`
 }
@@ -765,8 +678,8 @@ type __RecentSeriesReleasesInput struct {
 // GetNow returns __RecentSeriesReleasesInput.Now, and is useful for accessing the field via an interface.
 func (v *__RecentSeriesReleasesInput) GetNow() time.Time { return v.Now }
 
-// GetLastMonth returns __RecentSeriesReleasesInput.LastMonth, and is useful for accessing the field via an interface.
-func (v *__RecentSeriesReleasesInput) GetLastMonth() time.Time { return v.LastMonth }
+// GetEarliest returns __RecentSeriesReleasesInput.Earliest, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesInput) GetEarliest() time.Time { return v.Earliest }
 
 // GetSlug returns __RecentSeriesReleasesInput.Slug, and is useful for accessing the field via an interface.
 func (v *__RecentSeriesReleasesInput) GetSlug() []string { return v.Slug }
@@ -782,8 +695,8 @@ func (v *__RecentSeriesReleasesInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__RecentSeriesReleasesInput
-		Now       json.RawMessage `json:"now"`
-		LastMonth json.RawMessage `json:"lastMonth"`
+		Now      json.RawMessage `json:"now"`
+		Earliest json.RawMessage `json:"earliest"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__RecentSeriesReleasesInput = v
@@ -807,14 +720,14 @@ func (v *__RecentSeriesReleasesInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.LastMonth
-		src := firstPass.LastMonth
+		dst := &v.Earliest
+		src := firstPass.Earliest
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentSeriesReleasesInput.LastMonth: %w", err)
+					"unable to unmarshal __RecentSeriesReleasesInput.Earliest: %w", err)
 			}
 		}
 	}
@@ -824,7 +737,7 @@ func (v *__RecentSeriesReleasesInput) UnmarshalJSON(b []byte) error {
 type __premarshal__RecentSeriesReleasesInput struct {
 	Now json.RawMessage `json:"now"`
 
-	LastMonth json.RawMessage `json:"lastMonth"`
+	Earliest json.RawMessage `json:"earliest"`
 
 	Slug []string `json:"slug"`
 
@@ -856,14 +769,14 @@ func (v *__RecentSeriesReleasesInput) __premarshalJSON() (*__premarshal__RecentS
 	}
 	{
 
-		dst := &retval.LastMonth
-		src := v.LastMonth
+		dst := &retval.Earliest
+		src := v.Earliest
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentSeriesReleasesInput.LastMonth: %w", err)
+				"unable to marshal __RecentSeriesReleasesInput.Earliest: %w", err)
 		}
 	}
 	retval.Slug = v.Slug
@@ -951,11 +864,11 @@ func (v *__UserInterestsInput) __premarshalJSON() (*__premarshal__UserInterestsI
 
 // The query executed by RecentAuthorReleases.
 const RecentAuthorReleases_Operation = `
-query RecentAuthorReleases ($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentAuthorReleases ($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
 	authors(where: {slug:{_in:$slug}}) {
 		name
 		slug
-		contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$now,_gte:$lastMonth},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+		contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$now,_gte:$earliest},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 			author {
 				name
 			}
@@ -973,30 +886,15 @@ fragment Book on books {
 	usersCount: users_count
 	headline
 	description
-	genres: taggings(where: {tag:{tag_category_id:{_eq:1},count:{_gt:100}}}, order_by: {tag_id:asc_nulls_last}, distinct_on: tag_id) {
-		tag {
-			name: tag
-		}
-	}
+	genres: cached_tags(path: "Genre")
 	contributions {
 		author {
 			name
 		}
 	}
 	compilation
-	image {
-		url
-		width
-		height
-		ratio
-	}
-	bookSeries: book_series(where: {_or:[{featured:{_eq:true}},{series:{slug:{_in:$slug}}}]}) {
-		series {
-			name
-			slug
-		}
-		position
-	}
+	image: cached_image
+	featuredSeries: cached_featured_series
 }
 `
 
@@ -1004,7 +902,7 @@ func RecentAuthorReleases(
 	ctx_ context.Context,
 	client_ graphql.Client,
 	now time.Time,
-	lastMonth time.Time,
+	earliest time.Time,
 	slug []string,
 	compilations bool,
 ) (data_ *RecentAuthorReleasesResponse, err_ error) {
@@ -1013,7 +911,7 @@ func RecentAuthorReleases(
 		Query:  RecentAuthorReleases_Operation,
 		Variables: &__RecentAuthorReleasesInput{
 			Now:          now,
-			LastMonth:    lastMonth,
+			Earliest:     earliest,
 			Slug:         slug,
 			Compilations: compilations,
 		},
@@ -1033,8 +931,8 @@ func RecentAuthorReleases(
 
 // The query executed by RecentReleases.
 const RecentReleases_Operation = `
-query RecentReleases ($now: date, $lastMonth: date, $slug: [String!] = []) {
-	books(order_by: {users_count:desc_nulls_last}, where: {release_date:{_lte:$now,_gte:$lastMonth}}, limit: 25) {
+query RecentReleases ($now: date, $earliest: date) {
+	books(order_by: {users_count:desc_nulls_last}, where: {release_date:{_lte:$now,_gte:$earliest}}, limit: 25) {
 		... Book
 	}
 }
@@ -1046,30 +944,15 @@ fragment Book on books {
 	usersCount: users_count
 	headline
 	description
-	genres: taggings(where: {tag:{tag_category_id:{_eq:1},count:{_gt:100}}}, order_by: {tag_id:asc_nulls_last}, distinct_on: tag_id) {
-		tag {
-			name: tag
-		}
-	}
+	genres: cached_tags(path: "Genre")
 	contributions {
 		author {
 			name
 		}
 	}
 	compilation
-	image {
-		url
-		width
-		height
-		ratio
-	}
-	bookSeries: book_series(where: {_or:[{featured:{_eq:true}},{series:{slug:{_in:$slug}}}]}) {
-		series {
-			name
-			slug
-		}
-		position
-	}
+	image: cached_image
+	featuredSeries: cached_featured_series
 }
 `
 
@@ -1077,16 +960,14 @@ func RecentReleases(
 	ctx_ context.Context,
 	client_ graphql.Client,
 	now time.Time,
-	lastMonth time.Time,
-	slug []string,
+	earliest time.Time,
 ) (data_ *RecentReleasesResponse, err_ error) {
 	req_ := &graphql.Request{
 		OpName: "RecentReleases",
 		Query:  RecentReleases_Operation,
 		Variables: &__RecentReleasesInput{
-			Now:       now,
-			LastMonth: lastMonth,
-			Slug:      slug,
+			Now:      now,
+			Earliest: earliest,
 		},
 	}
 
@@ -1104,12 +985,12 @@ func RecentReleases(
 
 // The query executed by RecentSeriesReleases.
 const RecentSeriesReleases_Operation = `
-query RecentSeriesReleases ($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentSeriesReleases ($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
 	series(where: {slug:{_in:$slug}}) {
 		name
 		slug
 	}
-	bookSeries: book_series(where: {series:{slug:{_in:$slug}},book:{release_date:{_lte:$now,_gte:$lastMonth},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+	bookSeries: book_series(where: {series:{slug:{_in:$slug}},book:{release_date:{_lte:$now,_gte:$earliest},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 		series {
 			name
 		}
@@ -1126,30 +1007,15 @@ fragment Book on books {
 	usersCount: users_count
 	headline
 	description
-	genres: taggings(where: {tag:{tag_category_id:{_eq:1},count:{_gt:100}}}, order_by: {tag_id:asc_nulls_last}, distinct_on: tag_id) {
-		tag {
-			name: tag
-		}
-	}
+	genres: cached_tags(path: "Genre")
 	contributions {
 		author {
 			name
 		}
 	}
 	compilation
-	image {
-		url
-		width
-		height
-		ratio
-	}
-	bookSeries: book_series(where: {_or:[{featured:{_eq:true}},{series:{slug:{_in:$slug}}}]}) {
-		series {
-			name
-			slug
-		}
-		position
-	}
+	image: cached_image
+	featuredSeries: cached_featured_series
 }
 `
 
@@ -1157,7 +1023,7 @@ func RecentSeriesReleases(
 	ctx_ context.Context,
 	client_ graphql.Client,
 	now time.Time,
-	lastMonth time.Time,
+	earliest time.Time,
 	slug []string,
 	compilations bool,
 ) (data_ *RecentSeriesReleasesResponse, err_ error) {
@@ -1166,7 +1032,7 @@ func RecentSeriesReleases(
 		Query:  RecentSeriesReleases_Operation,
 		Variables: &__RecentSeriesReleasesInput{
 			Now:          now,
-			LastMonth:    lastMonth,
+			Earliest:     earliest,
 			Slug:         slug,
 			Compilations: compilations,
 		},

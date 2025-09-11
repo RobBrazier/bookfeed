@@ -47,7 +47,7 @@ type Builder interface {
 	GetUserReleases(ctx context.Context, username, filter string) (feeds.Feed, error)
 }
 
-func cdnUrl(image hardcover.BookImageImages) string {
+func cdnUrl(image hardcover.BookImage) string {
 	url := url.QueryEscape(image.Url)
 	return fmt.Sprintf("https://img.hardcover.app/enlarge?url=%s&width=%d&height=%d&type=webp", url, image.Width, image.Height)
 }
@@ -94,8 +94,8 @@ func (b *builder) buildFeed(title, link, description string, books []hardcover.B
 func (b *builder) renderContent(book hardcover.Book) string {
 	var builder strings.Builder
 	if book.Image.Width != 0 && book.Image.Height != 0 {
-		book.Image.Ratio = float32(book.Image.Width) / float32(book.Image.Height)
-		book.Image.Width = int(500 * book.Image.Ratio)
+		ratio := float32(book.Image.Width) / float32(book.Image.Height)
+		book.Image.Width = int(500 * ratio)
 		book.Image.Height = 500
 		book.Image.Url = cdnUrl(book.Image)
 	}
@@ -108,7 +108,7 @@ func (b *builder) GetRecentReleases(ctx context.Context) (feeds.Feed, error) {
 		now := time.Now()
 		lastMonth := now.AddDate(0, -1, 0)
 		slog.Info("Fetching recent releases", "now", now, "earliest", lastMonth)
-		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth, []string{})
+		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth)
 		slog.Info("Retrieved recent releases data", "elapsed", time.Since(now))
 		if err != nil {
 			return feeds.Feed{}, err

@@ -6,56 +6,26 @@ fragment Book on books {
   usersCount: users_count
   headline
   description
-  genres: taggings(
-    where: { 
-      tag: {
-        tag_category_id: {_eq: 1},
-        count: { _gt: 100 }
-      },
-    }
-    order_by: {
-      tag_id: asc_nulls_last
-    }
-    distinct_on: tag_id
-  ) {
-    tag {
-      name: tag
-    }
-  }
+  # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookGenre")
+  genres: cached_tags(path: "Genre")
   contributions {
     author {
       name
     }
   }
   compilation
-  image {
-    url
-    width
-    height
-    ratio
-  }
-  bookSeries: book_series(
-    where: {
-      _or: [
-        {featured: {_eq: true}},
-        {series: {slug: {_in: $slug}}}
-      ]
-    }
-  ) {
-    series {
-      name
-      slug
-    }
-    position
-  }
+  # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookImage")
+  image: cached_image
+  # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookFeaturedSeries")
+  featuredSeries: cached_featured_series
 }
 
-query RecentReleases($now: date, $lastMonth: date, $slug: [String!] = []) {
+query RecentReleases($now: date, $earliest: date) {
   # @genqlient(flatten: true)
   books(
     order_by: {users_count: desc_nulls_last}
     where: {
-      release_date: {_lte: $now, _gte: $lastMonth}
+      release_date: {_lte: $now, _gte: $earliest}
     }
     limit: 25
   ) {
@@ -63,7 +33,7 @@ query RecentReleases($now: date, $lastMonth: date, $slug: [String!] = []) {
   }
 }
 
-query RecentSeriesReleases($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentSeriesReleases($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
   series(where: { slug: {_in: $slug} }) {
     name
     slug
@@ -74,7 +44,7 @@ query RecentSeriesReleases($now: date, $lastMonth: date, $slug: [String!], $comp
         slug: {_in: $slug}
       },
       book: {
-        release_date: {_lte: $now, _gte: $lastMonth},
+        release_date: {_lte: $now, _gte: $earliest},
         book_mappings: {id: {_is_null: false}}
         compilation: {
           _in: [$compilations, false]
@@ -94,7 +64,7 @@ query RecentSeriesReleases($now: date, $lastMonth: date, $slug: [String!], $comp
   }
 }
 
-query RecentAuthorReleases($now: date, $lastMonth: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentAuthorReleases($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
   authors(where: {slug: {_in: $slug}}) {
     name
     slug
@@ -102,7 +72,7 @@ query RecentAuthorReleases($now: date, $lastMonth: date, $slug: [String!], $comp
       where: {
         contribution: {_is_null: true}, # only get Authors
         book: {
-          release_date: {_lte: $now, _gte: $lastMonth},
+          release_date: {_lte: $now, _gte: $earliest},
           book_mappings: {id: {_is_null: false}},
           compilation: {
             _in: [$compilations, false]
