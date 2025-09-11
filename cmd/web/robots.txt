@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /*.atom
+Disallow: /*.rss
+Disallow: /*.json

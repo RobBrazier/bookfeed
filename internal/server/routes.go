@@ -69,13 +69,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 	MountStatic(r)
 
 	// redirect root to hardcover
-	r.Get("/", http.RedirectHandler("/hc", http.StatusTemporaryRedirect).ServeHTTP)
+	r.Handle("/", http.RedirectHandler("/hc", http.StatusTemporaryRedirect))
 
 	r.Group(func(r chi.Router) {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
 
 		r.Route("/hc", func(r chi.Router) {
-			r.Get("/", templ.Handler(web.Hardcover()).ServeHTTP)
+			r.Handle("/", templ.Handler(web.Hardcover()))
 			r.Get("/recent", s.RecentHandler)
 			r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
 			r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
@@ -83,7 +83,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 
 		r.Route("/jnc", func(r chi.Router) {
-			r.Get("/", templ.Handler(web.JNovelClub()).ServeHTTP)
+			r.Handle("/", templ.Handler(web.JNovelClub()))
 		})
 	})
 

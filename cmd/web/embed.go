@@ -13,6 +13,9 @@ import (
 //go:embed static/*
 var Static embed.FS
 
+//go:embed robots.txt
+var RobotsTxt string
+
 var AssetVersions = func() map[string]string {
 	versions := make(map[string]string)
 

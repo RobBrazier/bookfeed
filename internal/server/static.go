@@ -18,4 +18,10 @@ func MountStatic(r *chi.Mux) {
 
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(staticRoot)))
 
+	// Because of URLFormat middleware this gets mapped to robots.txt... and robots.anything
+	r.Get("/robots", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(web.RobotsTxt))
+	})
+
 }
