@@ -54,12 +54,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Use(traceid.Middleware)
 	r.Use(middleware.RealIP)
+	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
-	r.Use(httplog.RequestLogger(logger, &httplog.Options{
-		Level:         slog.LevelInfo,
-		Schema:        format,
-		RecoverPanics: true,
-	}))
+	if os.Getenv("LOG_REQUESTS") == "true" {
+		r.Use(httplog.RequestLogger(logger, &httplog.Options{
+			Level:         slog.LevelInfo,
+			Schema:        format,
+			RecoverPanics: true,
+		}))
+	}
 	r.Use(middleware.Heartbeat("/up"))
 	r.Use(middleware.URLFormat)
 
