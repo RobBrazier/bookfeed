@@ -1,5 +1,9 @@
 [tools]
 air = "latest"
 bun = "latest"
+doppler = "latest"
 go = "latest"
 task = "latest"
+
+[tasks.task]
+run = "doppler run -- task"

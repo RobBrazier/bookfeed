@@ -6,6 +6,9 @@ dotenv:
 env:
   CGO_ENABLED: 0
 
+vars:
+  RUN_COMMAND: "{{ if .SECRETS_COMMAND }}{{ .SECRETS_COMMAND }} -- {{end}}"
+
 tasks:
   download-schema:
     cmd: 'go run github.com/benweint/gquil/cmd/gquil@latest introspection generate-sdl https://api.hardcover.app/v1/graphql -H "Authorization: {{ .HARDCOVER_TOKEN }}" > internal/schema/schema.gql'
@@ -47,13 +50,13 @@ tasks:
     cmd: go build -o {{ .OUT }} ./cmd/api
 
   run:
-    cmd: go run cmd/api/main.go
+    cmd: "{{ .RUN_COMMAND }}go run cmd/api/main.go"
 
   dev:
     vars:
       AIR_CMD:
         sh: which air 2>/dev/null || echo "go run github.com/air-verse/air@latest"
-    cmd: '{{ .AIR_CMD }}'
+    cmd: "{{ .RUN_COMMAND }}{{ .AIR_CMD }}"
 
   test:
     cmd: go test ./... -v
