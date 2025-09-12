@@ -36,6 +36,7 @@ jobs:
     runs-on: ubicloud-standard-2
     environment:
       name: prod
+      url: ${{ steps.deploy.outputs.url }}
     permissions:
       packages: write
     steps:
@@ -59,3 +60,9 @@ jobs:
           HARDCOVER_TOKEN: ${{ secrets.HARDCOVER_TOKEN }}
           KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
           KAMAL_REGISTRY_PASSWORD: ${{ github.token }}
+      - id: deploy
+        env:
+          PROXY_HOSTS: ${{ vars.PROXY_HOSTS }}
+        run: |
+          hosts=($PROXY_HOSTS)
+          echo "url=https://${hosts[0]}" >> $GITHUB_OUTPUT
