@@ -32,7 +32,3 @@ jobs:
     permissions:
       packages: write
     uses: ./.github/workflows/deploy.yml
-    secrets:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      SERVER_IPS: ${{ secrets.SERVER_IPS }}
-      HARDCOVER_TOKEN: ${{ secrets.HARDCOVER_TOKEN }}
