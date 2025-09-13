@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   changes:
-    runs-on: ubicloud-standard-2
+    runs-on: ubuntu-latest
     outputs:
       app: ${{ steps.changes.outputs.app }}
     steps:
@@ -35,7 +35,7 @@ jobs:
               - 'bun.lock'
 
   build:
-    runs-on: ubicloud-standard-2
+    runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
@@ -58,7 +58,7 @@ jobs:
     # 1. there are application code changes
     # 2. the pipeline is manually triggered
     if: github.ref_name == 'main' && (needs.changes.outputs.app == 'true' || github.event_name == 'workflow_dispatch')
-    runs-on: ubicloud-standard-2
+    runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
     environment:
       name: prod
       url: ${{ steps.deploy.outputs.url }}
