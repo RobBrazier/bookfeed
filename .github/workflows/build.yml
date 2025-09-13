@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   changes:
-    runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     outputs:
       app: ${{ steps.changes.outputs.app }}
     steps:
