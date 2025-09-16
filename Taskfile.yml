@@ -63,3 +63,12 @@ tasks:
 
   templui:
     cmd: go run github.com/templui/templui/cmd/templui@latest {{.CLI_ARGS}}
+
+  templui:update:
+    vars:
+      COMPONENTS:
+        sh: "ls cmd/web/components | xargs echo"
+    cmds:
+      - task: templui
+        vars:
+          CLI_ARGS: "-f add {{ .COMPONENTS }}"
