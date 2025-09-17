@@ -64,6 +64,21 @@ tasks:
   templui:
     cmd: go run github.com/templui/templui/cmd/templui@latest {{.CLI_ARGS}}
 
+  templui:add:
+    requires:
+      vars:
+        - NAME
+    cmds:
+      - task: templui
+        vars:
+          CLI_ARGS: "add {{ .NAME }}"
+
+  templui:list:
+    cmds:
+      - task: templui
+        vars:
+          CLI_ARGS: "list"
+
   templui:update:
     vars:
       COMPONENTS:

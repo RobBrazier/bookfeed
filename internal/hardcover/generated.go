@@ -273,12 +273,8 @@ func (v *RecentSeriesReleasesBookSeriesBook_series) GetBook() Book { return v.Bo
 //
 // columns and relationships of "series"
 type RecentSeriesReleasesBookSeriesBook_seriesSeries struct {
-	Name string `json:"name"`
 	Slug string `json:"slug"`
 }
-
-// GetName returns RecentSeriesReleasesBookSeriesBook_seriesSeries.Name, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesBookSeriesBook_seriesSeries) GetName() string { return v.Name }
 
 // GetSlug returns RecentSeriesReleasesBookSeriesBook_seriesSeries.Slug, and is useful for accessing the field via an interface.
 func (v *RecentSeriesReleasesBookSeriesBook_seriesSeries) GetSlug() string { return v.Slug }
@@ -378,17 +374,17 @@ func (v *UserInterestsUsers) GetUsername() string { return v.Username }
 
 // __RecentAuthorReleasesInput is used internally by genqlient
 type __RecentAuthorReleasesInput struct {
-	Now          time.Time `json:"-"`
-	Earliest     time.Time `json:"-"`
+	To           time.Time `json:"-"`
+	From         time.Time `json:"-"`
 	Slug         []string  `json:"slug"`
 	Compilations bool      `json:"compilations"`
 }
 
-// GetNow returns __RecentAuthorReleasesInput.Now, and is useful for accessing the field via an interface.
-func (v *__RecentAuthorReleasesInput) GetNow() time.Time { return v.Now }
+// GetTo returns __RecentAuthorReleasesInput.To, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesInput) GetTo() time.Time { return v.To }
 
-// GetEarliest returns __RecentAuthorReleasesInput.Earliest, and is useful for accessing the field via an interface.
-func (v *__RecentAuthorReleasesInput) GetEarliest() time.Time { return v.Earliest }
+// GetFrom returns __RecentAuthorReleasesInput.From, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesInput) GetFrom() time.Time { return v.From }
 
 // GetSlug returns __RecentAuthorReleasesInput.Slug, and is useful for accessing the field via an interface.
 func (v *__RecentAuthorReleasesInput) GetSlug() []string { return v.Slug }
@@ -404,8 +400,8 @@ func (v *__RecentAuthorReleasesInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__RecentAuthorReleasesInput
-		Now      json.RawMessage `json:"now"`
-		Earliest json.RawMessage `json:"earliest"`
+		To   json.RawMessage `json:"to"`
+		From json.RawMessage `json:"from"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__RecentAuthorReleasesInput = v
@@ -416,27 +412,27 @@ func (v *__RecentAuthorReleasesInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.Now
-		src := firstPass.Now
+		dst := &v.To
+		src := firstPass.To
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentAuthorReleasesInput.Now: %w", err)
+					"unable to unmarshal __RecentAuthorReleasesInput.To: %w", err)
 			}
 		}
 	}
 
 	{
-		dst := &v.Earliest
-		src := firstPass.Earliest
+		dst := &v.From
+		src := firstPass.From
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentAuthorReleasesInput.Earliest: %w", err)
+					"unable to unmarshal __RecentAuthorReleasesInput.From: %w", err)
 			}
 		}
 	}
@@ -444,9 +440,9 @@ func (v *__RecentAuthorReleasesInput) UnmarshalJSON(b []byte) error {
 }
 
 type __premarshal__RecentAuthorReleasesInput struct {
-	Now json.RawMessage `json:"now"`
+	To json.RawMessage `json:"to"`
 
-	Earliest json.RawMessage `json:"earliest"`
+	From json.RawMessage `json:"from"`
 
 	Slug []string `json:"slug"`
 
@@ -466,26 +462,26 @@ func (v *__RecentAuthorReleasesInput) __premarshalJSON() (*__premarshal__RecentA
 
 	{
 
-		dst := &retval.Now
-		src := v.Now
+		dst := &retval.To
+		src := v.To
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentAuthorReleasesInput.Now: %w", err)
+				"unable to marshal __RecentAuthorReleasesInput.To: %w", err)
 		}
 	}
 	{
 
-		dst := &retval.Earliest
-		src := v.Earliest
+		dst := &retval.From
+		src := v.From
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentAuthorReleasesInput.Earliest: %w", err)
+				"unable to marshal __RecentAuthorReleasesInput.From: %w", err)
 		}
 	}
 	retval.Slug = v.Slug
@@ -495,15 +491,15 @@ func (v *__RecentAuthorReleasesInput) __premarshalJSON() (*__premarshal__RecentA
 
 // __RecentReleasesInput is used internally by genqlient
 type __RecentReleasesInput struct {
-	Now      time.Time `json:"-"`
-	Earliest time.Time `json:"-"`
+	To   time.Time `json:"-"`
+	From time.Time `json:"-"`
 }
 
-// GetNow returns __RecentReleasesInput.Now, and is useful for accessing the field via an interface.
-func (v *__RecentReleasesInput) GetNow() time.Time { return v.Now }
+// GetTo returns __RecentReleasesInput.To, and is useful for accessing the field via an interface.
+func (v *__RecentReleasesInput) GetTo() time.Time { return v.To }
 
-// GetEarliest returns __RecentReleasesInput.Earliest, and is useful for accessing the field via an interface.
-func (v *__RecentReleasesInput) GetEarliest() time.Time { return v.Earliest }
+// GetFrom returns __RecentReleasesInput.From, and is useful for accessing the field via an interface.
+func (v *__RecentReleasesInput) GetFrom() time.Time { return v.From }
 
 func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 
@@ -513,8 +509,8 @@ func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__RecentReleasesInput
-		Now      json.RawMessage `json:"now"`
-		Earliest json.RawMessage `json:"earliest"`
+		To   json.RawMessage `json:"to"`
+		From json.RawMessage `json:"from"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__RecentReleasesInput = v
@@ -525,27 +521,27 @@ func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.Now
-		src := firstPass.Now
+		dst := &v.To
+		src := firstPass.To
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentReleasesInput.Now: %w", err)
+					"unable to unmarshal __RecentReleasesInput.To: %w", err)
 			}
 		}
 	}
 
 	{
-		dst := &v.Earliest
-		src := firstPass.Earliest
+		dst := &v.From
+		src := firstPass.From
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentReleasesInput.Earliest: %w", err)
+					"unable to unmarshal __RecentReleasesInput.From: %w", err)
 			}
 		}
 	}
@@ -553,9 +549,9 @@ func (v *__RecentReleasesInput) UnmarshalJSON(b []byte) error {
 }
 
 type __premarshal__RecentReleasesInput struct {
-	Now json.RawMessage `json:"now"`
+	To json.RawMessage `json:"to"`
 
-	Earliest json.RawMessage `json:"earliest"`
+	From json.RawMessage `json:"from"`
 }
 
 func (v *__RecentReleasesInput) MarshalJSON() ([]byte, error) {
@@ -571,26 +567,26 @@ func (v *__RecentReleasesInput) __premarshalJSON() (*__premarshal__RecentRelease
 
 	{
 
-		dst := &retval.Now
-		src := v.Now
+		dst := &retval.To
+		src := v.To
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentReleasesInput.Now: %w", err)
+				"unable to marshal __RecentReleasesInput.To: %w", err)
 		}
 	}
 	{
 
-		dst := &retval.Earliest
-		src := v.Earliest
+		dst := &retval.From
+		src := v.From
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentReleasesInput.Earliest: %w", err)
+				"unable to marshal __RecentReleasesInput.From: %w", err)
 		}
 	}
 	return &retval, nil
@@ -598,17 +594,17 @@ func (v *__RecentReleasesInput) __premarshalJSON() (*__premarshal__RecentRelease
 
 // __RecentSeriesReleasesInput is used internally by genqlient
 type __RecentSeriesReleasesInput struct {
-	Now          time.Time `json:"-"`
-	Earliest     time.Time `json:"-"`
+	To           time.Time `json:"-"`
+	From         time.Time `json:"-"`
 	Slug         []string  `json:"slug"`
 	Compilations bool      `json:"compilations"`
 }
 
-// GetNow returns __RecentSeriesReleasesInput.Now, and is useful for accessing the field via an interface.
-func (v *__RecentSeriesReleasesInput) GetNow() time.Time { return v.Now }
+// GetTo returns __RecentSeriesReleasesInput.To, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesInput) GetTo() time.Time { return v.To }
 
-// GetEarliest returns __RecentSeriesReleasesInput.Earliest, and is useful for accessing the field via an interface.
-func (v *__RecentSeriesReleasesInput) GetEarliest() time.Time { return v.Earliest }
+// GetFrom returns __RecentSeriesReleasesInput.From, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesInput) GetFrom() time.Time { return v.From }
 
 // GetSlug returns __RecentSeriesReleasesInput.Slug, and is useful for accessing the field via an interface.
 func (v *__RecentSeriesReleasesInput) GetSlug() []string { return v.Slug }
@@ -624,8 +620,8 @@ func (v *__RecentSeriesReleasesInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__RecentSeriesReleasesInput
-		Now      json.RawMessage `json:"now"`
-		Earliest json.RawMessage `json:"earliest"`
+		To   json.RawMessage `json:"to"`
+		From json.RawMessage `json:"from"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__RecentSeriesReleasesInput = v
@@ -636,27 +632,27 @@ func (v *__RecentSeriesReleasesInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.Now
-		src := firstPass.Now
+		dst := &v.To
+		src := firstPass.To
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentSeriesReleasesInput.Now: %w", err)
+					"unable to unmarshal __RecentSeriesReleasesInput.To: %w", err)
 			}
 		}
 	}
 
 	{
-		dst := &v.Earliest
-		src := firstPass.Earliest
+		dst := &v.From
+		src := firstPass.From
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __RecentSeriesReleasesInput.Earliest: %w", err)
+					"unable to unmarshal __RecentSeriesReleasesInput.From: %w", err)
 			}
 		}
 	}
@@ -664,9 +660,9 @@ func (v *__RecentSeriesReleasesInput) UnmarshalJSON(b []byte) error {
 }
 
 type __premarshal__RecentSeriesReleasesInput struct {
-	Now json.RawMessage `json:"now"`
+	To json.RawMessage `json:"to"`
 
-	Earliest json.RawMessage `json:"earliest"`
+	From json.RawMessage `json:"from"`
 
 	Slug []string `json:"slug"`
 
@@ -686,26 +682,26 @@ func (v *__RecentSeriesReleasesInput) __premarshalJSON() (*__premarshal__RecentS
 
 	{
 
-		dst := &retval.Now
-		src := v.Now
+		dst := &retval.To
+		src := v.To
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentSeriesReleasesInput.Now: %w", err)
+				"unable to marshal __RecentSeriesReleasesInput.To: %w", err)
 		}
 	}
 	{
 
-		dst := &retval.Earliest
-		src := v.Earliest
+		dst := &retval.From
+		src := v.From
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __RecentSeriesReleasesInput.Earliest: %w", err)
+				"unable to marshal __RecentSeriesReleasesInput.From: %w", err)
 		}
 	}
 	retval.Slug = v.Slug
@@ -716,14 +712,14 @@ func (v *__RecentSeriesReleasesInput) __premarshalJSON() (*__premarshal__RecentS
 // __UserInterestsInput is used internally by genqlient
 type __UserInterestsInput struct {
 	Username string    `json:"username"`
-	Earliest time.Time `json:"-"`
+	From     time.Time `json:"-"`
 }
 
 // GetUsername returns __UserInterestsInput.Username, and is useful for accessing the field via an interface.
 func (v *__UserInterestsInput) GetUsername() string { return v.Username }
 
-// GetEarliest returns __UserInterestsInput.Earliest, and is useful for accessing the field via an interface.
-func (v *__UserInterestsInput) GetEarliest() time.Time { return v.Earliest }
+// GetFrom returns __UserInterestsInput.From, and is useful for accessing the field via an interface.
+func (v *__UserInterestsInput) GetFrom() time.Time { return v.From }
 
 func (v *__UserInterestsInput) UnmarshalJSON(b []byte) error {
 
@@ -733,7 +729,7 @@ func (v *__UserInterestsInput) UnmarshalJSON(b []byte) error {
 
 	var firstPass struct {
 		*__UserInterestsInput
-		Earliest json.RawMessage `json:"earliest"`
+		From json.RawMessage `json:"from"`
 		graphql.NoUnmarshalJSON
 	}
 	firstPass.__UserInterestsInput = v
@@ -744,14 +740,14 @@ func (v *__UserInterestsInput) UnmarshalJSON(b []byte) error {
 	}
 
 	{
-		dst := &v.Earliest
-		src := firstPass.Earliest
+		dst := &v.From
+		src := firstPass.From
 		if len(src) != 0 && string(src) != "null" {
 			err = UnmarshalHardcoverDate(
 				src, dst)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to unmarshal __UserInterestsInput.Earliest: %w", err)
+					"unable to unmarshal __UserInterestsInput.From: %w", err)
 			}
 		}
 	}
@@ -761,7 +757,7 @@ func (v *__UserInterestsInput) UnmarshalJSON(b []byte) error {
 type __premarshal__UserInterestsInput struct {
 	Username string `json:"username"`
 
-	Earliest json.RawMessage `json:"earliest"`
+	From json.RawMessage `json:"from"`
 }
 
 func (v *__UserInterestsInput) MarshalJSON() ([]byte, error) {
@@ -778,14 +774,14 @@ func (v *__UserInterestsInput) __premarshalJSON() (*__premarshal__UserInterestsI
 	retval.Username = v.Username
 	{
 
-		dst := &retval.Earliest
-		src := v.Earliest
+		dst := &retval.From
+		src := v.From
 		var err error
 		*dst, err = MarshalHardcoverDate(
 			&src)
 		if err != nil {
 			return nil, fmt.Errorf(
-				"unable to marshal __UserInterestsInput.Earliest: %w", err)
+				"unable to marshal __UserInterestsInput.From: %w", err)
 		}
 	}
 	return &retval, nil
@@ -793,11 +789,11 @@ func (v *__UserInterestsInput) __premarshalJSON() (*__premarshal__UserInterestsI
 
 // The query executed by RecentAuthorReleases.
 const RecentAuthorReleases_Operation = `
-query RecentAuthorReleases ($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentAuthorReleases ($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
 	authors(where: {slug:{_in:$slug}}) {
 		name
 		slug
-		contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$now,_gte:$earliest},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+		contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 			author {
 				name
 			}
@@ -829,8 +825,8 @@ fragment Book on books {
 func RecentAuthorReleases(
 	ctx_ context.Context,
 	client_ graphql.Client,
-	now time.Time,
-	earliest time.Time,
+	to time.Time,
+	from time.Time,
 	slug []string,
 	compilations bool,
 ) (data_ *RecentAuthorReleasesResponse, err_ error) {
@@ -838,8 +834,8 @@ func RecentAuthorReleases(
 		OpName: "RecentAuthorReleases",
 		Query:  RecentAuthorReleases_Operation,
 		Variables: &__RecentAuthorReleasesInput{
-			Now:          now,
-			Earliest:     earliest,
+			To:           to,
+			From:         from,
 			Slug:         slug,
 			Compilations: compilations,
 		},
@@ -859,8 +855,8 @@ func RecentAuthorReleases(
 
 // The query executed by RecentReleases.
 const RecentReleases_Operation = `
-query RecentReleases ($now: date, $earliest: date) {
-	books(order_by: {users_count:desc_nulls_last}, where: {release_date:{_lte:$now,_gte:$earliest}}, limit: 25) {
+query RecentReleases ($to: date, $from: date) {
+	books(order_by: {users_count:desc_nulls_last}, where: {release_date:{_lte:$to,_gte:$from}}, limit: 25) {
 		... Book
 	}
 }
@@ -886,15 +882,15 @@ fragment Book on books {
 func RecentReleases(
 	ctx_ context.Context,
 	client_ graphql.Client,
-	now time.Time,
-	earliest time.Time,
+	to time.Time,
+	from time.Time,
 ) (data_ *RecentReleasesResponse, err_ error) {
 	req_ := &graphql.Request{
 		OpName: "RecentReleases",
 		Query:  RecentReleases_Operation,
 		Variables: &__RecentReleasesInput{
-			Now:      now,
-			Earliest: earliest,
+			To:   to,
+			From: from,
 		},
 	}
 
@@ -912,14 +908,13 @@ func RecentReleases(
 
 // The query executed by RecentSeriesReleases.
 const RecentSeriesReleases_Operation = `
-query RecentSeriesReleases ($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentSeriesReleases ($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
 	series(where: {slug:{_in:$slug}}) {
 		name
 		slug
 	}
-	bookSeries: book_series(where: {series:{slug:{_in:$slug}},book:{release_date:{_lte:$now,_gte:$earliest},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+	bookSeries: book_series(where: {series:{slug:{_in:$slug}},book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 		series {
-			name
 			slug
 		}
 		book {
@@ -949,8 +944,8 @@ fragment Book on books {
 func RecentSeriesReleases(
 	ctx_ context.Context,
 	client_ graphql.Client,
-	now time.Time,
-	earliest time.Time,
+	to time.Time,
+	from time.Time,
 	slug []string,
 	compilations bool,
 ) (data_ *RecentSeriesReleasesResponse, err_ error) {
@@ -958,8 +953,8 @@ func RecentSeriesReleases(
 		OpName: "RecentSeriesReleases",
 		Query:  RecentSeriesReleases_Operation,
 		Variables: &__RecentSeriesReleasesInput{
-			Now:          now,
-			Earliest:     earliest,
+			To:           to,
+			From:         from,
 			Slug:         slug,
 			Compilations: compilations,
 		},
@@ -979,11 +974,11 @@ func RecentSeriesReleases(
 
 // The query executed by UserInterests.
 const UserInterests_Operation = `
-query UserInterests ($username: citext, $earliest: date) {
+query UserInterests ($username: citext, $from: date) {
 	users(where: {username:{_eq:$username}}) {
 		username
 	}
-	userBooks: user_books(where: {user:{username:{_eq:$username}},status_id:{_eq:3},last_read_date:{_gt:$earliest}}) {
+	userBooks: user_books(where: {user:{username:{_eq:$username}},status_id:{_eq:3},last_read_date:{_gt:$from}}) {
 		book {
 			slug
 			contributors: cached_contributors
@@ -997,14 +992,14 @@ func UserInterests(
 	ctx_ context.Context,
 	client_ graphql.Client,
 	username string,
-	earliest time.Time,
+	from time.Time,
 ) (data_ *UserInterestsResponse, err_ error) {
 	req_ := &graphql.Request{
 		OpName: "UserInterests",
 		Query:  UserInterests_Operation,
 		Variables: &__UserInterestsInput{
 			Username: username,
-			Earliest: earliest,
+			From:     from,
 		},
 	}
 

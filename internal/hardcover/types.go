@@ -1,10 +1,7 @@
 package hardcover
 
 type BookGenre struct {
-	Tag          string `json:"tag"`
-	TagSlug      string `json:"tagSlug"`
-	Category     string `json:"category"`
-	CategorySlug string `json:"categorySlug"`
+	Tag string `json:"tag"`
 }
 
 type BookImage struct {

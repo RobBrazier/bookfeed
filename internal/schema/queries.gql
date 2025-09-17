@@ -19,12 +19,12 @@ fragment Book on books {
   featuredSeries: cached_featured_series
 }
 
-query RecentReleases($now: date, $earliest: date) {
+query RecentReleases($to: date, $from: date) {
   # @genqlient(flatten: true)
   books(
     order_by: {users_count: desc_nulls_last}
     where: {
-      release_date: {_lte: $now, _gte: $earliest}
+      release_date: {_lte: $to, _gte: $from}
     }
     limit: 25
   ) {
@@ -32,7 +32,7 @@ query RecentReleases($now: date, $earliest: date) {
   }
 }
 
-query RecentSeriesReleases($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentSeriesReleases($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
   series(where: { slug: {_in: $slug} }) {
     name
     slug
@@ -43,7 +43,7 @@ query RecentSeriesReleases($now: date, $earliest: date, $slug: [String!], $compi
         slug: {_in: $slug}
       },
       book: {
-        release_date: {_lte: $now, _gte: $earliest},
+        release_date: {_lte: $to, _gte: $from},
         book_mappings: {id: {_is_null: false}}
         compilation: {
           _in: [$compilations, false]
@@ -54,7 +54,6 @@ query RecentSeriesReleases($now: date, $earliest: date, $slug: [String!], $compi
     limit: 25
   ) {
     series {
-      name
       slug
     }
     # @genqlient(flatten: true)
@@ -64,7 +63,7 @@ query RecentSeriesReleases($now: date, $earliest: date, $slug: [String!], $compi
   }
 }
 
-query RecentAuthorReleases($now: date, $earliest: date, $slug: [String!], $compilations: Boolean = false) {
+query RecentAuthorReleases($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
   authors(where: {slug: {_in: $slug}}) {
     name
     slug
@@ -72,7 +71,7 @@ query RecentAuthorReleases($now: date, $earliest: date, $slug: [String!], $compi
       where: {
         contribution: {_is_null: true}, # only get Authors
         book: {
-          release_date: {_lte: $now, _gte: $earliest},
+          release_date: {_lte: $to, _gte: $from},
           book_mappings: {id: {_is_null: false}},
           compilation: {
             _in: [$compilations, false]
@@ -93,7 +92,7 @@ query RecentAuthorReleases($now: date, $earliest: date, $slug: [String!], $compi
   }
 }
 
-query UserInterests($username: citext, $earliest: date) {
+query UserInterests($username: citext, $from: date) {
   users(where: {username: {_eq: $username}}) {
     username
   }
@@ -101,7 +100,7 @@ query UserInterests($username: citext, $earliest: date) {
     where: { 
       user: { username: {_eq: $username}}, 
       status_id: {_eq: 3}, # status.READ
-      last_read_date: { _gt: $earliest}
+      last_read_date: { _gt: $from}
     }
   ) {
     book {
