@@ -1,10 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"log/slog"
 	"mime"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/feeds"
@@ -27,7 +29,10 @@ func (s *Server) notFound(err error, w http.ResponseWriter) {
 func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter) {
 	// Set Cloudflare cache header for 1 hour (3600 seconds)
 	// This is shorter than our data cache (6 hours) to ensure freshness
-	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.Header().Set("Last-Modified", out.Created.UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
+	cacheExpiry := out.Created.UTC().Add(12 * time.Hour)
+	remaining := cacheExpiry.Sub(time.Now().UTC())
+	w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%d", int(remaining.Seconds())))
 
 	switch format {
 	case "rss":
