@@ -2,11 +2,13 @@ package server
 
 import (
 	"fmt"
-	"github.com/RobBrazier/bookfeed/internal/feed"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/RobBrazier/bookfeed/internal/cache"
+	"github.com/RobBrazier/bookfeed/internal/feed"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -16,12 +18,12 @@ type Server struct {
 	builder feed.Builder
 }
 
-func NewServer() *http.Server {
+func NewServer() (*http.Server, func()) {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 
 	NewServer := &Server{
 		port:    port,
-		builder: feed.NewBuilder(),
+		builder: feed.NewHardcoverBuilder(),
 	}
 
 	// Declare Server config
@@ -33,5 +35,9 @@ func NewServer() *http.Server {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	return server
+	shutdown := func() {
+		cache.SaveCache()
+	}
+
+	return server, shutdown
 }

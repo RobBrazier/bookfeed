@@ -55,6 +55,7 @@ query RecentSeriesReleases($now: date, $earliest: date, $slug: [String!], $compi
   ) {
     series {
       name
+      slug
     }
     # @genqlient(flatten: true)
     book {

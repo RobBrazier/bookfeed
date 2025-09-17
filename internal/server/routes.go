@@ -1,11 +1,13 @@
 package server
 
 import (
-	"github.com/RobBrazier/bookfeed/cmd/web"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/RobBrazier/bookfeed/cmd/web"
+	"github.com/RobBrazier/bookfeed/internal/cache"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
@@ -51,6 +53,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	slog.SetDefault(logger)
 	slog.SetLogLoggerLevel(slog.LevelInfo)
+
+	cache.LoadCache()
 
 	r.Use(traceid.Middleware)
 	r.Use(middleware.RealIP)

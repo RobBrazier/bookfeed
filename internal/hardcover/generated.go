@@ -274,10 +274,14 @@ func (v *RecentSeriesReleasesBookSeriesBook_series) GetBook() Book { return v.Bo
 // columns and relationships of "series"
 type RecentSeriesReleasesBookSeriesBook_seriesSeries struct {
 	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 // GetName returns RecentSeriesReleasesBookSeriesBook_seriesSeries.Name, and is useful for accessing the field via an interface.
 func (v *RecentSeriesReleasesBookSeriesBook_seriesSeries) GetName() string { return v.Name }
+
+// GetSlug returns RecentSeriesReleasesBookSeriesBook_seriesSeries.Slug, and is useful for accessing the field via an interface.
+func (v *RecentSeriesReleasesBookSeriesBook_seriesSeries) GetSlug() string { return v.Slug }
 
 // RecentSeriesReleasesResponse is returned by RecentSeriesReleases on success.
 type RecentSeriesReleasesResponse struct {
@@ -916,6 +920,7 @@ query RecentSeriesReleases ($now: date, $earliest: date, $slug: [String!], $comp
 	bookSeries: book_series(where: {series:{slug:{_in:$slug}},book:{release_date:{_lte:$now,_gte:$earliest},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 		series {
 			name
+			slug
 		}
 		book {
 			... Book

@@ -39,3 +39,6 @@ cmd/web/static/
 
 # NodeJS :(
 node_modules/
+
+# Cache persistence files
+*.gob

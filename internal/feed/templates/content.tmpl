@@ -8,12 +8,14 @@
 {{- if .Compilation -}}
 <strong>NOTE: </strong>This is a Compilation <br />
 {{- end -}}
-<strong>{{ len .Contributions | plural "Author" "Authors" }}: </strong>{{ range $i, $e := .Contributions }}{{ if $i }}, {{ end }}{{ $e.Author.Name }}{{ end }} <br/>
-{{- if .FeaturedSeries.Series.Name -}}
-<strong>Series:</strong> {{ .FeaturedSeries.Series.Name }} {{ with .FeaturedSeries.Position }}#{{ . }}{{ end }} <br />
+{{- with .Authors -}}
+<strong>{{ len . | plural "Author" "Authors" }}: </strong>{{ . | join ", " }}<br/>
 {{- end -}}
-{{- if .Genres -}}
-<strong>{{ len .Genres | plural "Genre" "Genres" }}: </strong>{{ range $i, $e := .Genres }}{{ if $i }}, {{ end }}{{ $e.Tag }}{{ end }}
+{{- if .Series.Title -}}
+<strong>Series:</strong> {{ .Series.Title }} {{ with .Series.Position }}#{{ . }}{{ end }} <br />
+{{- end -}}
+{{- with .Genres -}}
+<strong>{{ len . | plural "Genre" "Genres" }}: </strong>{{ . | join ", " }}
 {{- end -}}
 </p>
 
@@ -26,6 +28,6 @@
 	{{ if . }}<p>{{ . }}</p>{{ end }}
 	{{- end -}}
 {{- end -}}
-{{- with cat "https://hardcover.app/books/" .Slug | nospace -}}
+{{- with .Link -}}
 <p>See more on Hardcover: <a href="{{ . }}">{{ . }}</a>
 {{- end -}}
