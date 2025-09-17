@@ -13,7 +13,7 @@ func NewCollection(name, slug string, books []Book) Collection {
 	return Collection{
 		Name:    name,
 		Slug:    slug,
-		Created: time.Now(),
+		Created: time.Now().UTC(),
 		Books:   books,
 	}
 }
