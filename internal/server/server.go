@@ -9,6 +9,7 @@ import (
 
 	"github.com/RobBrazier/bookfeed/internal/cache"
 	"github.com/RobBrazier/bookfeed/internal/feed"
+	"github.com/go-co-op/gocron/v2"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -20,6 +21,12 @@ type Server struct {
 
 func NewServer() (*http.Server, func()) {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	scheduler, _ := gocron.NewScheduler()
+	scheduler.NewJob(
+		gocron.DurationJob(1*time.Hour),
+		gocron.NewTask(cache.SaveCache),
+	)
+	scheduler.Start()
 
 	NewServer := &Server{
 		port:    port,
@@ -38,7 +45,7 @@ func NewServer() (*http.Server, func()) {
 	cache.LoadCache()
 
 	shutdown := func() {
-		cache.SaveCache()
+		scheduler.Shutdown()
 	}
 
 	return server, shutdown
