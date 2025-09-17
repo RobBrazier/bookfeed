@@ -26,7 +26,7 @@ type hardcoverBuilder struct {
 	compilations bool
 }
 
-func (b hardcoverBuilder) cdnUrl(image hardcover.BookImage) string {
+func (b hardcoverBuilder) cdnUrl(image model.Image) string {
 	url := url.QueryEscape(image.Url)
 	return fmt.Sprintf("https://img.hardcover.app/enlarge?url=%s&width=%d&height=%d&type=webp", url, image.Width, image.Height)
 }
@@ -47,7 +47,7 @@ func (b hardcoverBuilder) mapBook(source hardcover.Book) model.Book {
 		ratio := float32(source.Image.Width) / float32(source.Image.Height)
 		image.Width = int(500 * ratio)
 		image.Height = 500
-		image.Url = b.cdnUrl(source.Image)
+		image.Url = b.cdnUrl(image)
 	}
 	return model.Book{
 		Id:          source.Id,
