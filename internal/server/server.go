@@ -35,6 +35,8 @@ func NewServer() (*http.Server, func()) {
 		WriteTimeout: 30 * time.Second,
 	}
 
+	cache.LoadCache()
+
 	shutdown := func() {
 		cache.SaveCache()
 	}

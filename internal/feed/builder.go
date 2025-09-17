@@ -3,7 +3,6 @@ package feed
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -42,7 +41,6 @@ func (b *builder) buildFeed(title, link, description string, created time.Time, 
 		Updated:     created,
 	}
 	for _, book := range books {
-		slog.Info("Processing book", "book", book)
 		var authorName string
 		if len(book.Authors) > 0 {
 			authorName = book.Authors[0]
