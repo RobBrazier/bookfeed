@@ -248,7 +248,7 @@ func (b *hardcoverBuilder) GetUserReleases(ctx context.Context, username, filter
 	if slices.Contains([]string{"", "author"}, filter) && len(interests.Authors) > 0 {
 		descBuilder.WriteString(fmt.Sprintf("Authors: %s\n", strings.Join(interests.Authors, ", ")))
 		for _, item := range interests.Authors {
-			authorKeys = append(seriesKeys, fmt.Sprintf("hardcover/%s", item))
+			authorKeys = append(seriesKeys, fmt.Sprintf("hardcover/author/%s", item))
 		}
 	}
 
