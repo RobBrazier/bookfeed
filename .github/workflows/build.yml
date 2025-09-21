@@ -24,15 +24,16 @@ jobs:
         with:
           filters: |
             app:
+              - 'assets/**'
               - 'cmd/**'
               - 'internal/**'
               - 'go.mod'
               - 'go.sum'
               - 'Dockerfile'
-              - 'config/deploy.yml'
+              - 'config/**'
               - '.kamal/**'
               - 'package.json'
-              - 'bun.lock'
+              - 'package-lock.json'
 
   build:
     runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
