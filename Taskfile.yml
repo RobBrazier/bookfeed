@@ -18,7 +18,10 @@ tasks:
       vars: [HARDCOVER_TOKEN]
 
   install:
-    cmd: npm install --no-package-lock
+    cmds:
+      - cmd: npm install
+      - cmd: npx lefthook install
+        ignore_error: true
     sources:
       - package.json
     generates:

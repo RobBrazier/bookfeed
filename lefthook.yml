@@ -1,0 +1,17 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: go fmt
+      run: go fmt {files}
+      glob: "*.go"
+      stage_fixed: true
+
+    - name: templ fmt
+      run: go tool templ fmt internal
+      glob: "*.templ"
+      stage_fixed: true
+
+    - name: go vet
+      files: git ls-files -m
+      glob: "*.go"
+      run: go vet {files}

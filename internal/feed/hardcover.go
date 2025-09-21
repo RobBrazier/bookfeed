@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"maps"
 	"net/url"
-	"os"
 	"slices"
 	"strings"
 	"text/template"

@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 

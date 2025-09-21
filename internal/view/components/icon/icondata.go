@@ -498,7 +498,7 @@ var internalSvgData = map[string]string{
   <path d="M8 12a2 2 0 0 0 2-2V8H8" />
   <path d="M14 12a2 2 0 0 0 2-2V8h-2" />`,
 	"navigation": `<polygon points="3 11 22 2 13 21 11 13 3 11" />`,
-	"minus": `<path d="M5 12h14" />`,
+	"minus":      `<path d="M5 12h14" />`,
 	"list-check": `<path d="M11 18H3" />
   <path d="m15 18 2 2 4-4" />
   <path d="M16 12H3" />
@@ -2471,7 +2471,7 @@ var internalSvgData = map[string]string{
 	"toy-brick": `<rect width="18" height="12" x="3" y="8" rx="1" />
   <path d="M10 8V5c0-.6-.4-1-1-1H6a1 1 0 0 0-1 1v3" />
   <path d="M19 8V5c0-.6-.4-1-1-1h-3a1 1 0 0 0-1 1v3" />`,
-	"wrench": `<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />`,
+	"wrench":               `<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />`,
 	"rectangle-horizontal": `<rect width="20" height="12" x="2" y="6" rx="2" />`,
 	"map-pin-check-inside": `<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
   <path d="m9 10 2 2 4-4" />`,
@@ -4515,7 +4515,7 @@ var internalSvgData = map[string]string{
 	"ticket-plus": `<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
   <path d="M9 12h6" />
   <path d="M12 9v6" />`,
-	"wifi-zero": `<path d="M12 20h.01" />`,
+	"wifi-zero":    `<path d="M12 20h.01" />`,
 	"type-outline": `<path d="M14 16.5a.5.5 0 0 0 .5.5h.5a2 2 0 0 1 0 4H9a2 2 0 0 1 0-4h.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5V8a2 2 0 0 1-4 0V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-4 0v-.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5Z" />`,
 	"circle-pause": `<circle cx="12" cy="12" r="10" />
   <line x1="10" x2="10" y1="15" y2="9" />
@@ -4657,7 +4657,7 @@ var internalSvgData = map[string]string{
   <path d="M4 18v3" />
   <path d="M8 14v7" />`,
 	"chevron-down": `<path d="m6 9 6 6 6-6" />`,
-	"chevron-up": `<path d="m18 15-6-6-6 6" />`,
+	"chevron-up":   `<path d="m18 15-6-6-6 6" />`,
 	"dice-5": `<rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
   <path d="M16 8h.01" />
   <path d="M8 8h.01" />
