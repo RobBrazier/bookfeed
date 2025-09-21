@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"log/slog"
+	"github.com/rs/zerolog/log"
 	"mime"
 	"net/http"
 	"strings"
@@ -51,36 +51,38 @@ func (s *Server) RecentHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	feed, err := s.builder.GetRecentReleases(r.Context())
 	if err != nil {
-		slog.Error("error retrieving recent", "err", err)
+		log.Error().Err(err).Msg("error retrieving recent")
 	}
-	slog.Info("Generated feed for recent releases", "entries", len(feed.Items))
+	log.Info().Int("entries", len(feed.Items)).Msg("Generated feed for recent releases")
 	s.writeFeed(format, &feed, w)
 }
 
 func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	author := strings.ToLower(r.PathValue("author"))
+	log := log.With().Str("author", author).Logger()
 	feed, err := s.builder.GetAuthorReleases(r.Context(), author)
 
 	if err != nil {
-		slog.Error("error retrieving author", "author", author, "err", err)
+		log.Error().Err(err).Msg("error retrieving author")
 		s.notFound(err, w)
 		return
 	}
-	slog.Info("Generated feed for author", "author", author, "entries", len(feed.Items))
+	log.Info().Int("entries", len(feed.Items)).Msg("Generated feed for author")
 	s.writeFeed(format, &feed, w)
 }
 
 func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	series := strings.ToLower(r.PathValue("series"))
+	log := log.With().Str("series", series).Logger()
 	feed, err := s.builder.GetSeriesReleases(r.Context(), series)
 	if err != nil {
-		slog.Error("error retrieving series", "series", series, "err", err)
+		log.Error().Err(err).Msg("error retrieving series")
 		s.notFound(err, w)
 		return
 	}
-	slog.Info("Generated feed for series", "series", series, "entries", len(feed.Items))
+	log.Info().Int("entries", len(feed.Items)).Msg("Generated feed for series")
 	s.writeFeed(format, &feed, w)
 }
 
@@ -88,12 +90,13 @@ func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
 	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
 	user := strings.ToLower(r.PathValue("username"))
 	filter := strings.ToLower(r.URL.Query().Get("filter"))
+	log := log.With().Str("user", user).Str("filter", filter).Logger()
 	feed, err := s.builder.GetUserReleases(r.Context(), user, filter)
 	if err != nil {
-		slog.Error("error retrieving user", "user", user, "err", err)
+		log.Error().Err(err).Msg("error retrieving user")
 		s.notFound(err, w)
 		return
 	}
-	slog.Info("Generated feed for user", "user", user, "entries", len(feed.Items))
+	log.Info().Int("entries", len(feed.Items)).Msg("Generated feed for user")
 	s.writeFeed(format, &feed, w)
 }

@@ -2,8 +2,7 @@ package cache
 
 import (
 	"errors"
-	"fmt"
-	"log/slog"
+	"github.com/rs/zerolog/log"
 	"os"
 	"path"
 	"time"
@@ -49,16 +48,16 @@ func newUserCache() *otter.Cache[string, model.UserInterests] {
 func LoadCache() {
 	collectionPath := path.Join(cachePath, "collection.gob")
 	userPath := path.Join(cachePath, "user.gob")
-	slog.Info(fmt.Sprintf("Loading collection cache from %s", collectionPath))
+	log.Info().Str("path", collectionPath).Msg("Loading collection cache")
 	if err := otter.LoadCacheFromFile(CollectionCache, collectionPath); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			slog.Warn("Load cache failed", "error", err)
+			log.Warn().Err(err).Msg("Load cache failed")
 		}
 	}
-	slog.Info(fmt.Sprintf("Loading user cache from %s", userPath))
+	log.Info().Str("path", userPath).Msg("Loading user cache")
 	if err := otter.LoadCacheFromFile(UserCache, userPath); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			slog.Warn("Load cache failed", "error", err)
+			log.Warn().Err(err).Msg("Load cache failed")
 		}
 	}
 }
@@ -66,12 +65,12 @@ func LoadCache() {
 func SaveCache() {
 	collectionPath := path.Join(cachePath, "collection.gob")
 	userPath := path.Join(cachePath, "user.gob")
-	slog.Info(fmt.Sprintf("Saving collection cache to %s", collectionPath))
+	log.Info().Str("path", collectionPath).Msg("Saving collection cache")
 	if err := otter.SaveCacheToFile(CollectionCache, collectionPath); err != nil {
-		slog.Warn("Save cache failed", "error", err)
+		log.Warn().Err(err).Msg("Save cache failed")
 	}
-	slog.Info(fmt.Sprintf("Saving user cache to %s", userPath))
+	log.Info().Str("path", userPath).Msg("Saving user cache")
 	if err := otter.SaveCacheToFile(UserCache, userPath); err != nil {
-		slog.Warn("Save cache failed", "error", err)
+		log.Warn().Err(err).Msg("Save cache failed")
 	}
 }

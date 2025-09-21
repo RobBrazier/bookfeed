@@ -3,7 +3,7 @@ package feed
 import (
 	"context"
 	"fmt"
-	"log/slog"
+	"github.com/rs/zerolog/log"
 	"maps"
 	"net/url"
 	"os"
@@ -83,9 +83,9 @@ func (b *hardcoverBuilder) GetRecentReleases(ctx context.Context) (feeds.Feed, e
 	loader := cache.CollectionLoaderFunc(func(ctx context.Context, key string) (collection model.Collection, err error) {
 		now := time.Now()
 		lastMonth := now.AddDate(0, -1, 0)
-		slog.Info("Fetching recent releases")
+		log.Info().Msg("Fetching recent releases")
 		data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth)
-		slog.Info("Retrieved recent releases data", "elapsed", time.Since(now))
+		log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved recent releases data")
 		if err != nil {
 			return
 		}
@@ -100,12 +100,13 @@ func (b *hardcoverBuilder) GetRecentReleases(ctx context.Context) (feeds.Feed, e
 }
 
 func (b *hardcoverBuilder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Feed, error) {
+	log := log.With().Str("author", slug).Logger()
 	loader := cache.CollectionLoaderFunc(func(ctx context.Context, key string) (collection model.Collection, err error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		slog.Info("Fetching releases", "author", slug)
+		log.Info().Msg("Fetching releases")
 		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
-		slog.Info("Retrieved author data", "author", slug, "elapsed", time.Since(now))
+		log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
 		if err != nil {
 			return
 		}
@@ -131,12 +132,13 @@ func (b *hardcoverBuilder) GetAuthorReleases(ctx context.Context, slug string) (
 }
 
 func (b *hardcoverBuilder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Feed, error) {
+	log := log.With().Str("series", slug).Logger()
 	loader := cache.CollectionLoaderFunc(func(ctx context.Context, key string) (collection model.Collection, err error) {
 		now := time.Now()
 		lastYear := now.AddDate(-1, 0, 0)
-		slog.Info("Fetching releases", "series", slug)
+		log.Info().Msg("Fetching releases")
 		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, lastYear, []string{slug}, b.compilations)
-		slog.Info("Retrieved series data", "series", slug, "elapsed", time.Since(now))
+		log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
 		if err != nil {
 			return
 		}
@@ -162,12 +164,13 @@ func (b *hardcoverBuilder) GetSeriesReleases(ctx context.Context, slug string) (
 }
 
 func (b *hardcoverBuilder) getUserInterests(ctx context.Context, username string) (model.UserInterests, error) {
+	log := log.With().Str("user", username).Logger()
 	loader := cache.UserLoaderFunc(func(ctx context.Context, key string) (interests model.UserInterests, err error) {
 		now := time.Now()
 		earliest := now.AddDate(-2, 0, 0)
-		slog.Info("Fetching user interests", "user", username)
+		log.Info().Msg("Fetching user interests")
 		data, err := hardcover.UserInterests(ctx, b.client, username, earliest)
-		slog.Info("Retrieved user interests", "user", username, "elapsed", time.Since(now))
+		log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved user interests")
 		if err != nil {
 			return
 		}
@@ -229,6 +232,7 @@ func (b hardcoverBuilder) extractSlugs(keys []string) map[string]string {
 }
 
 func (b *hardcoverBuilder) GetUserReleases(ctx context.Context, username, filter string) (feeds.Feed, error) {
+	log := log.With().Str("user", username).Str("filter", filter).Logger()
 	interests, err := b.getUserInterests(ctx, username)
 	if err != nil {
 		return feeds.Feed{}, err
@@ -259,9 +263,10 @@ func (b *hardcoverBuilder) GetUserReleases(ctx context.Context, username, filter
 		uncachedKeys := b.uncachedKeys(seriesKeys)
 		slugMapping := b.extractSlugs(uncachedKeys)
 		slugs := slices.Collect(maps.Keys(slugMapping))
-		slog.Info("Fetching releases", "series", slugs, "keys", uncachedKeys)
+		log := log.With().Strs("series", slugs).Strs("uncached", uncachedKeys).Logger()
+		log.Info().Msg("Fetching releases")
 		data, err := hardcover.RecentSeriesReleases(ctx, b.client, now, earliest, slugs, b.compilations)
-		slog.Info("Retrieved series data", "series", slugs, "elapsed", time.Since(now))
+		log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
 		for _, series := range data.Series {
 			if cacheKey, ok := slugMapping[series.Slug]; ok {
 				var books []model.Book
@@ -282,9 +287,10 @@ func (b *hardcoverBuilder) GetUserReleases(ctx context.Context, username, filter
 		uncachedKeys := b.uncachedKeys(authorKeys)
 		slugMapping := b.extractSlugs(uncachedKeys)
 		slugs := slices.Collect(maps.Keys(slugMapping))
-		slog.Info("Fetching releases", "author", slugs, "keys", uncachedKeys)
+		log := log.With().Strs("author", slugs).Strs("uncached", uncachedKeys).Logger()
+		log.Info().Msg("Fetching releases")
 		data, err := hardcover.RecentAuthorReleases(ctx, b.client, now, earliest, slugs, b.compilations)
-		slog.Info("Retrieved author data", "author", slugs, "elapsed", time.Since(now))
+		log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
 		for _, author := range data.Authors {
 			if cacheKey, ok := slugMapping[author.Slug]; ok {
 				var books []model.Book
@@ -298,11 +304,11 @@ func (b *hardcoverBuilder) GetUserReleases(ctx context.Context, username, filter
 	})
 	seriesCollections, err := cache.CollectionCache.BulkGet(ctx, seriesKeys, seriesLoader)
 	if err != nil {
-		slog.Error("Unable to fetch series data for", "user", username, "error", err)
+		log.Error().Err(err).Msg("Unable to fetch series data for")
 	}
 	authorCollections, err := cache.CollectionCache.BulkGet(ctx, authorKeys, authorLoader)
 	if err != nil {
-		slog.Error("Unable to fetch author data for", "user", username, "error", err)
+		log.Error().Err(err).Msg("Unable to fetch author data for")
 	}
 
 	bookMapping := make(map[int]model.Book)

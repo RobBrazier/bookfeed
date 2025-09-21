@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -11,57 +10,31 @@ import (
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/httplog/v3"
 	"github.com/go-chi/httprate"
 	"github.com/go-chi/traceid"
-	"github.com/golang-cz/devslog"
+	"github.com/rs/zerolog/hlog"
 )
-
-func getLogger(isLocal bool) (*slog.Logger, *httplog.Schema) {
-	format := httplog.SchemaOTEL.Concise(isLocal)
-	handlerOpts := &slog.HandlerOptions{
-		AddSource:   !isLocal,
-		ReplaceAttr: format.ReplaceAttr,
-	}
-	var handler slog.Handler
-	if isLocal {
-		handler = devslog.NewHandler(os.Stdout, &devslog.Options{
-			SortKeys:           true,
-			MaxErrorStackTrace: 5,
-			MaxSlicePrintSize:  20,
-			HandlerOptions:     handlerOpts,
-		})
-	} else {
-		handler = traceid.LogHandler(
-			slog.NewJSONHandler(os.Stdout, handlerOpts),
-		)
-	}
-
-	logger := slog.New(handler)
-
-	if !isLocal {
-		logger = logger.With(slog.String("service.name", "bookfeed"))
-	}
-	return logger, format
-}
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
-	isLocal := os.Getenv("APP_ENV") == "local"
-	logger, format := getLogger(isLocal)
-
-	slog.SetDefault(logger)
-	slog.SetLogLoggerLevel(slog.LevelInfo)
 
 	r.Use(traceid.Middleware)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
 	if os.Getenv("LOG_REQUESTS") == "true" {
-		r.Use(httplog.RequestLogger(logger, &httplog.Options{
-			Level:         slog.LevelInfo,
-			Schema:        format,
-			RecoverPanics: true,
+		r.Use(hlog.NewHandler(*s.logger))
+		r.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
+		r.Use(hlog.MethodHandler("method"))
+		r.Use(hlog.URLHandler("url"))
+		r.Use(hlog.UserAgentHandler("user_agent"))
+		r.Use(hlog.RefererHandler("referer"))
+		r.Use(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
+			hlog.FromRequest(r).Info().
+				Int("status", status).
+				Int("size", size).
+				Dur("duration", duration).
+				Send()
 		}))
 	}
 	r.Use(middleware.Heartbeat("/up"))
