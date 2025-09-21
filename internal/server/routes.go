@@ -1,30 +1,38 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
-	"github.com/RobBrazier/bookfeed/cmd/web"
+	"github.com/RobBrazier/bookfeed/config"
+	"github.com/RobBrazier/bookfeed/internal/view/pages"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
-	"github.com/go-chi/traceid"
 	"github.com/rs/zerolog/hlog"
 )
+
+func formatPath(path string) string {
+	formats := []string{"json", "atom", "rss"}
+	regex := strings.Join(formats, "|")
+	return fmt.Sprintf("%s.{format:(%s)}", path, regex)
+}
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 
-	r.Use(traceid.Middleware)
+	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
-	if os.Getenv("LOG_REQUESTS") == "true" {
+	if config.LogRequests() {
 		r.Use(hlog.NewHandler(*s.logger))
-		r.Use(hlog.RequestIDHandler("req_id", "Request-Id"))
+		r.Use(hlog.RequestIDHandler("req_id", middleware.RequestIDHeader))
 		r.Use(hlog.MethodHandler("method"))
 		r.Use(hlog.URLHandler("url"))
 		r.Use(hlog.UserAgentHandler("user_agent"))
@@ -38,7 +46,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		}))
 	}
 	r.Use(middleware.Heartbeat("/up"))
-	r.Use(middleware.URLFormat)
 
 	MountStatic(r)
 
@@ -49,15 +56,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
 
 		r.Route("/hc", func(r chi.Router) {
-			r.With(middleware.NoCache).Handle("/", templ.Handler(web.Hardcover()))
-			r.Get("/recent", s.RecentHandler)
-			r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
-			r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
-			r.Get("/me/{username:[a-zA-Z0-9-]+}", s.MeHandler)
+			r.With(middleware.NoCache).Handle("/", templ.Handler(pages.Hardcover()))
+			r.Get(formatPath("/recent"), s.RecentHandler)
+			r.Get(formatPath("/author/{author:[a-zA-Z0-9-]+}"), s.AuthorHandler)
+			r.Get(formatPath("/series/{series:[a-zA-Z0-9-]+}"), s.SeriesHandler)
+			r.Get(formatPath("/me/{username:[a-zA-Z0-9-]+}"), s.MeHandler)
 		})
 
 		r.Route("/jnc", func(r chi.Router) {
-			r.With(middleware.NoCache).Handle("/", templ.Handler(web.JNovelClub()))
+			r.With(middleware.NoCache).Handle("/", templ.Handler(pages.JNovelClub()))
 		})
 	})
 

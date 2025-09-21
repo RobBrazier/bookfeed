@@ -1,0 +1,38 @@
+package pages
+
+import (
+	"github.com/RobBrazier/bookfeed/internal/view"
+	"github.com/RobBrazier/bookfeed/internal/view/components/button"
+	"github.com/RobBrazier/bookfeed/internal/view/components/card"
+	"github.com/RobBrazier/bookfeed/internal/view/layout"
+)
+
+var jnovelClubProvider = view.ProviderData{
+	Title: "J-Novel Club",
+	URL:   "https://j-novel.club",
+}
+
+templ JNovelClub() {
+	@layout.Layout(jnovelClubProvider) {
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Coming Soon
+				}
+				@card.Description() {
+					Not yet implemented
+				}
+			}
+			@card.Content() {
+				Go back
+				@button.Button(button.Props{
+					Variant: button.VariantLink,
+					Href:    "/",
+					Class:   "px-1 py-0 text-md",
+				}) {
+					Home
+				}
+			}
+		}
+	}
+}

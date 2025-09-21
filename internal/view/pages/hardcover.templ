@@ -1,0 +1,136 @@
+package pages
+
+import (
+	"github.com/RobBrazier/bookfeed/internal/view"
+	"github.com/RobBrazier/bookfeed/internal/view/components/card"
+	"github.com/RobBrazier/bookfeed/internal/view/components/form"
+	"github.com/RobBrazier/bookfeed/internal/view/components/selectbox"
+	"github.com/RobBrazier/bookfeed/internal/view/layout"
+	"github.com/RobBrazier/bookfeed/internal/view/modules/feed"
+)
+
+var hardcoverProvider = view.ProviderData{
+	Title: "Hardcover",
+	URL:   "https://hardcover.app",
+}
+
+templ Hardcover() {
+	@layout.Layout(hardcoverProvider) {
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Recent Releases
+				}
+				@card.Description() {
+					Equivalent to the list on upcoming/recent on Hardcover.app 
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/recent", false) {
+					@feed.Output(feed.OutputProps{
+						IsPreviewStatic: true,
+						PreviewTemplate: "https://hardcover.app/upcoming/recent",
+					})
+				}
+			}
+		}
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Author Releases
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/author", true) {
+					@feed.Input(feed.InputProps{
+						Label:       "Author Slug",
+						Placeholder: "e.g. brandon-sanderson",
+						MaskRegex:   "[^a-zA-Z0-9-]",
+					})
+					@feed.Output(feed.OutputProps{
+						RequiresInput:   true,
+						PreviewTemplate: "https://hardcover.app/authors/${$data.input}",
+					})
+				}
+			}
+		}
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					Series Releases
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/series", true) {
+					@feed.Input(feed.InputProps{
+						Label:       "Series Slug",
+						Placeholder: "e.g. dungeon-crawler-carl",
+						MaskRegex:   "[^a-zA-Z0-9-]",
+					})
+					@feed.Output(feed.OutputProps{
+						RequiresInput:   true,
+						PreviewTemplate: "https://hardcover.app/series/${$data.input}",
+					})
+				}
+			}
+		}
+		@card.Card() {
+			@card.Header() {
+				@card.Title() {
+					My Releases
+				}
+				@card.Description() {
+					Generate feeds for authors and series you follow based on your Hardcover reading history (only authors or series with more than 1 book read will appear in this feed) 
+				}
+			}
+			@card.Content() {
+				@feed.Container("hc/me", true) {
+					@feed.Input(feed.InputProps{
+						Label:       "Username",
+						Placeholder: "e.g. jules",
+						MaskRegex:   "[^a-zA-Z0-9-]",
+					})
+					@form.ItemFlex(form.ItemProps{
+						Class: "flex-col md:flex-row gap-4",
+					}) {
+						@form.Item(form.ItemProps{
+							Class: "flex-1 w-full mr-0",
+						}) {
+							@form.Label(form.LabelProps{For: "me-filter"}) {
+								Filter
+							}
+							@selectbox.SelectBox() {
+								@selectbox.Trigger(selectbox.TriggerProps{
+									ID: "me-filter",
+									Attributes: templ.Attributes{
+										"@change": "filter = $el.value",
+									},
+								}) {
+									@selectbox.Value(selectbox.ValueProps{
+										Placeholder: "Filter Feed",
+									})
+								}
+								@selectbox.Content() {
+									@selectbox.Item(selectbox.ItemProps{
+										Value: "author",
+									}) {
+										Only Authors
+									}
+									@selectbox.Item(selectbox.ItemProps{
+										Value: "series",
+									}) {
+										Only Series
+									}
+								}
+							}
+						}
+					}
+					@feed.Output(feed.OutputProps{
+						RequiresInput:   true,
+						PreviewTemplate: "https://hardcover.app/@${$data.input}",
+					})
+				}
+			}
+		}
+	}
+}

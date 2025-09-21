@@ -1,13 +1,47 @@
+#: schema https://gist.githubusercontent.com/nhahv/2f0b885e7bf74e9eb0651169bbf6389a/raw/730415ad0d6c394fcef92cb6b683e31bf858ae47/air-verse-air-schema.json
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
 [build]
+args_bin = []
+bin = "./tmp/main"
 cmd = "task build OUT=./tmp/main"
 delay = 1000
-include_dir = ["cmd", "internal"]
-include_ext = ["css", "js", "go", "templ", "tmpl"]
-exclude_dir = ["cmd/web/static"]
+exclude_dir = ["assets/build", "tmp", "vendor", "testdata", "node_modules"]
+exclude_file = []
 exclude_regex = ["_test.go", "_templ.go", "generated.go"]
+exclude_unchanged = false
+follow_symlink = false
+full_bin = ""
+include_dir = []
+include_ext = ["go", "templ"]
+include_file = []
+kill_delay = 1
+log = "build-errors.log"
+poll = false
+poll_interval = 0
+post_cmd = []
+pre_cmd = []
+rerun = false
+rerun_delay = 500
+send_interrupt = true
+stop_on_error = false
+
+[color]
+app = ""
+build = "yellow"
+main = "magenta"
+runner = "green"
+watcher = "cyan"
 
 [log]
 main_only = true
+time = false
 
 [misc]
 clean_on_exit = true
+
+[screen]
+clear_on_rebuild = false
+keep_scroll = true

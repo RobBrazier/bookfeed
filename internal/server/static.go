@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/RobBrazier/bookfeed/cmd/web"
+	"github.com/RobBrazier/bookfeed/assets"
+	"github.com/rs/zerolog/log"
 	"io/fs"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -11,17 +11,17 @@ import (
 
 func MountStatic(r *chi.Mux) {
 
-	staticRoot, err := fs.Sub(web.Static, "static")
+	staticRoot, err := fs.Sub(assets.Static, "build")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("Couldn't extract static assets from embedded FS")
 	}
 
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(staticRoot)))
 
 	// Because of URLFormat middleware this gets mapped to robots.txt... and robots.anything
-	r.Get("/robots", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(web.RobotsTxt))
+		w.Write([]byte(assets.RobotsTxt))
 	})
 
 }

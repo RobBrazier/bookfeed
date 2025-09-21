@@ -3,7 +3,6 @@ package feed
 import (
 	"context"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"maps"
 	"net/url"
 	"os"
@@ -12,8 +11,11 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/Khan/genqlient/graphql"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/RobBrazier/bookfeed/config"
 	"github.com/RobBrazier/bookfeed/internal/cache"
 	"github.com/RobBrazier/bookfeed/internal/hardcover"
 	"github.com/RobBrazier/bookfeed/internal/model"
@@ -336,7 +338,7 @@ func (b *hardcoverBuilder) GetUserReleases(ctx context.Context, username, filter
 }
 
 func NewHardcoverBuilder() Builder {
-	token := os.Getenv("HARDCOVER_TOKEN")
+	token := config.HardcoverToken()
 	client := hardcover.GetClient(token)
 	return &hardcoverBuilder{
 		client:       client,

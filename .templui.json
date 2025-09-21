@@ -1,7 +1,7 @@
 {
-  "componentsDir": "cmd/web/components",
-  "utilsDir": "cmd/web/utils",
+  "componentsDir": "internal/view/components",
+  "utilsDir": "internal/view/utils",
   "moduleName": "github.com/RobBrazier/bookfeed",
-  "jsDir": "cmd/web/assets/js",
+  "jsDir": "assets/js",
   "jsPublicPath": "/static/js"
 }

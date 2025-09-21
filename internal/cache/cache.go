@@ -2,11 +2,13 @@ package cache
 
 import (
 	"errors"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
+	"github.com/RobBrazier/bookfeed/config"
 	"github.com/RobBrazier/bookfeed/internal/model"
 	"github.com/maypok86/otter/v2"
 )
@@ -14,7 +16,6 @@ import (
 var (
 	CollectionCache *otter.Cache[string, model.Collection]
 	UserCache       *otter.Cache[string, model.UserInterests]
-	cachePath       string
 )
 
 type CollectionLoaderFunc = otter.LoaderFunc[string, model.Collection]
@@ -24,11 +25,6 @@ type UserLoaderFunc = otter.LoaderFunc[string, model.UserInterests]
 func init() {
 	CollectionCache = newCollectionCache()
 	UserCache = newUserCache()
-
-	cachePath = "."
-	if value, ok := os.LookupEnv("CACHE_BACKUP"); ok {
-		cachePath = value
-	}
 }
 
 func newCollectionCache() *otter.Cache[string, model.Collection] {
@@ -46,31 +42,33 @@ func newUserCache() *otter.Cache[string, model.UserInterests] {
 }
 
 func LoadCache() {
+	cachePath := config.CacheStorage()
 	collectionPath := path.Join(cachePath, "collection.gob")
 	userPath := path.Join(cachePath, "user.gob")
 	log.Info().Str("path", collectionPath).Msg("Loading collection cache")
 	if err := otter.LoadCacheFromFile(CollectionCache, collectionPath); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			log.Warn().Err(err).Msg("Load cache failed")
+			log.Error().Err(err).Msg("Load cache failed")
 		}
 	}
 	log.Info().Str("path", userPath).Msg("Loading user cache")
 	if err := otter.LoadCacheFromFile(UserCache, userPath); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			log.Warn().Err(err).Msg("Load cache failed")
+			log.Error().Err(err).Msg("Load cache failed")
 		}
 	}
 }
 
 func SaveCache() {
+	cachePath := config.CacheStorage()
 	collectionPath := path.Join(cachePath, "collection.gob")
 	userPath := path.Join(cachePath, "user.gob")
 	log.Info().Str("path", collectionPath).Msg("Saving collection cache")
 	if err := otter.SaveCacheToFile(CollectionCache, collectionPath); err != nil {
-		log.Warn().Err(err).Msg("Save cache failed")
+		log.Error().Err(err).Msg("Save cache failed")
 	}
 	log.Info().Str("path", userPath).Msg("Saving user cache")
 	if err := otter.SaveCacheToFile(UserCache, userPath); err != nil {
-		log.Warn().Err(err).Msg("Save cache failed")
+		log.Error().Err(err).Msg("Save cache failed")
 	}
 }

@@ -6,10 +6,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
+	"github.com/RobBrazier/bookfeed/config"
 	"github.com/RobBrazier/bookfeed/internal/cache"
 	"github.com/RobBrazier/bookfeed/internal/feed"
 	"github.com/go-co-op/gocron/v2"
@@ -26,48 +25,48 @@ type Server struct {
 	builder feed.Builder
 }
 
-func getLevel() zerolog.Level {
-	level := strings.ToLower(os.Getenv("LOG_LEVEL"))
+func getSlogLevel(level zerolog.Level) slog.Leveler {
 	switch level {
-	case "trace":
-		return zerolog.TraceLevel
-	case "info":
-		return zerolog.InfoLevel
-	case "warn":
-		return zerolog.WarnLevel
-	case "error":
-		return zerolog.ErrorLevel
-	case "fatal":
-		return zerolog.WarnLevel
-	case "panic":
-		return zerolog.WarnLevel
+	case zerolog.DebugLevel:
+		return slog.LevelDebug
+	case zerolog.InfoLevel:
+		return slog.LevelInfo
+	case zerolog.WarnLevel:
+		return slog.LevelWarn
 	default:
-		return zerolog.DebugLevel
+		return slog.LevelError
 	}
 }
 
-func getLogger(isLocal bool) *zerolog.Logger {
+func getLogger() *zerolog.Logger {
 	var writer io.Writer
 	writer = os.Stdout
-	if isLocal {
-		writer = zerolog.NewConsoleWriter()
-	}
 	context := zerolog.New(writer).With().Timestamp().Caller().Stack()
-	if !isLocal {
-		context = context.Str("service.name", "bookfeed")
+	logger := context.Logger()
+	err := config.LoadConfig()
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Unable to load config")
 	}
-	logger := context.Logger().Level(getLevel())
+	if config.LogFormat() == "text" {
+		writer = zerolog.NewConsoleWriter()
+		logger = logger.Output(writer)
+	} else {
+		logger = logger.With().Str("service.name", "bookfeed").Logger()
+	}
+	level := config.LogLevel()
+	logger = logger.Level(level)
 	log.Logger = logger
+	slogLevel := getSlogLevel(level)
 
 	// Set up slog to use zerolog for compatibility with go-retryablehttp
-	slog.SetDefault(slog.New(slogzerolog.Option{Logger: &logger}.NewZerologHandler()))
+	slog.SetDefault(slog.New(slogzerolog.Option{Level: slogLevel, Logger: &logger}.NewZerologHandler()))
 	return &logger
 }
 
 func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	isLocal := os.Getenv("APP_ENV") == "local"
-	logger := getLogger(isLocal)
+	logger := getLogger()
+	port := config.Port()
+	log.Info().Int("port", port).Msg("Started server")
 	scheduler, _ := gocron.NewScheduler()
 	scheduler.NewJob(
 		gocron.DurationJob(1*time.Hour),

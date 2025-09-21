@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/feeds"
 )
 
@@ -48,7 +47,7 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 }
 
 func (s *Server) RecentHandler(w http.ResponseWriter, r *http.Request) {
-	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
+	format := strings.ToLower(r.PathValue("format"))
 	feed, err := s.builder.GetRecentReleases(r.Context())
 	if err != nil {
 		log.Error().Err(err).Msg("error retrieving recent")
@@ -58,7 +57,7 @@ func (s *Server) RecentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
-	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
+	format := strings.ToLower(r.PathValue("format"))
 	author := strings.ToLower(r.PathValue("author"))
 	log := log.With().Str("author", author).Logger()
 	feed, err := s.builder.GetAuthorReleases(r.Context(), author)
@@ -73,7 +72,7 @@ func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
-	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
+	format := strings.ToLower(r.PathValue("format"))
 	series := strings.ToLower(r.PathValue("series"))
 	log := log.With().Str("series", series).Logger()
 	feed, err := s.builder.GetSeriesReleases(r.Context(), series)
@@ -87,7 +86,7 @@ func (s *Server) SeriesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) MeHandler(w http.ResponseWriter, r *http.Request) {
-	format, _ := r.Context().Value(middleware.URLFormatCtxKey).(string)
+	format := strings.ToLower(r.PathValue("format"))
 	user := strings.ToLower(r.PathValue("username"))
 	filter := strings.ToLower(r.URL.Query().Get("filter"))
 	log := log.With().Str("user", user).Str("filter", filter).Logger()

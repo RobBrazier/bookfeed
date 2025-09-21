@@ -8,6 +8,8 @@ env:
 
 vars:
   RUN_COMMAND: "{{ if .SECRETS_COMMAND }}{{ .SECRETS_COMMAND }} -- {{end}}"
+  NAME: bookfeed
+  MAIN_PATH: '{{ joinPath "cmd" .NAME "main.go" }}'
 
 tasks:
   download-schema:
@@ -15,20 +17,10 @@ tasks:
     requires:
       vars: [HARDCOVER_TOKEN]
 
-  install-bun:
-    internal: true
-    prompt: This project needs the bun package manager - Install (via npm)?
-    cmd: npm install -g bun
-    status:
-      - which bun
-
   install:
-    deps:
-      - install-bun
-    cmd: bun install
+    cmd: npm install --no-package-lock
     sources:
       - package.json
-      - bun.lock
     generates:
       - node_modules/**/*
 
@@ -46,11 +38,11 @@ tasks:
     deps:
       - generate
     vars:
-      OUT: '{{ .OUT | default "dist/bookfeed" }}'
-    cmd: go build -o {{ .OUT }} ./cmd/api
+      OUT: '{{ .OUT | default (joinPath "dist" .NAME) }}'
+    cmd: go build -o {{ .OUT }} {{ .MAIN_PATH }}
 
   run:
-    cmd: "{{ .RUN_COMMAND }}go run cmd/api/main.go"
+    cmd: "{{ .RUN_COMMAND }}go run {{ .MAIN_PATH }}"
 
   dev:
     vars:
@@ -82,7 +74,7 @@ tasks:
   templui:update:
     vars:
       COMPONENTS:
-        sh: "ls cmd/web/components | xargs echo"
+        sh: "ls internal/view/components | xargs echo"
     cmds:
       - task: templui
         vars:

@@ -31,7 +31,7 @@ tmp/
 # Project build
 dist/
 tmp/
-cmd/web/static/
+assets/build/
 *templ.go
 
 # OS X generated file

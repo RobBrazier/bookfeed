@@ -9,11 +9,11 @@ require (
 	github.com/a-h/templ v0.3.943
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/httprate v0.15.0
-	github.com/go-chi/traceid v0.3.0
 	github.com/go-co-op/gocron/v2 v2.16.5
 	github.com/gorilla/feeds v1.2.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/joho/godotenv v1.5.1
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/maypok86/otter/v2 v2.2.1
 	github.com/rs/zerolog v1.34.0
 	github.com/samber/slog-zerolog/v2 v2.7.3

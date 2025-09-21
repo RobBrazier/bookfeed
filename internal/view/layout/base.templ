@@ -1,0 +1,94 @@
+package layout
+
+import (
+	"fmt"
+	"github.com/RobBrazier/bookfeed/internal/view/components/toast"
+	"github.com/RobBrazier/bookfeed/internal/view/components/card"
+	"github.com/RobBrazier/bookfeed/internal/view/modules/feed"
+	"github.com/RobBrazier/bookfeed/internal/view/components/button"
+	"github.com/RobBrazier/bookfeed/internal/view"
+	"github.com/RobBrazier/bookfeed/assets"
+)
+
+templ Layout(provider view.ProviderData) {
+	<!DOCTYPE html>
+	<html lang="en" class="h-screen">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width,initial-scale=1"/>
+			<title>BookFeed: { provider.Title }</title>
+			<link rel="icon" href="data:image/png;base64,iVBORw0KGgo="/>
+			<link href={ templ.URL(fmt.Sprintf("/static/css/app.css?v=%s", assets.AssetVersions["build/css/app.css"])) } rel="stylesheet"/>
+			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?v=%s", assets.AssetVersions["build/js/app.js"])) }></script>
+			<style>
+				[x-cloak] {
+					display: none !important;
+				}
+			</style>
+		</head>
+		<body class="h-full">
+			<header class="container mx-auto pt-8">
+				<div class="mb-4 flex flex-col items-center justify-center gap-2">
+					<h1 class="text-4xl font-bold">
+						BookFeed ({ provider.Title })
+					</h1>
+					<p class="mb-4 text-muted-foreground">
+						Generate RSS, Atom or JSON feeds for
+						@button.Button(button.Props{
+							Variant: button.VariantLink,
+							Href:    provider.URL,
+							Target:  "_blank",
+							Class:   "px-1 py-0 text-md",
+						}) {
+							{ provider.Title }
+						}
+						releases
+					</p>
+				</div>
+			</header>
+			<main class="container mx-auto px-4 py-4">
+				<div class="w-full max-w-2xl mx-auto flex flex-col gap-8">
+					@card.Card() {
+						@card.Header() {
+							@card.Title() {
+								Feed Format 
+							}
+						}
+						@card.Content(card.ContentProps{
+							Attributes: templ.Attributes{
+								"x-data": "",
+							},
+						}) {
+							@feed.FormatRadio()
+						}
+					}
+					{ children... }
+				</div>
+				<div id="toast-container" @feed-copied.window="copied = true" x-data="{copied: false}">
+					@toast.Toast(toast.Props{
+						Title:         "Copied to clipboard",
+						Variant:       toast.VariantSuccess,
+						ShowIndicator: true,
+						Attributes: templ.Attributes{
+							"x-show":       "copied",
+							"x-cloak":      "",
+							"x-transition": "",
+							"x-effect":     "copied; setTimeout(() => copied = false, $el.dataset.tuiToastDuration)",
+						},
+					})
+				</div>
+			</main>
+			<footer class="container text-muted-foreground text-sm mx-auto text-center">
+				Source Code at
+				@button.Button(button.Props{
+					Variant: button.VariantLink,
+					Href:    "https://github.com/RobBrazier/bookfeed",
+					Class:   "px-1 py-0",
+					Target:  "_blank",
+				}) {
+					RobBrazier/bookfeed
+				}
+			</footer>
+		</body>
+	</html>
+}
