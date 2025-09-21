@@ -4,22 +4,18 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/RobBrazier/bookfeed/internal/model"
-
-	"embed"
-	"text/template"
-
+	"github.com/RobBrazier/bookfeed/internal/view"
+	"github.com/RobBrazier/bookfeed/internal/view/feed"
+	"github.com/a-h/templ"
 	"github.com/gorilla/feeds"
+	"github.com/rs/zerolog/log"
 )
 
-//go:embed templates/*
-var fs embed.FS
-
 type builder struct {
-	templates *template.Template
+	provider view.ProviderData
 }
 
 type Builder interface {
@@ -29,16 +25,25 @@ type Builder interface {
 	GetUserReleases(ctx context.Context, username, filter string) (feeds.Feed, error)
 }
 
-func (b *builder) buildFeed(title, link, description string, created time.Time, books []model.Book) (feeds.Feed, error) {
+func (b *builder) buildFeed(
+	ctx context.Context,
+	title, link, description string,
+	created time.Time,
+	books []model.Book,
+) (feeds.Feed, error) {
 	if description != "" {
 		description = "\n" + description
 	}
 	feed := &feeds.Feed{
-		Title:       title,
-		Link:        &feeds.Link{Href: link},
-		Created:     created,
-		Description: fmt.Sprintf("Generated on %s%s", created.Format("02 Jan 2006 15:04:05 (-0700)"), description),
-		Updated:     created,
+		Title:   title,
+		Link:    &feeds.Link{Href: link},
+		Created: created,
+		Description: fmt.Sprintf(
+			"Generated on %s%s",
+			created.Format("02 Jan 2006 15:04:05 (-0700)"),
+			description,
+		),
+		Updated: created,
 	}
 	for _, book := range books {
 		var authorName string
@@ -52,13 +57,22 @@ func (b *builder) buildFeed(title, link, description string, created time.Time, 
 				Type: "image/webp",
 			}
 		}
+		content, err := b.renderContent(ctx, book)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Interface("book", book).
+				Str("feed", title).
+				Msg("Unable to render feed for book")
+			continue
+		}
 
 		item := &feeds.Item{
 			Id:        strconv.Itoa(book.Id),
 			Title:     book.Title,
 			Link:      &feeds.Link{Href: book.Link},
 			Author:    &feeds.Author{Name: authorName},
-			Content:   b.renderContent(book),
+			Content:   content,
 			Created:   book.ReleaseDate,
 			Enclosure: enclosure,
 		}
@@ -71,8 +85,11 @@ func (b *builder) buildFeed(title, link, description string, created time.Time, 
 	return *feed, nil
 }
 
-func (b *builder) renderContent(book model.Book) string {
-	var builder strings.Builder
-	b.templates.ExecuteTemplate(&builder, "content.tmpl", book)
-	return builder.String()
+func (b *builder) renderContent(ctx context.Context, book model.Book) (string, error) {
+	buf := templ.GetBuffer()
+	defer templ.ReleaseBuffer(buf)
+	if err := feed.Feed(book, b.provider).Render(ctx, buf); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

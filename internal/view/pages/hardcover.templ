@@ -9,13 +9,13 @@ import (
 	"github.com/RobBrazier/bookfeed/internal/view/modules/feed"
 )
 
-var hardcoverProvider = view.ProviderData{
+var HardcoverProvider = view.ProviderData{
 	Title: "Hardcover",
 	URL:   "https://hardcover.app",
 }
 
 templ Hardcover() {
-	@layout.Layout(hardcoverProvider) {
+	@layout.Layout(HardcoverProvider) {
 		@card.Card() {
 			@card.Header() {
 				@card.Title() {

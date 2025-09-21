@@ -6,11 +6,10 @@ import (
 	"path"
 	"time"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/RobBrazier/bookfeed/config"
 	"github.com/RobBrazier/bookfeed/internal/model"
 	"github.com/maypok86/otter/v2"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -18,9 +17,11 @@ var (
 	UserCache       *otter.Cache[string, model.UserInterests]
 )
 
-type CollectionLoaderFunc = otter.LoaderFunc[string, model.Collection]
-type BulkCollectionLoaderFunc = otter.BulkLoaderFunc[string, model.Collection]
-type UserLoaderFunc = otter.LoaderFunc[string, model.UserInterests]
+type (
+	CollectionLoaderFunc     = otter.LoaderFunc[string, model.Collection]
+	BulkCollectionLoaderFunc = otter.BulkLoaderFunc[string, model.Collection]
+	UserLoaderFunc           = otter.LoaderFunc[string, model.UserInterests]
+)
 
 func init() {
 	CollectionCache = newCollectionCache()

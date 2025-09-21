@@ -1,0 +1,83 @@
+package feed
+
+import "github.com/RobBrazier/bookfeed/internal/model"
+import "github.com/RobBrazier/bookfeed/internal/view"
+import "fmt"
+import "strings"
+import "strconv"
+
+type infoOpts struct {
+	Title         string
+	TitleMultiple string
+	Separator     string
+	Break         bool
+}
+
+templ bookInformation(opts infoOpts, items ...string) {
+	if opts.TitleMultiple == "" {
+		{{ opts.TitleMultiple = opts.Title }}
+	}
+	if opts.Separator == "" {
+		{{ opts.Separator = ", " }}
+	}
+	{{ title := opts.Title }}
+	if len(items) > 1 {
+		{{ title = opts.TitleMultiple }}
+	}
+	<span>
+		<strong>{ title }: </strong>{ strings.Join(items, opts.Separator) }
+		if opts.Break {
+			<br/>
+		}
+	</span>
+}
+
+templ Feed(book model.Book, provider view.ProviderData) {
+	if book.Image.Url != "" {
+		<figure>
+			<img src={ templ.URL(book.Image.Url) } width={ book.Image.Width } height={ book.Image.Height }/>
+		</figure>
+	}
+	<section>
+		<h3>Book Information</h3>
+		<div>
+			if book.Compilation {
+				@bookInformation(infoOpts{Title: "NOTE", Break: true}, "This is a Compilation")
+			}
+			if len(book.Authors) > 0 {
+				@bookInformation(infoOpts{Title: "Author", TitleMultiple: "Authors", Break: true}, book.Authors...)
+			}
+			if book.Series.Title != "" {
+				{{ series := book.Series.Title }}
+				if book.Series.Position != 0 {
+					{{ series = fmt.Sprintf("%s (#%s)", series, strconv.FormatFloat(float64(book.Series.Position), 'f', -1, 32)) }}
+				}
+				@bookInformation(infoOpts{Title: "Series", Break: true}, series)
+			}
+			if len(book.Genres) > 0 {
+				@bookInformation(infoOpts{Title: "Genre", TitleMultiple: "Genres", Break: false}, book.Genres...)
+			}
+		</div>
+	</section>
+	if book.Description != "" {
+		<section>
+			<h3>Summary</h3>
+			<div>
+				if book.Headline != "" {
+					<h4>{ strings.ToUpper(book.Headline) }</h4>
+				}
+				for _, line := range strings.Split(book.Description, "\n") {
+					{{ line = strings.TrimSpace(line) }}
+					if line != "" {
+						<p>{ line }</p>
+					}
+				}
+			</div>
+		</section>
+	}
+	if book.Link != "" {
+		<p>
+			See more on { provider.Title }: <a href={ templ.URL(book.Link) }>{ book.Link }</a>
+		</p>
+	}
+}

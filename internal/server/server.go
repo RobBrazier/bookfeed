@@ -12,11 +12,10 @@ import (
 	"github.com/RobBrazier/bookfeed/internal/cache"
 	"github.com/RobBrazier/bookfeed/internal/feed"
 	"github.com/go-co-op/gocron/v2"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	slogzerolog "github.com/samber/slog-zerolog/v2"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 type Server struct {
@@ -59,7 +58,9 @@ func getLogger() *zerolog.Logger {
 	slogLevel := getSlogLevel(level)
 
 	// Set up slog to use zerolog for compatibility with go-retryablehttp
-	slog.SetDefault(slog.New(slogzerolog.Option{Level: slogLevel, Logger: &logger}.NewZerologHandler()))
+	slog.SetDefault(
+		slog.New(slogzerolog.Option{Level: slogLevel, Logger: &logger}.NewZerologHandler()),
+	)
 	return &logger
 }
 
@@ -68,10 +69,13 @@ func NewServer() *http.Server {
 	port := config.Port()
 	log.Info().Int("port", port).Msg("Started server")
 	scheduler, _ := gocron.NewScheduler()
-	scheduler.NewJob(
+	_, err := scheduler.NewJob(
 		gocron.DurationJob(1*time.Hour),
 		gocron.NewTask(cache.SaveCache),
 	)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to start scheduler")
+	}
 	scheduler.Start()
 
 	NewServer := &Server{
@@ -89,7 +93,10 @@ func NewServer() *http.Server {
 		WriteTimeout: 30 * time.Second,
 	}
 	server.RegisterOnShutdown(func() {
-		scheduler.Shutdown()
+		err := scheduler.Shutdown()
+		if err != nil {
+			log.Error().Err(err).Msg("Unable to shutdown scheduler")
+		}
 	})
 
 	cache.LoadCache()

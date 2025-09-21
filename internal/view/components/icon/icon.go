@@ -55,7 +55,12 @@ func Icon(name string) func(...Props) templ.Component {
 			generatedSvg, err := generateSVG(name, p) // p (Props) is passed to generateSVG
 			if err != nil {
 				// Provide more context in the error message
-				return fmt.Errorf("failed to generate svg for icon '%s' with props %+v: %w", name, p, err)
+				return fmt.Errorf(
+					"failed to generate svg for icon '%s' with props %+v: %w",
+					name,
+					p,
+					err,
+				)
 			}
 
 			iconMutex.Lock()
@@ -102,8 +107,16 @@ func generateSVG(name string, props Props) (string, error) {
 
 	// Construct the final SVG string.
 	// The data-lucide attribute helps identify these as Lucide icons if needed.
-	return fmt.Sprintf("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" height=\"%d\" viewBox=\"0 0 24 24\" fill=\"%s\" stroke=\"%s\" stroke-width=\"%s\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"%s\" data-lucide=\"icon\">%s</svg>",
-		size, size, fill, stroke, strokeWidth, props.Class, content), nil
+	return fmt.Sprintf(
+		"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%d\" height=\"%d\" viewBox=\"0 0 24 24\" fill=\"%s\" stroke=\"%s\" stroke-width=\"%s\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"%s\" data-lucide=\"icon\">%s</svg>",
+		size,
+		size,
+		fill,
+		stroke,
+		strokeWidth,
+		props.Class,
+		content,
+	), nil
 }
 
 // getIconContent retrieves the raw inner SVG content for a given icon name.

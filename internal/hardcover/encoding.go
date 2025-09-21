@@ -8,7 +8,10 @@ import (
 
 func UnmarshalHardcoverDate(b []byte, v *time.Time) error {
 	var input string
-	json.Unmarshal(b, &input)
+	err := json.Unmarshal(b, &input)
+	if err != nil {
+		return err
+	}
 	parsedTime, err := time.Parse(time.DateOnly, input)
 	if err != nil {
 		return err

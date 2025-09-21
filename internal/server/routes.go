@@ -8,7 +8,6 @@ import (
 
 	"github.com/RobBrazier/bookfeed/config"
 	"github.com/RobBrazier/bookfeed/internal/view/pages"
-
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

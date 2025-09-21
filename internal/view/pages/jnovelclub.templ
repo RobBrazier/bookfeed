@@ -7,13 +7,13 @@ import (
 	"github.com/RobBrazier/bookfeed/internal/view/layout"
 )
 
-var jnovelClubProvider = view.ProviderData{
+var JnovelClubProvider = view.ProviderData{
 	Title: "J-Novel Club",
 	URL:   "https://j-novel.club",
 }
 
 templ JNovelClub() {
-	@layout.Layout(jnovelClubProvider) {
+	@layout.Layout(JnovelClubProvider) {
 		@card.Card() {
 			@card.Header() {
 				@card.Title() {

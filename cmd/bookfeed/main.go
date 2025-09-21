@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/RobBrazier/bookfeed/internal/server"
+	"github.com/rs/zerolog/log"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {

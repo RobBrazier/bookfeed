@@ -2,13 +2,13 @@ package server
 
 import (
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"mime"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/feeds"
+	"github.com/rs/zerolog/log"
 )
 
 func writeContentType(mediaType string, w http.ResponseWriter) {
@@ -22,7 +22,7 @@ func writeContentType(mediaType string, w http.ResponseWriter) {
 func (s *Server) notFound(err error, w http.ResponseWriter) {
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 	w.WriteHeader(http.StatusNotFound)
-	w.Write([]byte(err.Error()))
+	_, _ = w.Write([]byte(err.Error()))
 }
 
 func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter) {
@@ -32,17 +32,25 @@ func (s *Server) writeFeed(format string, out *feeds.Feed, w http.ResponseWriter
 	cacheExpiry := out.Created.Add(12 * time.Hour)
 	remaining := cacheExpiry.Sub(time.Now().UTC())
 	w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%d", int(remaining.Seconds())))
+	var err error
 
 	switch format {
 	case "rss":
 		writeContentType("application/rss+xml", w)
-		out.WriteRss(w)
+		err = out.WriteRss(w)
 	case "json":
 		writeContentType("application/json", w)
-		out.WriteJSON(w)
+		err = out.WriteJSON(w)
 	default:
 		writeContentType("application/atom+xml", w)
-		out.WriteAtom(w)
+		err = out.WriteAtom(w)
+	}
+	if err != nil {
+		log.Error().
+			Err(err).
+			Interface("feed", out).
+			Str("format", format).
+			Msg("Unable to write output for feed")
 	}
 }
 
@@ -61,7 +69,6 @@ func (s *Server) AuthorHandler(w http.ResponseWriter, r *http.Request) {
 	author := strings.ToLower(r.PathValue("author"))
 	log := log.With().Str("author", author).Logger()
 	feed, err := s.builder.GetAuthorReleases(r.Context(), author)
-
 	if err != nil {
 		log.Error().Err(err).Msg("error retrieving author")
 		s.notFound(err, w)
