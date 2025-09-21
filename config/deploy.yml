@@ -25,7 +25,9 @@ builder:
 env:
   clear:
     PORT: 8080
-    CACHE_BACKUP: /tmp/cache
+    LOG_LEVEL: info
+    LOG_FORMAT: json
+    CACHE_STORAGE_PATH: /tmp/cache
   secret:
     - HARDCOVER_TOKEN
 
