@@ -19,7 +19,7 @@ type Server struct {
 	builder feed.Builder
 }
 
-func NewServer() (*http.Server, func()) {
+func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	scheduler, _ := gocron.NewScheduler()
 	scheduler.NewJob(
@@ -41,12 +41,11 @@ func NewServer() (*http.Server, func()) {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
+	server.RegisterOnShutdown(func() {
+		scheduler.Shutdown()
+	})
 
 	cache.LoadCache()
 
-	shutdown := func() {
-		scheduler.Shutdown()
-	}
-
-	return server, shutdown
+	return server
 }

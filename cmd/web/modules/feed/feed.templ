@@ -22,8 +22,7 @@ templ FormatRadio() {
 				@tabs.Trigger(tabs.TriggerProps{
 					Value: value,
 					Attributes: templ.Attributes{
-						":data-tui-tabs-state": fmt.Sprintf("$store.format === %q ? 'active' : 'inactive'", value),
-						"@click":               fmt.Sprintf("$store.format = %q", value),
+						"@click": fmt.Sprintf("$store.format = %q", value),
 					},
 				}) {
 					{ format }

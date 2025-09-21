@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs'
 import "./selectbox.min.js";
 import "./popover.min.js";
+import "./tabs.min.js";
 
 window.Alpine = Alpine
 
@@ -23,9 +24,6 @@ Alpine.data('container', (baseUrl, useInput) => ({
 		if (this.filter !== "") {
 			query.filter = this.filter
 		}
-		if (this.within < 24) {
-			query.within = this.within
-		}
 		const params = new URLSearchParams(query)
 		if (params.size > 0) {
 			url += `?${params.toString()}`
@@ -34,7 +32,6 @@ Alpine.data('container', (baseUrl, useInput) => ({
 	},
 	input: '',
 	filter: '',
-	within: 24,
 }))
 
 Alpine.start()

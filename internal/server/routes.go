@@ -76,7 +76,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Use(httprate.LimitByIP(10, 10*time.Second))
 
 		r.Route("/hc", func(r chi.Router) {
-			r.Handle("/", templ.Handler(web.Hardcover()))
+			r.With(middleware.NoCache).Handle("/", templ.Handler(web.Hardcover()))
 			r.Get("/recent", s.RecentHandler)
 			r.Get("/author/{author:[a-zA-Z0-9-]+}", s.AuthorHandler)
 			r.Get("/series/{series:[a-zA-Z0-9-]+}", s.SeriesHandler)
@@ -84,7 +84,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 
 		r.Route("/jnc", func(r chi.Router) {
-			r.Handle("/", templ.Handler(web.JNovelClub()))
+			r.With(middleware.NoCache).Handle("/", templ.Handler(web.JNovelClub()))
 		})
 	})
 
