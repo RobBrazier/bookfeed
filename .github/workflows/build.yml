@@ -90,7 +90,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           log-public-key: false
-      - run: kamal deploy
+      - run: |
+          kamal deploy
+          kamal prune all
         env:
           SERVER_IPS: ${{ secrets.SERVER_IPS }}
           PROXY_HOSTS: ${{ vars.PROXY_HOSTS }}
