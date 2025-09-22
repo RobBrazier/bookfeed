@@ -31,7 +31,6 @@ tmp/
 # Project build
 dist/
 tmp/
-assets/build/
 *templ.go
 
 # OS X generated file
