@@ -92,7 +92,7 @@ func (b *hardcoverBuilder) GetRecentReleases(ctx context.Context) (feeds.Feed, e
 			data, err := hardcover.RecentReleases(ctx, b.client, now, lastMonth)
 			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved recent releases data")
 			if err != nil {
-				return
+				return collection, err
 			}
 			books := b.mapBooks(data.Books)
 			return model.NewCollection("Recent", "upcoming/recent", books), nil
@@ -129,11 +129,11 @@ func (b *hardcoverBuilder) GetAuthorReleases(ctx context.Context, slug string) (
 			)
 			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
 			if err != nil {
-				return
+				return collection, err
 			}
 			if len(data.Authors) == 0 {
 				err = fmt.Errorf("author not found")
-				return
+				return collection, err
 			}
 			author := data.Authors[0]
 			authorName := author.Name
@@ -181,11 +181,11 @@ func (b *hardcoverBuilder) GetSeriesReleases(ctx context.Context, slug string) (
 			)
 			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
 			if err != nil {
-				return
+				return collection, err
 			}
 			if len(data.Series) == 0 {
 				err = fmt.Errorf("series not found")
-				return
+				return collection, err
 			}
 			var books []model.Book
 			seriesName := data.Series[0].Name
@@ -229,11 +229,11 @@ func (b *hardcoverBuilder) getUserInterests(
 			data, err := hardcover.UserInterests(ctx, b.client, username, earliest)
 			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved user interests")
 			if err != nil {
-				return
+				return interests, err
 			}
 			if len(data.Users) == 0 {
 				err = fmt.Errorf("user not found")
-				return
+				return interests, err
 			}
 			authorCount := make(map[string]int)
 			seriesCount := make(map[string]int)
