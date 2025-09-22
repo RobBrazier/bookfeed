@@ -82,6 +82,12 @@ func (b *builder) buildFeed(
 		return b.Created.Before(a.Created)
 	})
 
+	// Limit feed result size
+	maxItems := 25
+	if len(feed.Items) > maxItems {
+		feed.Items = feed.Items[:maxItems]
+	}
+
 	return *feed, nil
 }
 
