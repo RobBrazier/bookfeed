@@ -8,7 +8,7 @@ pre-commit:
 
     - name: templ fmt
       run: go tool templ fmt {files}
-      glob: "*.templ"
+      glob: "**/*.templ"
       stage_fixed: true
 
     - name: golangci-lint
