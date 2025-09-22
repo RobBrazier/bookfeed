@@ -1,6 +1,6 @@
 [tools]
 air = "latest"
-node = "latest"
+node = "lts"
 doppler = "latest"
 go = "latest"
 task = "latest"
