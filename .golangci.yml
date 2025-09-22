@@ -1,8 +1,15 @@
 version: "2"
 linters:
   default: standard
+  enable:
+    - contextcheck
+    - gocognit
+    - goconst
+    - tagalign
+    - goprintffuncname
+    - zerologlint
+    - iotamixing
 formatters:
   enable:
     - gofumpt
-    - gci
     - golines

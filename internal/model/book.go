@@ -7,6 +7,7 @@ type Collection struct {
 	Slug    string
 	Created time.Time
 	Books   []Book
+	Found   bool
 }
 
 func NewCollection(name, slug string, books []Book) Collection {
@@ -15,6 +16,7 @@ func NewCollection(name, slug string, books []Book) Collection {
 		Slug:    slug,
 		Created: time.Now().UTC(),
 		Books:   books,
+		Found:   true,
 	}
 }
 
@@ -47,4 +49,5 @@ type Series struct {
 type UserInterests struct {
 	Authors []string
 	Series  []string
+	Found   bool
 }

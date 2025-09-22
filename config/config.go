@@ -9,17 +9,17 @@ import (
 )
 
 type config struct {
-	Port int `envconfig:"PORT" default:"8080"`
+	Port int `default:"8080" envconfig:"PORT"`
 	Log  struct {
-		Level    string `envconfig:"LOG_LEVEL" default:"debug"`
-		Format   string `envconfig:"LOG_FORMAT" default:"text"`
-		Requests bool   `envconfig:"LOG_REQUESTS" default:"false"`
+		Level    string `default:"debug" envconfig:"LOG_LEVEL"`
+		Format   string `default:"text"  envconfig:"LOG_FORMAT"`
+		Requests bool   `default:"false" envconfig:"LOG_REQUESTS"`
 	}
 	Tokens struct {
 		Hardcover string `envconfig:"HARDCOVER_TOKEN"`
 	}
 	Cache struct {
-		StoragePath string `envconfig:"CACHE_STORAGE_PATH" default:"."`
+		StoragePath string `default:"." envconfig:"CACHE_STORAGE_PATH"`
 	}
 }
 

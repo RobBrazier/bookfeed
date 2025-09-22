@@ -27,6 +27,12 @@ tasks:
     generates:
       - node_modules/**/*
 
+  fmt:
+    cmd: golangci-lint fmt {{ .CLI_ARGS }}
+
+  lint:
+    cmd: golangci-lint run --fix {{ .CLI_ARGS }}
+
   clean:
     cmd: rm -r {{ .ROOT_DIR }}/dist
     status:

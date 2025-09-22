@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Khan/genqlient/graphql"
@@ -17,6 +18,8 @@ import (
 	"github.com/RobBrazier/bookfeed/internal/view/pages"
 	"github.com/gorilla/feeds"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type hardcoverBuilder struct {
@@ -112,46 +115,74 @@ func (b *hardcoverBuilder) GetRecentReleases(ctx context.Context) (feeds.Feed, e
 	)
 }
 
-func (b *hardcoverBuilder) GetAuthorReleases(ctx context.Context, slug string) (feeds.Feed, error) {
-	log := log.With().Str("author", slug).Logger()
-	loader := cache.CollectionLoaderFunc(
-		func(ctx context.Context, key string) (collection model.Collection, err error) {
+func (b *hardcoverBuilder) authorLoader() cache.BulkCollectionLoaderFunc {
+	return cache.BulkCollectionLoaderFunc(
+		func(ctx context.Context, keys []string) (map[string]model.Collection, error) {
+			result := make(map[string]model.Collection)
 			now := time.Now()
-			lastYear := now.AddDate(-1, 0, 0)
+			earliest := now.AddDate(-1, 0, 0)
+			uncachedKeys := b.uncachedKeys(keys)
+			slugMapping := b.extractSlugs(uncachedKeys)
+			slugs := slices.Collect(maps.Keys(slugMapping))
+			log := log.With().Strs("authors", slugs).Strs("uncached", uncachedKeys).Logger()
 			log.Info().Msg("Fetching releases")
 			data, err := hardcover.RecentAuthorReleases(
 				ctx,
 				b.client,
 				now,
-				lastYear,
-				[]string{slug},
+				earliest,
+				slugs,
 				b.compilations,
 			)
-			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
 			if err != nil {
-				return collection, err
+				return result, err
 			}
-			if len(data.Authors) == 0 {
-				err = fmt.Errorf("author not found")
-				return collection, err
+			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
+			for _, author := range data.Authors {
+				if cacheKey, ok := slugMapping[author.Slug]; ok {
+					var books []model.Book
+					for _, contribution := range author.Contributions {
+						books = append(books, b.mapBook(contribution.Book))
+					}
+					result[cacheKey] = model.NewCollection(
+						author.Name,
+						fmt.Sprintf("authors/%s", author.Slug),
+						books,
+					)
+				}
 			}
-			author := data.Authors[0]
-			authorName := author.Name
-			var books []model.Book
-			for _, contribution := range author.Contributions {
-				books = append(books, b.mapBook(contribution.Book))
+			for _, uncachedKey := range uncachedKeys {
+				if _, ok := result[uncachedKey]; !ok {
+					// Prevent abuse from entry not found
+					result[uncachedKey] = model.Collection{}
+				}
 			}
-			url := fmt.Sprintf("authors/%s", slug)
-			return model.NewCollection(authorName, url, books), nil
+			return result, err
 		},
 	)
-	collection, err := cache.CollectionCache.Get(
+}
+
+func (b *hardcoverBuilder) GetAuthorReleases(
+	ctx context.Context,
+	slug string,
+) (feed feeds.Feed, err error) {
+	loader := b.authorLoader()
+	key := fmt.Sprintf("hardcover/authors/%s", slug)
+	collections, err := cache.CollectionCache.BulkGet(
 		ctx,
-		fmt.Sprintf("hardcover/author/%s", slug),
+		[]string{key},
 		loader,
 	)
 	if err != nil {
-		return feeds.Feed{}, err
+		return feed, err
+	}
+
+	collection, ok := collections[key]
+	if !ok {
+		return feed, fmt.Errorf("error occurred fetching series %s", key)
+	}
+	if !collection.Found {
+		return feed, fmt.Errorf("author not found")
 	}
 	title := fmt.Sprintf("Hardcover Author Releases: %s", collection.Name)
 	return b.buildFeed(
@@ -164,46 +195,79 @@ func (b *hardcoverBuilder) GetAuthorReleases(ctx context.Context, slug string) (
 	)
 }
 
-func (b *hardcoverBuilder) GetSeriesReleases(ctx context.Context, slug string) (feeds.Feed, error) {
-	log := log.With().Str("series", slug).Logger()
-	loader := cache.CollectionLoaderFunc(
-		func(ctx context.Context, key string) (collection model.Collection, err error) {
+func (b *hardcoverBuilder) seriesLoader() cache.BulkCollectionLoaderFunc {
+	return cache.BulkCollectionLoaderFunc(
+		func(ctx context.Context, keys []string) (map[string]model.Collection, error) {
+			result := make(map[string]model.Collection)
 			now := time.Now()
-			lastYear := now.AddDate(-1, 0, 0)
+			earliest := now.AddDate(-1, 0, 0)
+			uncachedKeys := keys
+			if len(keys) > 1 {
+				uncachedKeys = b.uncachedKeys(keys)
+			}
+			slugMapping := b.extractSlugs(uncachedKeys)
+			slugs := slices.Collect(maps.Keys(slugMapping))
+			log := log.With().Strs("series", slugs).Strs("uncached", uncachedKeys).Logger()
 			log.Info().Msg("Fetching releases")
 			data, err := hardcover.RecentSeriesReleases(
 				ctx,
 				b.client,
 				now,
-				lastYear,
-				[]string{slug},
+				earliest,
+				slugs,
 				b.compilations,
 			)
-			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
 			if err != nil {
-				return collection, err
+				return result, err
 			}
-			if len(data.Series) == 0 {
-				err = fmt.Errorf("series not found")
-				return collection, err
+			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
+			for _, series := range data.Series {
+				if cacheKey, ok := slugMapping[series.Slug]; ok {
+					var books []model.Book
+					for _, book := range data.BookSeries {
+						if book.Series.Slug == series.Slug {
+							books = append(books, b.mapBook(book.Book))
+						}
+					}
+					result[cacheKey] = model.NewCollection(
+						series.Name,
+						fmt.Sprintf("series/%s", series.Slug),
+						books,
+					)
+				}
 			}
-			var books []model.Book
-			seriesName := data.Series[0].Name
-			for _, series := range data.BookSeries {
-				books = append(books, b.mapBook(series.Book))
+			for _, uncachedKey := range uncachedKeys {
+				if _, ok := result[uncachedKey]; !ok {
+					// Prevent abuse from entry not found
+					result[uncachedKey] = model.Collection{}
+				}
 			}
-
-			url := fmt.Sprintf("series/%s", slug)
-			return model.NewCollection(seriesName, url, books), nil
+			return result, err
 		},
 	)
-	collection, err := cache.CollectionCache.Get(
+}
+
+func (b *hardcoverBuilder) GetSeriesReleases(
+	ctx context.Context,
+	slug string,
+) (feed feeds.Feed, err error) {
+	loader := b.seriesLoader()
+	key := fmt.Sprintf("hardcover/series/%s", slug)
+	collections, err := cache.CollectionCache.BulkGet(
 		ctx,
-		fmt.Sprintf("hardcover/series/%s", slug),
+		[]string{key},
 		loader,
 	)
 	if err != nil {
-		return feeds.Feed{}, err
+		return feed, err
+	}
+
+	collection, ok := collections[key]
+	if !ok {
+		return feed, fmt.Errorf("error occurred fetching series %s", key)
+	}
+	if !collection.Found {
+		return feed, fmt.Errorf("series not found")
 	}
 	title := fmt.Sprintf("Hardcover Series Releases: %s", collection.Name)
 	return b.buildFeed(
@@ -232,8 +296,7 @@ func (b *hardcoverBuilder) getUserInterests(
 				return interests, err
 			}
 			if len(data.Users) == 0 {
-				err = fmt.Errorf("user not found")
-				return interests, err
+				return interests, nil
 			}
 			authorCount := make(map[string]int)
 			seriesCount := make(map[string]int)
@@ -268,6 +331,7 @@ func (b *hardcoverBuilder) getUserInterests(
 			return model.UserInterests{
 				Series:  series,
 				Authors: authors,
+				Found:   true,
 			}, nil
 		},
 	)
@@ -292,6 +356,26 @@ func (b hardcoverBuilder) extractSlugs(keys []string) map[string]string {
 	return result
 }
 
+func (b hardcoverBuilder) collectKeys(
+	collect bool,
+	key string,
+	items []string,
+	builder *strings.Builder,
+) []string {
+	if !collect || len(items) == 0 {
+		return []string{}
+	}
+	caser := cases.Title(language.English)
+	title := caser.String(key)
+	fmt.Fprintf(builder, "%s: %s\n", title, strings.Join(items, ", "))
+
+	var keys []string
+	for _, item := range items {
+		keys = append(keys, fmt.Sprintf("hardcover/%s/%s", key, item))
+	}
+	return keys
+}
+
 func (b *hardcoverBuilder) GetUserReleases(
 	ctx context.Context,
 	username, filter string,
@@ -301,108 +385,100 @@ func (b *hardcoverBuilder) GetUserReleases(
 	if err != nil {
 		return feeds.Feed{}, err
 	}
+	if !interests.Found {
+		return feeds.Feed{}, fmt.Errorf("user not found")
+	}
 
-	var seriesKeys []string
-	var authorKeys []string
 	var descBuilder strings.Builder
 	descBuilder.WriteString("Includes New Releases from:\n")
-	if slices.Contains([]string{"", "series"}, filter) && len(interests.Series) > 0 {
-		descBuilder.WriteString(fmt.Sprintf("Series: %s\n", strings.Join(interests.Series, ", ")))
-		for _, item := range interests.Series {
-			seriesKeys = append(seriesKeys, fmt.Sprintf("hardcover/series/%s", item))
-		}
-	}
 
-	if slices.Contains([]string{"", "author"}, filter) && len(interests.Authors) > 0 {
-		descBuilder.WriteString(fmt.Sprintf("Authors: %s\n", strings.Join(interests.Authors, ", ")))
-		for _, item := range interests.Authors {
-			authorKeys = append(seriesKeys, fmt.Sprintf("hardcover/author/%s", item))
-		}
-	}
-
-	seriesLoader := cache.BulkCollectionLoaderFunc(
-		func(ctx context.Context, keys []string) (map[string]model.Collection, error) {
-			result := make(map[string]model.Collection)
-			now := time.Now()
-			earliest := now.AddDate(-1, 0, 0)
-			uncachedKeys := b.uncachedKeys(seriesKeys)
-			slugMapping := b.extractSlugs(uncachedKeys)
-			slugs := slices.Collect(maps.Keys(slugMapping))
-			log := log.With().Strs("series", slugs).Strs("uncached", uncachedKeys).Logger()
-			log.Info().Msg("Fetching releases")
-			data, err := hardcover.RecentSeriesReleases(
-				ctx,
-				b.client,
-				now,
-				earliest,
-				slugs,
-				b.compilations,
-			)
-			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
-			for _, series := range data.Series {
-				if cacheKey, ok := slugMapping[series.Slug]; ok {
-					var books []model.Book
-					for _, book := range data.BookSeries {
-						if book.Series.Slug == series.Slug {
-							books = append(books, b.mapBook(book.Book))
-						}
-					}
-					result[cacheKey] = model.NewCollection(series.Name, series.Slug, books)
-				}
-			}
-			return result, err
-		},
+	seriesKeys := b.collectKeys(
+		slices.Contains([]string{"", "series"}, filter),
+		"series",
+		interests.Series,
+		&descBuilder,
 	)
-	authorLoader := cache.BulkCollectionLoaderFunc(
-		func(ctx context.Context, keys []string) (map[string]model.Collection, error) {
-			result := make(map[string]model.Collection)
-			now := time.Now()
-			earliest := now.AddDate(-1, 0, 0)
-			uncachedKeys := b.uncachedKeys(authorKeys)
-			slugMapping := b.extractSlugs(uncachedKeys)
-			slugs := slices.Collect(maps.Keys(slugMapping))
-			log := log.With().Strs("author", slugs).Strs("uncached", uncachedKeys).Logger()
-			log.Info().Msg("Fetching releases")
-			data, err := hardcover.RecentAuthorReleases(
-				ctx,
-				b.client,
-				now,
-				earliest,
-				slugs,
-				b.compilations,
-			)
-			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
-			for _, author := range data.Authors {
-				if cacheKey, ok := slugMapping[author.Slug]; ok {
-					var books []model.Book
-					for _, contribution := range author.Contributions {
-						books = append(books, b.mapBook(contribution.Book))
-					}
-					result[cacheKey] = model.NewCollection(author.Name, author.Slug, books)
-				}
-			}
-			return result, err
-		},
+
+	authorKeys := b.collectKeys(
+		slices.Contains([]string{"", "author"}, filter),
+		"authors",
+		interests.Authors,
+		&descBuilder,
 	)
-	seriesCollections, err := cache.CollectionCache.BulkGet(ctx, seriesKeys, seriesLoader)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to fetch series data for")
+
+	type job struct {
+		key    string
+		keys   []string
+		loader cache.BulkCollectionLoaderFunc
 	}
-	authorCollections, err := cache.CollectionCache.BulkGet(ctx, authorKeys, authorLoader)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to fetch author data for")
+	jobs := []job{}
+	if len(seriesKeys) > 0 {
+		jobs = append(jobs, job{
+			key:    "series",
+			keys:   seriesKeys,
+			loader: b.seriesLoader(),
+		})
+	}
+	if len(authorKeys) > 0 {
+		jobs = append(jobs, job{
+			key:    "author",
+			keys:   authorKeys,
+			loader: b.authorLoader(),
+		})
 	}
 
+	var wg sync.WaitGroup
+	results := sync.Map{}
+	wg.Add(len(jobs))
+	for _, job := range jobs {
+		go func() {
+			defer wg.Done()
+			result, err := cache.CollectionCache.BulkGet(ctx, job.keys, job.loader)
+			if err != nil {
+				log.Error().Err(err).Msgf("Unable to fetch %s data", job.key)
+			}
+			for key, value := range result {
+				results.Store(key, value)
+			}
+		}()
+	}
+	wg.Wait()
+	keys := []string{}
+	keys = append(keys, seriesKeys...)
+	keys = append(keys, authorKeys...)
+
+	collections := make(map[string]model.Collection)
+	for _, key := range keys {
+		value, ok := results.Load(key)
+		log := log.With().Str("key", key).Logger()
+		if !ok {
+			log.Warn().Msg("key not found in collected collections")
+			continue
+		}
+		collection, ok := value.(model.Collection)
+		if !ok {
+			log.Warn().Msg("value not Collection type")
+			continue
+		}
+		collections[key] = collection
+	}
+
+	// seriesCollections, err := cache.CollectionCache.BulkGet(ctx, seriesKeys, b.seriesLoader())
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("Unable to fetch series data")
+	// }
+	// authorCollections, err := cache.CollectionCache.BulkGet(ctx, authorKeys, b.authorLoader())
+	// if err != nil {
+	// 	log.Error().Err(err).Msg("Unable to fetch author data")
+	// }
+	//
 	bookMapping := make(map[int]model.Book)
-	for _, series := range seriesCollections {
-		for _, book := range series.Books {
-			if _, ok := bookMapping[book.Id]; !ok {
-				bookMapping[book.Id] = book
-			}
-		}
-	}
-	for _, author := range authorCollections {
-		for _, book := range author.Books {
+	// results := make(map[string]model.Collection)
+	// maps.Copy(results, authorCollections)
+	// maps.Copy(results, seriesCollections)
+
+	for _, collection := range collections {
+		for _, book := range collection.Books {
 			if _, ok := bookMapping[book.Id]; !ok {
 				bookMapping[book.Id] = book
 			}
