@@ -33,6 +33,7 @@ dist/
 tmp/
 assets/build/
 *templ.go
+generated.go
 
 # OS X generated file
 .DS_Store

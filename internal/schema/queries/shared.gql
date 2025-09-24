@@ -7,11 +7,8 @@ fragment Book on books {
   description
   # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookGenre")
   genres: cached_tags(path: "Genre")
-  contributions {
-    author {
-      name
-    }
-  }
+  # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookContributor")
+  contributions: cached_contributors
   compilation
   # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookImage")
   image: cached_image
