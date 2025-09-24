@@ -527,19 +527,7 @@ func (b *hardcoverBuilder) GetUserReleases(
 		collections[key] = collection
 	}
 
-	// seriesCollections, err := cache.CollectionCache.BulkGet(ctx, seriesKeys, b.seriesLoader())
-	// if err != nil {
-	// 	log.Error().Err(err).Msg("Unable to fetch series data")
-	// }
-	// authorCollections, err := cache.CollectionCache.BulkGet(ctx, authorKeys, b.authorLoader())
-	// if err != nil {
-	// 	log.Error().Err(err).Msg("Unable to fetch author data")
-	// }
-	//
 	bookMapping := make(map[int]model.Book)
-	// results := make(map[string]model.Collection)
-	// maps.Copy(results, authorCollections)
-	// maps.Copy(results, seriesCollections)
 
 	for _, collection := range collections {
 		for _, book := range collection.Books {
