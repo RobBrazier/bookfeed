@@ -1,0 +1,40 @@
+fragment SeriesRelease on series {
+    name
+    slug
+    bookSeries: book_series(
+      where: {
+        book: {
+          release_date: {_lte: $to, _gte: $from},
+          book_mappings: {id: {_is_null: false}}
+          compilation: {
+            _in: [$compilations, false]
+          }
+        }
+      }
+      order_by: {book: {release_date: desc_nulls_last}}
+      limit: 25
+    ) {
+      # @genqlient(flatten: true)
+      book {
+        ...Book
+      }
+    }
+}
+
+query RecentSeriesReleases($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
+  # @genqlient(flatten: true)
+  series(where: {
+    slug: {_in: $slug}
+  }) {
+    ...SeriesRelease
+  }
+}
+
+query RecentSeriesReleasesById($to: date, $from: date, $ids: [Int!], $compilations: Boolean = false) {
+  # @genqlient(flatten: true)
+  series(where: {
+    id: {_in: $ids}
+  }) {
+    ...SeriesRelease
+  }
+}

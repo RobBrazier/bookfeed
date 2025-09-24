@@ -11,6 +11,56 @@ import (
 	"github.com/Khan/genqlient/graphql"
 )
 
+// AuthorRelease includes the GraphQL fields of authors requested by the fragment AuthorRelease.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "authors"
+type AuthorRelease struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+	// An array relationship
+	Contributions []AuthorReleaseContributions `json:"contributions"`
+}
+
+// GetName returns AuthorRelease.Name, and is useful for accessing the field via an interface.
+func (v *AuthorRelease) GetName() string { return v.Name }
+
+// GetSlug returns AuthorRelease.Slug, and is useful for accessing the field via an interface.
+func (v *AuthorRelease) GetSlug() string { return v.Slug }
+
+// GetContributions returns AuthorRelease.Contributions, and is useful for accessing the field via an interface.
+func (v *AuthorRelease) GetContributions() []AuthorReleaseContributions { return v.Contributions }
+
+// AuthorReleaseContributions includes the requested fields of the GraphQL type contributions.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "contributions"
+type AuthorReleaseContributions struct {
+	// An object relationship
+	Author AuthorReleaseContributionsAuthorAuthors `json:"author"`
+	// An object relationship
+	Book Book `json:"book"`
+}
+
+// GetAuthor returns AuthorReleaseContributions.Author, and is useful for accessing the field via an interface.
+func (v *AuthorReleaseContributions) GetAuthor() AuthorReleaseContributionsAuthorAuthors {
+	return v.Author
+}
+
+// GetBook returns AuthorReleaseContributions.Book, and is useful for accessing the field via an interface.
+func (v *AuthorReleaseContributions) GetBook() Book { return v.Book }
+
+// AuthorReleaseContributionsAuthorAuthors includes the requested fields of the GraphQL type authors.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "authors"
+type AuthorReleaseContributionsAuthorAuthors struct {
+	Name string `json:"name"`
+}
+
+// GetName returns AuthorReleaseContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
+func (v *AuthorReleaseContributionsAuthorAuthors) GetName() string { return v.Name }
+
 // Book includes the GraphQL fields of books requested by the fragment Book.
 // The GraphQL type's documentation follows.
 //
@@ -179,66 +229,23 @@ type BookContributionsAuthorAuthors struct {
 // GetName returns BookContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
 func (v *BookContributionsAuthorAuthors) GetName() string { return v.Name }
 
-// RecentAuthorReleasesAuthors includes the requested fields of the GraphQL type authors.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "authors"
-type RecentAuthorReleasesAuthors struct {
-	Name string `json:"name"`
-	Slug string `json:"slug"`
-	// An array relationship
-	Contributions []RecentAuthorReleasesAuthorsContributions `json:"contributions"`
+// RecentAuthorReleasesByIdResponse is returned by RecentAuthorReleasesById on success.
+type RecentAuthorReleasesByIdResponse struct {
+	// fetch data from the table: "authors"
+	Authors []AuthorRelease `json:"authors"`
 }
 
-// GetName returns RecentAuthorReleasesAuthors.Name, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesAuthors) GetName() string { return v.Name }
-
-// GetSlug returns RecentAuthorReleasesAuthors.Slug, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesAuthors) GetSlug() string { return v.Slug }
-
-// GetContributions returns RecentAuthorReleasesAuthors.Contributions, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesAuthors) GetContributions() []RecentAuthorReleasesAuthorsContributions {
-	return v.Contributions
-}
-
-// RecentAuthorReleasesAuthorsContributions includes the requested fields of the GraphQL type contributions.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "contributions"
-type RecentAuthorReleasesAuthorsContributions struct {
-	// An object relationship
-	Author RecentAuthorReleasesAuthorsContributionsAuthorAuthors `json:"author"`
-	// An object relationship
-	Book Book `json:"book"`
-}
-
-// GetAuthor returns RecentAuthorReleasesAuthorsContributions.Author, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesAuthorsContributions) GetAuthor() RecentAuthorReleasesAuthorsContributionsAuthorAuthors {
-	return v.Author
-}
-
-// GetBook returns RecentAuthorReleasesAuthorsContributions.Book, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesAuthorsContributions) GetBook() Book { return v.Book }
-
-// RecentAuthorReleasesAuthorsContributionsAuthorAuthors includes the requested fields of the GraphQL type authors.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "authors"
-type RecentAuthorReleasesAuthorsContributionsAuthorAuthors struct {
-	Name string `json:"name"`
-}
-
-// GetName returns RecentAuthorReleasesAuthorsContributionsAuthorAuthors.Name, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesAuthorsContributionsAuthorAuthors) GetName() string { return v.Name }
+// GetAuthors returns RecentAuthorReleasesByIdResponse.Authors, and is useful for accessing the field via an interface.
+func (v *RecentAuthorReleasesByIdResponse) GetAuthors() []AuthorRelease { return v.Authors }
 
 // RecentAuthorReleasesResponse is returned by RecentAuthorReleases on success.
 type RecentAuthorReleasesResponse struct {
 	// fetch data from the table: "authors"
-	Authors []RecentAuthorReleasesAuthors `json:"authors"`
+	Authors []AuthorRelease `json:"authors"`
 }
 
 // GetAuthors returns RecentAuthorReleasesResponse.Authors, and is useful for accessing the field via an interface.
-func (v *RecentAuthorReleasesResponse) GetAuthors() []RecentAuthorReleasesAuthors { return v.Authors }
+func (v *RecentAuthorReleasesResponse) GetAuthors() []AuthorRelease { return v.Authors }
 
 // RecentReleasesResponse is returned by RecentReleases on success.
 type RecentReleasesResponse struct {
@@ -249,66 +256,55 @@ type RecentReleasesResponse struct {
 // GetBooks returns RecentReleasesResponse.Books, and is useful for accessing the field via an interface.
 func (v *RecentReleasesResponse) GetBooks() []Book { return v.Books }
 
-// RecentSeriesReleasesBookSeriesBook_series includes the requested fields of the GraphQL type book_series.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "book_series"
-type RecentSeriesReleasesBookSeriesBook_series struct {
-	// An object relationship
-	Series RecentSeriesReleasesBookSeriesBook_seriesSeries `json:"series"`
-	// An object relationship
-	Book Book `json:"book"`
+// RecentSeriesReleasesByIdResponse is returned by RecentSeriesReleasesById on success.
+type RecentSeriesReleasesByIdResponse struct {
+	// fetch data from the table: "series"
+	Series []SeriesRelease `json:"series"`
 }
 
-// GetSeries returns RecentSeriesReleasesBookSeriesBook_series.Series, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesBookSeriesBook_series) GetSeries() RecentSeriesReleasesBookSeriesBook_seriesSeries {
-	return v.Series
-}
-
-// GetBook returns RecentSeriesReleasesBookSeriesBook_series.Book, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesBookSeriesBook_series) GetBook() Book { return v.Book }
-
-// RecentSeriesReleasesBookSeriesBook_seriesSeries includes the requested fields of the GraphQL type series.
-// The GraphQL type's documentation follows.
-//
-// columns and relationships of "series"
-type RecentSeriesReleasesBookSeriesBook_seriesSeries struct {
-	Slug string `json:"slug"`
-}
-
-// GetSlug returns RecentSeriesReleasesBookSeriesBook_seriesSeries.Slug, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesBookSeriesBook_seriesSeries) GetSlug() string { return v.Slug }
+// GetSeries returns RecentSeriesReleasesByIdResponse.Series, and is useful for accessing the field via an interface.
+func (v *RecentSeriesReleasesByIdResponse) GetSeries() []SeriesRelease { return v.Series }
 
 // RecentSeriesReleasesResponse is returned by RecentSeriesReleases on success.
 type RecentSeriesReleasesResponse struct {
 	// fetch data from the table: "series"
-	Series []RecentSeriesReleasesSeries `json:"series"`
-	// An array relationship
-	BookSeries []RecentSeriesReleasesBookSeriesBook_series `json:"bookSeries"`
+	Series []SeriesRelease `json:"series"`
 }
 
 // GetSeries returns RecentSeriesReleasesResponse.Series, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesResponse) GetSeries() []RecentSeriesReleasesSeries { return v.Series }
+func (v *RecentSeriesReleasesResponse) GetSeries() []SeriesRelease { return v.Series }
 
-// GetBookSeries returns RecentSeriesReleasesResponse.BookSeries, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesResponse) GetBookSeries() []RecentSeriesReleasesBookSeriesBook_series {
-	return v.BookSeries
-}
-
-// RecentSeriesReleasesSeries includes the requested fields of the GraphQL type series.
+// SeriesRelease includes the GraphQL fields of series requested by the fragment SeriesRelease.
 // The GraphQL type's documentation follows.
 //
 // columns and relationships of "series"
-type RecentSeriesReleasesSeries struct {
+type SeriesRelease struct {
 	Name string `json:"name"`
 	Slug string `json:"slug"`
+	// An array relationship
+	BookSeries []SeriesReleaseBookSeriesBook_series `json:"bookSeries"`
 }
 
-// GetName returns RecentSeriesReleasesSeries.Name, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesSeries) GetName() string { return v.Name }
+// GetName returns SeriesRelease.Name, and is useful for accessing the field via an interface.
+func (v *SeriesRelease) GetName() string { return v.Name }
 
-// GetSlug returns RecentSeriesReleasesSeries.Slug, and is useful for accessing the field via an interface.
-func (v *RecentSeriesReleasesSeries) GetSlug() string { return v.Slug }
+// GetSlug returns SeriesRelease.Slug, and is useful for accessing the field via an interface.
+func (v *SeriesRelease) GetSlug() string { return v.Slug }
+
+// GetBookSeries returns SeriesRelease.BookSeries, and is useful for accessing the field via an interface.
+func (v *SeriesRelease) GetBookSeries() []SeriesReleaseBookSeriesBook_series { return v.BookSeries }
+
+// SeriesReleaseBookSeriesBook_series includes the requested fields of the GraphQL type book_series.
+// The GraphQL type's documentation follows.
+//
+// columns and relationships of "book_series"
+type SeriesReleaseBookSeriesBook_series struct {
+	// An object relationship
+	Book Book `json:"book"`
+}
+
+// GetBook returns SeriesReleaseBookSeriesBook_series.Book, and is useful for accessing the field via an interface.
+func (v *SeriesReleaseBookSeriesBook_series) GetBook() Book { return v.Book }
 
 // UserInterestsResponse is returned by UserInterests on success.
 type UserInterestsResponse struct {
@@ -371,6 +367,123 @@ type UserInterestsUsers struct {
 
 // GetUsername returns UserInterestsUsers.Username, and is useful for accessing the field via an interface.
 func (v *UserInterestsUsers) GetUsername() string { return v.Username }
+
+// __RecentAuthorReleasesByIdInput is used internally by genqlient
+type __RecentAuthorReleasesByIdInput struct {
+	To           time.Time `json:"-"`
+	From         time.Time `json:"-"`
+	Ids          []int     `json:"ids"`
+	Compilations bool      `json:"compilations"`
+}
+
+// GetTo returns __RecentAuthorReleasesByIdInput.To, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesByIdInput) GetTo() time.Time { return v.To }
+
+// GetFrom returns __RecentAuthorReleasesByIdInput.From, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesByIdInput) GetFrom() time.Time { return v.From }
+
+// GetIds returns __RecentAuthorReleasesByIdInput.Ids, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesByIdInput) GetIds() []int { return v.Ids }
+
+// GetCompilations returns __RecentAuthorReleasesByIdInput.Compilations, and is useful for accessing the field via an interface.
+func (v *__RecentAuthorReleasesByIdInput) GetCompilations() bool { return v.Compilations }
+
+func (v *__RecentAuthorReleasesByIdInput) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*__RecentAuthorReleasesByIdInput
+		To   json.RawMessage `json:"to"`
+		From json.RawMessage `json:"from"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.__RecentAuthorReleasesByIdInput = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.To
+		src := firstPass.To
+		if len(src) != 0 && string(src) != "null" {
+			err = UnmarshalHardcoverDate(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal __RecentAuthorReleasesByIdInput.To: %w", err)
+			}
+		}
+	}
+
+	{
+		dst := &v.From
+		src := firstPass.From
+		if len(src) != 0 && string(src) != "null" {
+			err = UnmarshalHardcoverDate(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal __RecentAuthorReleasesByIdInput.From: %w", err)
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshal__RecentAuthorReleasesByIdInput struct {
+	To json.RawMessage `json:"to"`
+
+	From json.RawMessage `json:"from"`
+
+	Ids []int `json:"ids"`
+
+	Compilations bool `json:"compilations"`
+}
+
+func (v *__RecentAuthorReleasesByIdInput) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *__RecentAuthorReleasesByIdInput) __premarshalJSON() (*__premarshal__RecentAuthorReleasesByIdInput, error) {
+	var retval __premarshal__RecentAuthorReleasesByIdInput
+
+	{
+
+		dst := &retval.To
+		src := v.To
+		var err error
+		*dst, err = MarshalHardcoverDate(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal __RecentAuthorReleasesByIdInput.To: %w", err)
+		}
+	}
+	{
+
+		dst := &retval.From
+		src := v.From
+		var err error
+		*dst, err = MarshalHardcoverDate(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal __RecentAuthorReleasesByIdInput.From: %w", err)
+		}
+	}
+	retval.Ids = v.Ids
+	retval.Compilations = v.Compilations
+	return &retval, nil
+}
 
 // __RecentAuthorReleasesInput is used internally by genqlient
 type __RecentAuthorReleasesInput struct {
@@ -592,6 +705,123 @@ func (v *__RecentReleasesInput) __premarshalJSON() (*__premarshal__RecentRelease
 	return &retval, nil
 }
 
+// __RecentSeriesReleasesByIdInput is used internally by genqlient
+type __RecentSeriesReleasesByIdInput struct {
+	To           time.Time `json:"-"`
+	From         time.Time `json:"-"`
+	Ids          []int     `json:"ids"`
+	Compilations bool      `json:"compilations"`
+}
+
+// GetTo returns __RecentSeriesReleasesByIdInput.To, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesByIdInput) GetTo() time.Time { return v.To }
+
+// GetFrom returns __RecentSeriesReleasesByIdInput.From, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesByIdInput) GetFrom() time.Time { return v.From }
+
+// GetIds returns __RecentSeriesReleasesByIdInput.Ids, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesByIdInput) GetIds() []int { return v.Ids }
+
+// GetCompilations returns __RecentSeriesReleasesByIdInput.Compilations, and is useful for accessing the field via an interface.
+func (v *__RecentSeriesReleasesByIdInput) GetCompilations() bool { return v.Compilations }
+
+func (v *__RecentSeriesReleasesByIdInput) UnmarshalJSON(b []byte) error {
+
+	if string(b) == "null" {
+		return nil
+	}
+
+	var firstPass struct {
+		*__RecentSeriesReleasesByIdInput
+		To   json.RawMessage `json:"to"`
+		From json.RawMessage `json:"from"`
+		graphql.NoUnmarshalJSON
+	}
+	firstPass.__RecentSeriesReleasesByIdInput = v
+
+	err := json.Unmarshal(b, &firstPass)
+	if err != nil {
+		return err
+	}
+
+	{
+		dst := &v.To
+		src := firstPass.To
+		if len(src) != 0 && string(src) != "null" {
+			err = UnmarshalHardcoverDate(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal __RecentSeriesReleasesByIdInput.To: %w", err)
+			}
+		}
+	}
+
+	{
+		dst := &v.From
+		src := firstPass.From
+		if len(src) != 0 && string(src) != "null" {
+			err = UnmarshalHardcoverDate(
+				src, dst)
+			if err != nil {
+				return fmt.Errorf(
+					"unable to unmarshal __RecentSeriesReleasesByIdInput.From: %w", err)
+			}
+		}
+	}
+	return nil
+}
+
+type __premarshal__RecentSeriesReleasesByIdInput struct {
+	To json.RawMessage `json:"to"`
+
+	From json.RawMessage `json:"from"`
+
+	Ids []int `json:"ids"`
+
+	Compilations bool `json:"compilations"`
+}
+
+func (v *__RecentSeriesReleasesByIdInput) MarshalJSON() ([]byte, error) {
+	premarshaled, err := v.__premarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(premarshaled)
+}
+
+func (v *__RecentSeriesReleasesByIdInput) __premarshalJSON() (*__premarshal__RecentSeriesReleasesByIdInput, error) {
+	var retval __premarshal__RecentSeriesReleasesByIdInput
+
+	{
+
+		dst := &retval.To
+		src := v.To
+		var err error
+		*dst, err = MarshalHardcoverDate(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal __RecentSeriesReleasesByIdInput.To: %w", err)
+		}
+	}
+	{
+
+		dst := &retval.From
+		src := v.From
+		var err error
+		*dst, err = MarshalHardcoverDate(
+			&src)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"unable to marshal __RecentSeriesReleasesByIdInput.From: %w", err)
+		}
+	}
+	retval.Ids = v.Ids
+	retval.Compilations = v.Compilations
+	return &retval, nil
+}
+
 // __RecentSeriesReleasesInput is used internally by genqlient
 type __RecentSeriesReleasesInput struct {
 	To           time.Time `json:"-"`
@@ -791,15 +1021,18 @@ func (v *__UserInterestsInput) __premarshalJSON() (*__premarshal__UserInterestsI
 const RecentAuthorReleases_Operation = `
 query RecentAuthorReleases ($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
 	authors(where: {slug:{_in:$slug}}) {
-		name
-		slug
-		contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
-			author {
-				name
-			}
-			book {
-				... Book
-			}
+		... AuthorRelease
+	}
+}
+fragment AuthorRelease on authors {
+	name
+	slug
+	contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+		author {
+			name
+		}
+		book {
+			... Book
 		}
 	}
 }
@@ -842,6 +1075,75 @@ func RecentAuthorReleases(
 	}
 
 	data_ = &RecentAuthorReleasesResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by RecentAuthorReleasesById.
+const RecentAuthorReleasesById_Operation = `
+query RecentAuthorReleasesById ($to: date, $from: date, $ids: [Int!], $compilations: Boolean = false) {
+	authors(where: {id:{_in:$ids}}) {
+		... AuthorRelease
+	}
+}
+fragment AuthorRelease on authors {
+	name
+	slug
+	contributions(where: {contribution:{_is_null:true},book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+		author {
+			name
+		}
+		book {
+			... Book
+		}
+	}
+}
+fragment Book on books {
+	id
+	slug
+	title
+	releaseDate: release_date
+	headline
+	description
+	genres: cached_tags(path: "Genre")
+	contributions {
+		author {
+			name
+		}
+	}
+	compilation
+	image: cached_image
+	featuredSeries: cached_featured_series
+}
+`
+
+func RecentAuthorReleasesById(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	to time.Time,
+	from time.Time,
+	ids []int,
+	compilations bool,
+) (data_ *RecentAuthorReleasesByIdResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "RecentAuthorReleasesById",
+		Query:  RecentAuthorReleasesById_Operation,
+		Variables: &__RecentAuthorReleasesByIdInput{
+			To:           to,
+			From:         from,
+			Ids:          ids,
+			Compilations: compilations,
+		},
+	}
+
+	data_ = &RecentAuthorReleasesByIdResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(
@@ -910,13 +1212,13 @@ func RecentReleases(
 const RecentSeriesReleases_Operation = `
 query RecentSeriesReleases ($to: date, $from: date, $slug: [String!], $compilations: Boolean = false) {
 	series(where: {slug:{_in:$slug}}) {
-		name
-		slug
+		... SeriesRelease
 	}
-	bookSeries: book_series(where: {series:{slug:{_in:$slug}},book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
-		series {
-			slug
-		}
+}
+fragment SeriesRelease on series {
+	name
+	slug
+	bookSeries: book_series(where: {book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
 		book {
 			... Book
 		}
@@ -961,6 +1263,72 @@ func RecentSeriesReleases(
 	}
 
 	data_ = &RecentSeriesReleasesResponse{}
+	resp_ := &graphql.Response{Data: data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return data_, err_
+}
+
+// The query executed by RecentSeriesReleasesById.
+const RecentSeriesReleasesById_Operation = `
+query RecentSeriesReleasesById ($to: date, $from: date, $ids: [Int!], $compilations: Boolean = false) {
+	series(where: {id:{_in:$ids}}) {
+		... SeriesRelease
+	}
+}
+fragment SeriesRelease on series {
+	name
+	slug
+	bookSeries: book_series(where: {book:{release_date:{_lte:$to,_gte:$from},book_mappings:{id:{_is_null:false}},compilation:{_in:[$compilations,false]}}}, order_by: {book:{release_date:desc_nulls_last}}, limit: 25) {
+		book {
+			... Book
+		}
+	}
+}
+fragment Book on books {
+	id
+	slug
+	title
+	releaseDate: release_date
+	headline
+	description
+	genres: cached_tags(path: "Genre")
+	contributions {
+		author {
+			name
+		}
+	}
+	compilation
+	image: cached_image
+	featuredSeries: cached_featured_series
+}
+`
+
+func RecentSeriesReleasesById(
+	ctx_ context.Context,
+	client_ graphql.Client,
+	to time.Time,
+	from time.Time,
+	ids []int,
+	compilations bool,
+) (data_ *RecentSeriesReleasesByIdResponse, err_ error) {
+	req_ := &graphql.Request{
+		OpName: "RecentSeriesReleasesById",
+		Query:  RecentSeriesReleasesById_Operation,
+		Variables: &__RecentSeriesReleasesByIdInput{
+			To:           to,
+			From:         from,
+			Ids:          ids,
+			Compilations: compilations,
+		},
+	}
+
+	data_ = &RecentSeriesReleasesByIdResponse{}
 	resp_ := &graphql.Response{Data: data_}
 
 	err_ = client_.MakeRequest(

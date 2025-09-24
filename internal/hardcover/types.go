@@ -12,6 +12,7 @@ type BookImage struct {
 
 type BookSeries struct {
 	Name string `json:"name"`
+	Id   int    `json:"id"`
 	Slug string `json:"slug"`
 }
 
@@ -22,6 +23,7 @@ type BookFeaturedSeries struct {
 
 type BookAuthor struct {
 	Name string `json:"name"`
+	Id   int    `json:"id"`
 	Slug string `json:"slug"`
 }
 

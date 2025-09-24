@@ -1,0 +1,20 @@
+query UserInterests($username: citext, $from: date) {
+  users(where: {username: {_eq: $username}}) {
+    username
+  }
+  userBooks: user_books(
+    where: { 
+      user: { username: {_eq: $username}}, 
+      status_id: {_eq: 3}, # status.READ
+      last_read_date: { _gt: $from}
+    }
+  ) {
+    book {
+      slug
+      # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookContributor")
+      contributors: cached_contributors
+      # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookFeaturedSeries")
+      featuredSeries: cached_featured_series
+    }
+  }
+}

@@ -1,0 +1,20 @@
+fragment Book on books {
+  id
+  slug
+  title
+  releaseDate: release_date
+  headline
+  description
+  # @genqlient(bind: "[]github.com/RobBrazier/bookfeed/internal/hardcover.BookGenre")
+  genres: cached_tags(path: "Genre")
+  contributions {
+    author {
+      name
+    }
+  }
+  compilation
+  # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookImage")
+  image: cached_image
+  # @genqlient(bind: "github.com/RobBrazier/bookfeed/internal/hardcover.BookFeaturedSeries")
+  featuredSeries: cached_featured_series
+}

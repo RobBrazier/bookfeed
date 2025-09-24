@@ -115,7 +115,7 @@ func (b *hardcoverBuilder) GetRecentReleases(ctx context.Context) (feeds.Feed, e
 	)
 }
 
-func (b *hardcoverBuilder) authorLoader() cache.BulkCollectionLoaderFunc {
+func (b *hardcoverBuilder) authorLoader(ids ...int) cache.BulkCollectionLoaderFunc {
 	return cache.BulkCollectionLoaderFunc(
 		func(ctx context.Context, keys []string) (map[string]model.Collection, error) {
 			result := make(map[string]model.Collection)
@@ -124,21 +124,42 @@ func (b *hardcoverBuilder) authorLoader() cache.BulkCollectionLoaderFunc {
 			uncachedKeys := b.uncachedKeys(keys)
 			slugMapping := b.extractSlugs(uncachedKeys)
 			slugs := slices.Collect(maps.Keys(slugMapping))
-			log := log.With().Strs("authors", slugs).Strs("uncached", uncachedKeys).Logger()
+			log := log.With().
+				Strs("authors", slugs).
+				Strs("uncached", uncachedKeys).
+				Ints("ids", ids).
+				Logger()
 			log.Info().Msg("Fetching releases")
-			data, err := hardcover.RecentAuthorReleases(
-				ctx,
-				b.client,
-				now,
-				earliest,
-				slugs,
-				b.compilations,
-			)
-			if err != nil {
-				return result, err
+			var releases []hardcover.AuthorRelease
+			if len(ids) > 0 {
+				data, err := hardcover.RecentAuthorReleases(
+					ctx,
+					b.client,
+					now,
+					earliest,
+					slugs,
+					b.compilations,
+				)
+				if err != nil {
+					return result, err
+				}
+				releases = data.Authors
+			} else {
+				data, err := hardcover.RecentAuthorReleasesById(
+					ctx,
+					b.client,
+					now,
+					earliest,
+					ids,
+					b.compilations,
+				)
+				if err != nil {
+					return result, err
+				}
+				releases = data.Authors
 			}
 			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved author data")
-			for _, author := range data.Authors {
+			for _, author := range releases {
 				if cacheKey, ok := slugMapping[author.Slug]; ok {
 					var books []model.Book
 					for _, contribution := range author.Contributions {
@@ -157,7 +178,7 @@ func (b *hardcoverBuilder) authorLoader() cache.BulkCollectionLoaderFunc {
 					result[uncachedKey] = model.Collection{}
 				}
 			}
-			return result, err
+			return result, nil
 		},
 	)
 }
@@ -195,7 +216,7 @@ func (b *hardcoverBuilder) GetAuthorReleases(
 	)
 }
 
-func (b *hardcoverBuilder) seriesLoader() cache.BulkCollectionLoaderFunc {
+func (b *hardcoverBuilder) seriesLoader(ids ...int) cache.BulkCollectionLoaderFunc {
 	return cache.BulkCollectionLoaderFunc(
 		func(ctx context.Context, keys []string) (map[string]model.Collection, error) {
 			result := make(map[string]model.Collection)
@@ -207,27 +228,46 @@ func (b *hardcoverBuilder) seriesLoader() cache.BulkCollectionLoaderFunc {
 			}
 			slugMapping := b.extractSlugs(uncachedKeys)
 			slugs := slices.Collect(maps.Keys(slugMapping))
-			log := log.With().Strs("series", slugs).Strs("uncached", uncachedKeys).Logger()
+			log := log.With().
+				Strs("series", slugs).
+				Strs("uncached", uncachedKeys).
+				Ints("ids", ids).
+				Logger()
 			log.Info().Msg("Fetching releases")
-			data, err := hardcover.RecentSeriesReleases(
-				ctx,
-				b.client,
-				now,
-				earliest,
-				slugs,
-				b.compilations,
-			)
-			if err != nil {
-				return result, err
+			var releases []hardcover.SeriesRelease
+			if len(ids) > 0 {
+				data, err := hardcover.RecentSeriesReleasesById(
+					ctx,
+					b.client,
+					now,
+					earliest,
+					ids,
+					b.compilations,
+				)
+				if err != nil {
+					return result, err
+				}
+				releases = data.Series
+			} else {
+				data, err := hardcover.RecentSeriesReleases(
+					ctx,
+					b.client,
+					now,
+					earliest,
+					slugs,
+					b.compilations,
+				)
+				if err != nil {
+					return result, err
+				}
+				releases = data.Series
 			}
 			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved series data")
-			for _, series := range data.Series {
+			for _, series := range releases {
 				if cacheKey, ok := slugMapping[series.Slug]; ok {
 					var books []model.Book
-					for _, book := range data.BookSeries {
-						if book.Series.Slug == series.Slug {
-							books = append(books, b.mapBook(book.Book))
-						}
+					for _, book := range series.BookSeries {
+						books = append(books, b.mapBook(book.Book))
 					}
 					result[cacheKey] = model.NewCollection(
 						series.Name,
@@ -242,7 +282,7 @@ func (b *hardcoverBuilder) seriesLoader() cache.BulkCollectionLoaderFunc {
 					result[uncachedKey] = model.Collection{}
 				}
 			}
-			return result, err
+			return result, nil
 		},
 	)
 }
@@ -291,13 +331,18 @@ func (b *hardcoverBuilder) getUserInterests(
 			earliest := now.AddDate(-2, 0, 0)
 			log.Info().Msg("Fetching user interests")
 			data, err := hardcover.UserInterests(ctx, b.client, username, earliest)
-			log.Info().Dur("elapsed", time.Since(now)).Msg("Retrieved user interests")
+			log.Info().
+				Dur("elapsed", time.Since(now)).
+				Int("count", len(data.UserBooks)).
+				Msg("Retrieved user interests")
 			if err != nil {
 				return interests, err
 			}
 			if len(data.Users) == 0 {
 				return interests, nil
 			}
+			authorMapping := make(map[string]int)
+			seriesMapping := make(map[string]int)
 			authorCount := make(map[string]int)
 			seriesCount := make(map[string]int)
 			for _, book := range data.UserBooks {
@@ -306,25 +351,34 @@ func (b *hardcoverBuilder) getUserInterests(
 						[]string{"author", ""},
 						strings.ToLower(contribution.Contribution),
 					) {
-						authorCount[contribution.Author.Slug]++
+						slug := contribution.Author.Slug
+						authorCount[slug]++
+						authorMapping[slug] = contribution.Author.Id
 					}
 				}
 				if slug := book.Book.FeaturedSeries.Series.Slug; slug != "" {
 					seriesCount[slug]++
+					seriesMapping[slug] = book.Book.FeaturedSeries.Series.Id
 				}
 			}
-			var authors []string
-			var series []string
+			var authors []model.Interest
+			var series []model.Interest
 
 			// only check feeds for authors that have > 1 book read
 			for slug, count := range authorCount {
 				if count > 1 {
-					authors = append(authors, slug)
+					authors = append(authors, model.Interest{
+						Slug: slug,
+						Id:   authorMapping[slug],
+					})
 				}
 			}
 			for slug, count := range seriesCount {
 				if count > 1 {
-					series = append(series, slug)
+					series = append(series, model.Interest{
+						Slug: slug,
+						Id:   seriesMapping[slug],
+					})
 				}
 			}
 
@@ -359,21 +413,29 @@ func (b hardcoverBuilder) extractSlugs(keys []string) map[string]string {
 func (b hardcoverBuilder) collectKeys(
 	collect bool,
 	key string,
-	items []string,
+	items []model.Interest,
 	builder *strings.Builder,
-) []string {
+) ([]string, []int) {
 	if !collect || len(items) == 0 {
-		return []string{}
+		return []string{}, []int{}
 	}
 	caser := cases.Title(language.English)
 	title := caser.String(key)
-	fmt.Fprintf(builder, "%s: %s\n", title, strings.Join(items, ", "))
+
+	var slugs []string
+	var ids []int
+	for _, item := range items {
+		slugs = append(slugs, item.Slug)
+		ids = append(ids, item.Id)
+	}
+
+	fmt.Fprintf(builder, "%s: %s\n", title, strings.Join(slugs, ", "))
 
 	var keys []string
-	for _, item := range items {
+	for _, item := range slugs {
 		keys = append(keys, fmt.Sprintf("hardcover/%s/%s", key, item))
 	}
-	return keys
+	return keys, ids
 }
 
 func (b *hardcoverBuilder) GetUserReleases(
@@ -389,17 +451,19 @@ func (b *hardcoverBuilder) GetUserReleases(
 		return feeds.Feed{}, fmt.Errorf("user not found")
 	}
 
+	log.Info().Interface("interests", interests).Msg("Getting releases for interests")
+
 	var descBuilder strings.Builder
 	descBuilder.WriteString("Includes New Releases from:\n")
 
-	seriesKeys := b.collectKeys(
+	seriesKeys, seriesIds := b.collectKeys(
 		slices.Contains([]string{"", "series"}, filter),
 		"series",
 		interests.Series,
 		&descBuilder,
 	)
 
-	authorKeys := b.collectKeys(
+	authorKeys, authorIds := b.collectKeys(
 		slices.Contains([]string{"", "author"}, filter),
 		"authors",
 		interests.Authors,
@@ -416,14 +480,14 @@ func (b *hardcoverBuilder) GetUserReleases(
 		jobs = append(jobs, job{
 			key:    "series",
 			keys:   seriesKeys,
-			loader: b.seriesLoader(),
+			loader: b.seriesLoader(seriesIds...),
 		})
 	}
 	if len(authorKeys) > 0 {
 		jobs = append(jobs, job{
 			key:    "author",
 			keys:   authorKeys,
-			loader: b.authorLoader(),
+			loader: b.authorLoader(authorIds...),
 		})
 	}
 

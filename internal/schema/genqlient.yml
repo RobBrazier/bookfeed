@@ -1,6 +1,6 @@
 schema: schema.gql
 operations:
-  - queries.gql
+  - queries/*.gql
 generated: ../hardcover/generated.go
 bindings:
   citext:

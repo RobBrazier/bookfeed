@@ -1,0 +1,12 @@
+query RecentReleases($to: date, $from: date) {
+  # @genqlient(flatten: true)
+  books(
+    order_by: {users_count: desc_nulls_last}
+    where: {
+      release_date: {_lte: $to, _gte: $from}
+    }
+    limit: 25
+  ) {
+    ...Book
+  }
+}

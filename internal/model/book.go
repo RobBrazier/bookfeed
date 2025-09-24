@@ -46,8 +46,13 @@ type Series struct {
 	Position float32
 }
 
+type Interest struct {
+	Slug string
+	Id   int
+}
+
 type UserInterests struct {
-	Authors []string
-	Series  []string
+	Authors []Interest
+	Series  []Interest
 	Found   bool
 }
