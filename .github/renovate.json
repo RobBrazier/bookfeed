@@ -29,5 +29,8 @@
 				"github-actions"
 			]
 		}
+	],
+	"postUpdateOptions": [
+		"gomodTidy"
 	]
 }
