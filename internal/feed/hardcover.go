@@ -132,19 +132,6 @@ func (b *hardcoverBuilder) authorLoader(ids ...int) cache.BulkCollectionLoaderFu
 			log.Info().Msg("Fetching releases")
 			var releases []hardcover.AuthorRelease
 			if len(ids) > 0 {
-				data, err := hardcover.RecentAuthorReleases(
-					ctx,
-					b.client,
-					now,
-					earliest,
-					slugs,
-					b.compilations,
-				)
-				if err != nil {
-					return result, err
-				}
-				releases = data.Authors
-			} else {
 				data, err := hardcover.RecentAuthorReleasesById(
 					ctx,
 					b.client,
@@ -154,6 +141,21 @@ func (b *hardcoverBuilder) authorLoader(ids ...int) cache.BulkCollectionLoaderFu
 					b.compilations,
 				)
 				if err != nil {
+					log.Error().Err(err).Msg("Error from hardcover RecentAuthorReleasesById")
+					return result, err
+				}
+				releases = data.Authors
+			} else {
+				data, err := hardcover.RecentAuthorReleases(
+					ctx,
+					b.client,
+					now,
+					earliest,
+					slugs,
+					b.compilations,
+				)
+				if err != nil {
+					log.Error().Err(err).Msg("Error from hardcover RecentAuthorReleases")
 					return result, err
 				}
 				releases = data.Authors
@@ -196,6 +198,12 @@ func (b *hardcoverBuilder) GetAuthorReleases(
 	)
 	if err != nil {
 		log.Error().Err(err).Msgf("error retrieving author via cache, key=%s", key)
+		_, invalidated := cache.CollectionCache.Invalidate(key)
+		if invalidated {
+			log.Info().Msgf("Invalidated cache for key=%s", key)
+		} else {
+			log.Info().Msgf("Unable to invalidate cache for key=%s", key)
+		}
 		return feed, err
 	}
 
@@ -300,7 +308,13 @@ func (b *hardcoverBuilder) GetSeriesReleases(
 		loader,
 	)
 	if err != nil {
-		return feed, err
+		log.Error().Err(err).Msgf("error retrieving series via cache, key=%s", key)
+		_, invalidated := cache.CollectionCache.Invalidate(key)
+		if invalidated {
+			log.Info().Msgf("Invalidated cache for key=%s", key)
+		} else {
+			log.Info().Msgf("Unable to invalidate cache for key=%s", key)
+		}
 	}
 
 	collection, ok := collections[key]
