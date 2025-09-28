@@ -195,6 +195,7 @@ func (b *hardcoverBuilder) GetAuthorReleases(
 		loader,
 	)
 	if err != nil {
+		log.Error().Err(err).Msgf("error retrieving author via cache, key=%s", key)
 		return feed, err
 	}
 

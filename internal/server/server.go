@@ -49,8 +49,6 @@ func getLogger() *zerolog.Logger {
 	if config.LogFormat() == "text" {
 		writer = zerolog.NewConsoleWriter()
 		logger = logger.Output(writer)
-	} else {
-		logger = logger.With().Str("service.name", "bookfeed").Logger()
 	}
 	level := config.LogLevel()
 	logger = logger.Level(level)
