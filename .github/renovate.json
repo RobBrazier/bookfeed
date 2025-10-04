@@ -13,12 +13,13 @@
 		":prHourlyLimit2",
 		":label(dependencies)"
 	],
+	"internalChecksFilter": "strict",
+	"minimumReleaseAge": "7 days",
 	"packageRules": [
 		{
 			"matchManagers": [
 				"*"
 			],
-			"minimumReleaseAge": "14 days",
 			"addLabels": [
 				"{{ manager }}"
 			]
