@@ -1,4 +1,4 @@
-// templui component tabs - version: v0.97.0 installed by templui v0.97.0
+// templui component tabs - version: v0.98.0 installed by templui v0.98.0
 package tabs
 
 import (
@@ -158,5 +158,5 @@ func IDFromContext(ctx context.Context) string {
 }
 
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src="/static/js/tabs.min.js"></script>
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/static/js/tabs.min.js?v=" + utils.ScriptVersion }></script>
 }

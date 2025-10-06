@@ -1,4 +1,4 @@
-// templui component selectbox - version: v0.97.0 installed by templui v0.97.0
+// templui component selectbox - version: v0.98.0 installed by templui v0.98.0
 package selectbox
 
 import (
@@ -222,6 +222,7 @@ templ Content(props ...ContentProps) {
 			},
 			p.Attributes,
 		),
+		Exclusive: true,
 	}) {
 		if !p.NoSearch {
 			<div class="sticky top-0 bg-popover p-1">
@@ -322,5 +323,5 @@ templ Item(props ...ItemProps) {
 }
 
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src="/static/js/selectbox.min.js"></script>
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/static/js/selectbox.min.js?v=" + utils.ScriptVersion }></script>
 }
