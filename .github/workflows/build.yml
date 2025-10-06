@@ -32,8 +32,10 @@ jobs:
           PATHS="assets/ cmd/ internal/ go.mod go.sum Dockerfile config/ .kamal/ package.json package-lock.json"
 
           if git diff --name-only $BASE HEAD | grep -qE "^($(echo $PATHS | tr ' ' '|'))"; then
+            echo "app files changed - flagged for deployment"
             echo "deploy=true" >> $GITHUB_OUTPUT
           else
+            echo "no app files changed - skipping deployment"
             echo "deploy=false" >> $GITHUB_OUTPUT
           fi
   lint:
