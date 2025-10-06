@@ -1,4 +1,4 @@
-// templui component toast - version: v0.97.0 installed by templui v0.97.0
+// templui component toast - version: v0.98.0 installed by templui v0.98.0
 package toast
 
 import (
@@ -148,5 +148,5 @@ templ Toast(props ...Props) {
 }
 
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src="/static/js/toast.min.js"></script>
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/static/js/toast.min.js?v=" + utils.ScriptVersion }></script>
 }

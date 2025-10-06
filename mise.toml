@@ -3,8 +3,5 @@ air = "latest"
 node = "lts"
 doppler = "latest"
 go = "latest"
-task = "latest"
 golangci-lint = "latest"
-
-[tasks.task]
-run = "doppler run -- task"
+just = "latest"

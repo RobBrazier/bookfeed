@@ -1,4 +1,4 @@
-// templui component input - version: v0.97.0 installed by templui v0.97.0
+// templui component input - version: v0.98.0 installed by templui v0.98.0
 package input
 
 import (
@@ -127,5 +127,5 @@ templ Input(props ...Props) {
 }
 
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src="/static/js/input.min.js"></script>
+	<script defer nonce={ templ.GetNonce(ctx) } src={ "/static/js/input.min.js?v=" + utils.ScriptVersion }></script>
 }

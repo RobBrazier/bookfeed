@@ -58,16 +58,16 @@ Run directly with Go:
 go run cmd/api/main.go
 ```
 
-Or use Task (if installed):
+Or use Just (if installed):
 
 ```bash
-task run
+just run
 ```
 
 For development with live reload:
 
 ```bash
-task dev
+just dev
 ```
 
 ### Building
@@ -79,10 +79,10 @@ mkdir dist
 go build -o dist/bookfeed cmd/api/main.go
 ```
 
-Or with Task:
+Or with Just:
 
 ```bash
-task build
+just build
 ```
 
 ### Testing
@@ -93,10 +93,10 @@ Run tests:
 go test ./... -v
 ```
 
-Or with Task:
+Or with Just:
 
 ```bash
-task test
+just test
 ```
 
 ## Usage
@@ -130,13 +130,13 @@ Once running, the application exposes the following endpoints:
 Update the GraphQL schema from the Hardcover API:
 
 ```bash
-task download-schema
+just downloadSchema
 ```
 
 Generate Go code from GraphQL schema:
 
 ```bash
-task generate
+just generate
 ```
 
 ## Deployment
