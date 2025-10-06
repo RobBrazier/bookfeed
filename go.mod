@@ -8,7 +8,7 @@ require (
 	github.com/a-h/templ v0.3.943
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/httprate v0.15.0
-	github.com/go-co-op/gocron/v2 v2.16.5
+	github.com/go-co-op/gocron/v2 v2.16.6
 	github.com/gorilla/feeds v1.2.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/joho/godotenv v1.5.1
@@ -16,6 +16,7 @@ require (
 	github.com/maypok86/otter/v2 v2.2.1
 	github.com/rs/zerolog v1.34.0
 	github.com/samber/slog-zerolog/v2 v2.7.3
+	golang.org/x/text v0.28.0
 )
 
 require (
@@ -46,7 +47,6 @@ require (
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
