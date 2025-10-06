@@ -56,9 +56,18 @@ templui *args:
     go run github.com/templui/templui/cmd/templui@latest {{ args }}
 
 # Update all TemplUI components
-templuiUpdate:
-    just templui -f add $(ls internal/view/components)
+templui-update:
+    @just templui -f add $(ls internal/view/components)
+    @just fmt
 
 # Download the Hardcover GraphQL Schema
 schema:
     go run github.com/benweint/gquil/cmd/gquil@latest introspection generate-sdl {{ hardcoverApi }} -H "Authorization: {{ env('HARDCOVER_TOKEN') }}" > internal/schema/schema.gql
+
+[private]
+kamal *args:
+    @SSH_AUTH_SOCK='' just kamal-sock {{args}}
+
+[private]
+kamal-sock *args:
+    {{run}}kamal {{args}}

@@ -1,7 +1,6 @@
 [tools]
 air = "latest"
 node = "lts"
-doppler = "latest"
 go = "latest"
 golangci-lint = "latest"
 just = "latest"

@@ -36,3 +36,4 @@ volumes:
 
 ssh:
   user: deploy
+  key_data: <%= ENV.fetch('SSH_PRIVATE_KEY', '').split('\n') %>
