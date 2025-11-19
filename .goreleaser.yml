@@ -48,7 +48,7 @@ kos:
       - linux/arm64
     tags:
       - latest
-      - "{{.Tag}}"
+      - "{{.Version}}"
       - "{{if not .IsSnapshot}}v{{.Major}}{{end}}"
 
 checksum:
