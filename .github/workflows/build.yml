@@ -75,7 +75,7 @@ jobs:
         run: just install generate
       - name: Release Snapshot
         if: success() && github.ref == 'refs/heads/main'
-        run: >
+        run: |
           goreleaser release --clean --snapshot
           # List snapshot images
           docker image ls --format "{{.Repository}}:{{.Tag}}" | \
