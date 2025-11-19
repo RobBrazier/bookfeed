@@ -10,6 +10,10 @@ backend = "core:go"
 version = "2.5.0"
 backend = "aqua:golangci/golangci-lint"
 
+[[tools.goreleaser]]
+version = "2.12.7"
+backend = "aqua:goreleaser/goreleaser"
+
 [[tools.just]]
 version = "1.43.1"
 backend = "aqua:casey/just"
