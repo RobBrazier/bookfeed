@@ -82,7 +82,7 @@ jobs:
             grep -e "$GITHUB_REPOSITORY:develop-.*" | \
             paste -sd ' ' /dev/stdin > images.txt
           # Push snapshot images
-          cat images | xargs -d ' ' -I{} -n1 sh -c "docker push {}"
+          cat images.txt | xargs -d ' ' -I{} -n1 sh -c "docker push {}"
           # Create and push manifest for :develop tag
           docker manifest create ghcr.io/$GITHUB_REPOSITORY:develop $(cat images.txt)
           docker manifest push $GITHUB_REPOSITORY:develop
