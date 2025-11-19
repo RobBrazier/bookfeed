@@ -93,3 +93,16 @@ jobs:
         run: goreleaser release --clean
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  deploy:
+    needs:
+      - release
+    runs-on: ubuntu-24.04
+    if: github.repository == "RobBrazier/bookfeed"
+    steps:
+      - name: Deploy to Dev
+        if: github.ref == 'refs/heads/main'
+        run: curl --request GET "${{ secrets.DEV_WEBHOOK }} --header 'Authorization Bearer ${{ secrets.DEPLOY_TOKEN }}'
+      - name: Deploy to Prod
+        if: startsWith(github.ref, 'refs/tags/')
+        run: curl --request GET "${{ secrets.PROD_WEBHOOK }} --header 'Authorization Bearer ${{ secrets.DEPLOY_TOKEN }}'
