@@ -3,42 +3,17 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      deploy: ${{ steps.changes.outputs.deploy }}
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0
-      - name: Check if deployment is required
-        id: changes
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            BASE="${{ github.event.pull_request.base.sha }}"
-          else
-            BASE="HEAD~1"
-          fi
-
-          PATHS="assets/ cmd/ internal/ go.mod go.sum Dockerfile config/ .kamal/ package.json package-lock.json"
-
-          if git diff --name-only $BASE HEAD | grep -qE "^($(echo $PATHS | tr ' ' '|'))"; then
-            echo "app files changed - flagged for deployment"
-            echo "deploy=true" >> $GITHUB_OUTPUT
-          else
-            echo "no app files changed - skipping deployment"
-            echo "deploy=false" >> $GITHUB_OUTPUT
-          fi
   lint:
     runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
     permissions:
@@ -57,54 +32,62 @@ jobs:
     runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
       - uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3.3.1
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           cache: "npm"
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
-      - name: Build
-        run: just install build
+      - name: Install Dependencies
+        run: just install generate
       - name: Test
         run: just test
+      - name: Build
+        uses: goreleaser/goreleaser-action@v6.4.0
+        with:
+          version: ~> v2
+          args: build --clean --snapshot
 
-  deploy:
+  release:
     needs:
-      - changes
       - lint
       - build
-    # only deploy on main branch if:
-    # 1. there are application code changes
-    # 2. the pipeline is manually triggered
-    if: github.ref_name == 'main' && (needs.changes.outputs.deploy == 'true' || github.event_name == 'workflow_dispatch')
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ${{ vars.ACTION_RUNNER || 'ubuntu-latest' }}
-    environment:
-      name: prod
-      url: ${{ steps.deploy.outputs.url }}
     permissions:
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: ruby/setup-ruby@ab177d40ee5483edb974554986f56b33477e21d0 # v1.265.0
         with:
-          ruby-version: "3.4.7"
-      - run: |
-          gem install kamal
+          fetch-depth: 0
+      - uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3.3.1
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          cache: "npm"
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
       - uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
-      - uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
+      - uses: docker/login-action@v3.6.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          log-public-key: false
-      - run: kamal deploy
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Install Dependencies
+        run: just install generate
+      - name: Release Snapshot
+        if: success() && startsWith(github.ref, 'refs/tags/')
+        uses: goreleaser/goreleaser-action@v6.4.0
+        with:
+          version: ~> v2
+          args: release --clean --skip publish
         env:
-          SERVER_IPS: ${{ secrets.SERVER_IPS }}
-          PROXY_HOSTS: ${{ vars.PROXY_HOSTS }}
-          HARDCOVER_TOKEN: ${{ secrets.HARDCOVER_TOKEN }}
-          KAMAL_REGISTRY_USERNAME: ${{ github.actor }}
-          KAMAL_REGISTRY_PASSWORD: ${{ github.token }}
-      - id: deploy
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Release Version
+        if: success() && startsWith(github.ref, 'refs/tags/')
+        uses: goreleaser/goreleaser-action@v6.4.0
+        with:
+          version: ~> v2
+          args: release --clean --skip publish
         env:
-          PROXY_HOSTS: ${{ vars.PROXY_HOSTS }}
-        run: |
-          hosts=($PROXY_HOSTS)
-          echo "url=https://${hosts[0]}" >> $GITHUB_OUTPUT
+          GITHUB_TOKEN: ${{ github.token }}
