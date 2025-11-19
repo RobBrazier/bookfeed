@@ -44,7 +44,7 @@ jobs:
       - name: Build
         uses: goreleaser/goreleaser-action@v2
         with:
-          version: latest
+          version: ~> v2
           args: build --clean --snapshot
 
   release:
@@ -71,11 +71,19 @@ jobs:
           password: ${{ github.token }}
       - name: Install Dependencies
         run: just install generate
-      - name: Release
+      - name: Release Snapshot
         if: success() && startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v2
         with:
-          version: latest
-          args: build --clean
+          version: ~> v2
+          args: release --clean --skip publish
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Release Version
+        if: success() && startsWith(github.ref, 'refs/tags/')
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: ~> v2
+          args: release --clean --skip publish
         env:
           GITHUB_TOKEN: ${{ github.token }}

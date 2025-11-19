@@ -47,11 +47,9 @@ kos:
       - linux/amd64
       - linux/arm64
     tags:
-      # - latest
+      - latest
       - "{{.Tag}}"
-      - "v{{.Major}}"
-      - "v{{.Major}}.{{.Minor}}"
-      - "{{if not .Prerelease}}stable{{end}}"
+      - "{{if not .IsSnapshot}}v{{.Major}}{{end}}"
 
 checksum:
   name_template: "checksums.txt"
