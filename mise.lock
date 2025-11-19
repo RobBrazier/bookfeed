@@ -1,0 +1,23 @@
+[[tools.air]]
+version = "1.63.0"
+backend = "aqua:air-verse/air"
+
+[[tools.go]]
+version = "1.25.4"
+backend = "core:go"
+
+[[tools.golangci-lint]]
+version = "2.5.0"
+backend = "aqua:golangci/golangci-lint"
+
+[[tools.just]]
+version = "1.43.1"
+backend = "aqua:casey/just"
+
+[[tools.ko]]
+version = "0.18.0"
+backend = "aqua:ko-build/ko"
+
+[[tools.node]]
+version = "24.11.1"
+backend = "core:node"
