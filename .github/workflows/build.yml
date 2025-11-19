@@ -38,7 +38,7 @@ jobs:
           cache: "npm"
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
       - name: Install Dependencies
-        run: just install
+        run: just install generate
       - name: Test
         run: just test
       - name: Build
@@ -70,7 +70,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
       - name: Install Dependencies
-        run: just install
+        run: just install generate
       - name: Release
         if: success() && startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v2
