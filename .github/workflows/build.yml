@@ -98,7 +98,7 @@ jobs:
     needs:
       - release
     runs-on: ubuntu-24.04
-    if: github.repository == "RobBrazier/bookfeed"
+    if: ${{ github.repository }} == "RobBrazier/bookfeed"
     steps:
       - name: Deploy to Dev
         if: github.ref == 'refs/heads/main'
