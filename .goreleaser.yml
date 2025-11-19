@@ -6,7 +6,7 @@ before:
 
 builds:
   - binary: "{{ .ProjectName }}"
-    main: ./cmd/api
+    main: ./cmd/bookfeed
     goos:
       - darwin
       - linux
@@ -36,6 +36,22 @@ archives:
       owner: root
     files:
       - README.md
+
+kos:
+  - id: bookfeed
+    user: 1000:1000
+    repositories:
+      - ghcr.io/robbrazier/{{ .ProjectName }}
+      - "{{ .GitUrl.Owner }}/{{ .ProjectName }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    tags:
+      # - latest
+      - "{{.Tag}}"
+      - "v{{.Major}}"
+      - "v{{.Major}}.{{.Minor}}"
+      - "{{if not .Prerelease}}stable{{end}}"
 
 checksum:
   name_template: "checksums.txt"
