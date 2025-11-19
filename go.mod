@@ -16,7 +16,7 @@ require (
 	github.com/maypok86/otter/v2 v2.2.1
 	github.com/rs/zerolog v1.34.0
 	github.com/samber/slog-zerolog/v2 v2.9.0
-	golang.org/x/text v0.28.0
+	golang.org/x/text v0.31.0
 )
 
 require (
@@ -43,11 +43,11 @@ require (
 	github.com/samber/slog-common v0.19.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.30 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	golang.org/x/mod v0.27.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/tools v0.36.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/net v0.46.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/tools v0.38.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
