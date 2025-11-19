@@ -36,19 +36,15 @@ archives:
       owner: root
     files:
       - README.md
+snapshot:
+  version_template: "{{incpatch .Version}}-{{.ShortCommit}}"
 
-kos:
-  - id: bookfeed
-    user: 1000:1000
-    repositories:
-      - ghcr.io/robbrazier/{{ .ProjectName }}
-      - "{{ .GitUrl.Owner }}/{{ .ProjectName }}"
-    platforms:
-      - linux/amd64
-      - linux/arm64
+dockers_v2:
+  - images:
+      - ghcr.io/robbrazier/{{.ProjectName}}
     tags:
-      - latest
-      - "{{.Version}}"
+      - "{{if .IsSnapshot}}develop{{else}}latest{{end}}"
+      - "{{if not .IsSnapshot}}v{{.Version}}{{end}}"
       - "{{if not .IsSnapshot}}v{{.Major}}{{end}}"
 
 checksum:

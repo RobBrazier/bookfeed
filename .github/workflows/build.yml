@@ -75,7 +75,17 @@ jobs:
         run: just install generate
       - name: Release Snapshot
         if: success() && github.ref == 'refs/heads/main'
-        run: goreleaser release --clean --snapshot --skip publish
+        run: >
+          goreleaser release --clean --snapshot
+          # List snapshot images
+          docker image ls --format "{{.Repository}}:{{.Tag}}" | \
+            grep -e "$GITHUB_REPOSITORY:develop-.*" | \
+            paste -sd ' ' /dev/stdin > images.txt
+          # Push snapshot images
+          cat images | xargs -d ' ' -I{} -n1 sh -c "docker push {}"
+          # Create and push manifest for :develop tag
+          docker manifest create ghcr.io/$GITHUB_REPOSITORY:develop $(cat images.txt)
+          docker manifest push $GITHUB_REPOSITORY:develop
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Release Version
