@@ -79,13 +79,13 @@ jobs:
           goreleaser release --clean --snapshot
           # List snapshot images
           docker image ls --format "{{.Repository}}:{{.Tag}}" | \
-            grep -e "$GITHUB_REPOSITORY:develop-.*" | \
+            grep -e "${{ github.repository }}:develop-.*" | \
             paste -sd ' ' /dev/stdin > images.txt
           # Push snapshot images
           cat images.txt | xargs -d ' ' -I{} -n1 sh -c "docker push {}"
           # Create and push manifest for :develop tag
-          docker manifest create ghcr.io/$GITHUB_REPOSITORY:develop $(cat images.txt)
-          docker manifest push $GITHUB_REPOSITORY:develop
+          docker manifest create ghcr.io/${{ github.repository }}:develop $(cat images.txt)
+          docker manifest push ghcr.io/${{ github.repository }}:develop
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Release Version
