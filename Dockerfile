@@ -1,6 +1,6 @@
-FROM cgr.dev/chainguard/bash:latest
+FROM cgr.dev/chainguard/busybox:latest
 ARG TARGETPLATFORM
 ENTRYPOINT ["/usr/bin/bookfeed"]
-HEALTHCHECK --interval=30s --timeout=2s --start-period=5s --retries=3 CMD [ "curl", "http://localhost:8080/up"]
+HEALTHCHECK --start-period=5s CMD [ "pgrep", "bookfeed" ]
 EXPOSE 8080
 COPY $TARGETPLATFORM/bookfeed /usr/bin/
