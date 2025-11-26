@@ -102,15 +102,9 @@ jobs:
     steps:
       - name: Deploy to Dev
         if: github.ref == 'refs/heads/main'
-        uses: benbristow/dokploy-deploy-action@0.0.1
-        with:
-          auth_token: ${{ secrets.DOKPLOY_AUTH_TOKEN }}
-          application_id: ${{ secrets.DEV_APPLICATION_ID }}
-          dokploy_url: ${{ secrets.DOKPLOY_URL }}
+        run: >
+          curl -H 'x-api-key: ${{ secrets.DOKPLOY_AUTH_TOKEN }}' -H 'Content-Type: application/json' -d '{"applicationId": "${{ secrets.DEV_APPLICATION_ID}}"}' "${{ secrets.DOKPLOY_URL }}/api/application.deploy"
       - name: Deploy to Prod
         if: startsWith(github.ref, 'refs/tags/')
-        uses: benbristow/dokploy-deploy-action@0.0.1
-        with:
-          auth_token: ${{ secrets.DOKPLOY_AUTH_TOKEN }}
-          application_id: ${{ secrets.PROD_APPLICATION_ID }}
-          dokploy_url: ${{ secrets.DOKPLOY_URL }}
+        run: >
+          curl -H 'x-api-key: ${{ secrets.DOKPLOY_AUTH_TOKEN }}' -H 'Content-Type: application/json' -d '{"applicationId": "${{ secrets.PROD_APPLICATION_ID}}"}' "${{ secrets.DOKPLOY_URL }}/api/application.deploy"
