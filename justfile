@@ -5,7 +5,6 @@ name := "bookfeed"
 main := "cmd" / name / "main.go"
 out := "dist" / name
 root := justfile_directory()
-run := if env("SECRETS_COMMAND", "") != "" { env("SECRETS_COMMAND") + " -- " } else { "" }
 air := if which("air") != "" { which("air") } else { "go run github.com/air-verse/air@latest" }
 hardcoverApi := "https://api.hardcover.app/v1/graphql"
 export CGO_ENABLED := "0"
@@ -41,11 +40,11 @@ build OUT=out: generate
 
 # Run the app
 run:
-    {{ run }}go run {{ main }}
+    go run {{ main }}
 
 # Run the app in dev mode (auto-restart) with air
 dev:
-    {{ run }}{{ air }}
+    {{ air }}
 
 # Run tests
 test:
@@ -64,10 +63,8 @@ templui-update:
 schema:
     go run github.com/benweint/gquil/cmd/gquil@latest introspection generate-sdl {{ hardcoverApi }} -H "Authorization: {{ env('HARDCOVER_TOKEN') }}" > internal/schema/schema.gql
 
-[private]
-kamal *args:
-    @SSH_AUTH_SOCK='' just kamal-sock {{args}}
+release-snapshot:
+    goreleaser release --snapshot --clean
 
-[private]
-kamal-sock *args:
-    {{run}}kamal {{args}}
+release:
+    goreleaser release --clean
