@@ -38,6 +38,9 @@ generate:
 build OUT=out: generate
     go build -o {{ OUT }} {{ main }}
 
+build-all:
+    goreleaser build --snapshot --clean
+
 # Run the app
 run:
     go run {{ main }}

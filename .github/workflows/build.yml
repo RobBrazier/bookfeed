@@ -44,7 +44,7 @@ jobs:
       - name: Test
         run: just test
       - name: Build
-        run: goreleaser build --clean --snapshot
+        run: just build-all
 
   release:
     needs:
