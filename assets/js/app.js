@@ -1,7 +1,4 @@
 import Alpine from 'alpinejs'
-import "./selectbox.min.js";
-import "./popover.min.js";
-import "./tabs.min.js";
 
 window.Alpine = Alpine
 

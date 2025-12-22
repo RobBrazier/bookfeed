@@ -1,32 +1,33 @@
 [[tools.air]]
-version = "1.63.0"
+version = "1.63.4"
 backend = "aqua:air-verse/air"
+"platforms.linux-x64" = { checksum = "sha256:12162e5ab6a8e87a0c3ae48b4eb0acfa5cc43214c24d480b47dda707547e13ee", url = "https://github.com/air-verse/air/releases/download/v1.63.4/air_1.63.4_linux_amd64.tar.gz"}
 
 [[tools.go]]
-version = "1.25.4"
+version = "1.25.5"
 backend = "core:go"
+"platforms.linux-x64" = { checksum = "sha256:9e9b755d63b36acf30c12a9a3fc379243714c1c6d3dd72861da637f336ebb35b", url = "https://dl.google.com/go/go1.25.5.linux-amd64.tar.gz"}
 
 [[tools.golangci-lint]]
-version = "2.5.0"
+version = "2.7.2"
 backend = "aqua:golangci/golangci-lint"
-
-[tools.golangci-lint.platforms.linux-x64]
-checksum = "sha256:c77313a77e19b06123962c411d9943cc0d092bbec76b956104d18964e274902e"
-size = 14221503
-url = "https://github.com/golangci/golangci-lint/releases/download/v2.5.0/golangci-lint-2.5.0-linux-amd64.tar.gz"
+"platforms.linux-x64" = { checksum = "sha256:ce46a1f1d890e7b667259f70bb236297f5cf8791a9b6b98b41b283d93b5b6e88", url = "https://github.com/golangci/golangci-lint/releases/download/v2.7.2/golangci-lint-2.7.2-linux-amd64.tar.gz"}
 
 [[tools.goreleaser]]
-version = "2.12.7"
+version = "2.13.1"
 backend = "aqua:goreleaser/goreleaser"
+"platforms.linux-x64" = { checksum = "sha256:04764528d7344bc5efae80ef62467480578a37db0bb98ea2cee185e04aeb1a7d", url = "https://github.com/goreleaser/goreleaser/releases/download/v2.13.1/goreleaser_Linux_x86_64.tar.gz"}
 
 [[tools.just]]
-version = "1.43.1"
+version = "1.45.0"
 backend = "aqua:casey/just"
+"platforms.linux-x64" = { checksum = "sha256:dc3f958aaf8c6506dd90426e9b03f86dd15e74a6467ee0e54929f750af3d9e49", url = "https://github.com/casey/just/releases/download/1.45.0/just-1.45.0-x86_64-unknown-linux-musl.tar.gz"}
 
 [[tools.ko]]
-version = "0.18.0"
+version = "0.18.1"
 backend = "aqua:ko-build/ko"
+"platforms.linux-x64" = { checksum = "sha256:048ab11818089a43b7b74bc554494a79a3fd0d9822c061142e5cd3cf8b30cb27", url = "https://github.com/ko-build/ko/releases/download/v0.18.1/ko_0.18.1_Linux_x86_64.tar.gz"}
 
 [[tools.node]]
-version = "24.11.1"
+version = "24.12.0"
 backend = "core:node"
