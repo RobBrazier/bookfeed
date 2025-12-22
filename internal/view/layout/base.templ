@@ -2,12 +2,15 @@ package layout
 
 import (
 	"fmt"
-	"github.com/RobBrazier/bookfeed/assets"
 	"github.com/RobBrazier/bookfeed/internal/view"
 	"github.com/RobBrazier/bookfeed/internal/view/components/button"
 	"github.com/RobBrazier/bookfeed/internal/view/components/card"
+	"github.com/RobBrazier/bookfeed/internal/view/components/popover"
+	"github.com/RobBrazier/bookfeed/internal/view/components/selectbox"
+	"github.com/RobBrazier/bookfeed/internal/view/components/tabs"
 	"github.com/RobBrazier/bookfeed/internal/view/components/toast"
 	"github.com/RobBrazier/bookfeed/internal/view/modules/feed"
+	"github.com/RobBrazier/bookfeed/internal/view/utils"
 )
 
 templ Layout(provider view.ProviderData) {
@@ -18,8 +21,11 @@ templ Layout(provider view.ProviderData) {
 			<meta name="viewport" content="width=device-width,initial-scale=1"/>
 			<title>BookFeed: { provider.Title }</title>
 			<link rel="icon" href="data:image/png;base64,iVBORw0KGgo="/>
-			<link href={ templ.URL(fmt.Sprintf("/static/css/app.css?v=%s", assets.AssetVersions["build/css/app.css"])) } rel="stylesheet"/>
-			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?v=%s", assets.AssetVersions["build/js/app.js"])) }></script>
+			<link href={ templ.URL(fmt.Sprintf("/static/css/app.css?v=%s", utils.ScriptVersion)) } rel="stylesheet"/>
+			<script defer src={ templ.URL(fmt.Sprintf("/static/js/app.js?v=%s", utils.ScriptVersion)) }></script>
+			@selectbox.Script()
+			@popover.Script()
+			@tabs.Script()
 			<style>
 				[x-cloak] {
 					display: none !important;
