@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/Khan/genqlient v0.8.1
 	github.com/Oudwins/tailwind-merge-go v0.2.1
-	github.com/a-h/templ v0.3.960
+	github.com/a-h/templ v0.3.977
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-chi/httprate v0.15.0
 	github.com/go-co-op/gocron/v2 v2.19.0
