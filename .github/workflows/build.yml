@@ -107,7 +107,7 @@ jobs:
     steps:
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        uses: benbristow/dokploy-deploy-action@0.2.2
+        uses: benbristow/dokploy-deploy-action@3a2a16f0158b41377adf300c9dd6d3d396aa7586 # 0.2.2
         with:
           api_token: ${{ secrets.DOKPLOY_AUTH_TOKEN }}
           application_id: ${{ startsWith(github.ref, 'refs/tags/') && secrets.PROD_APPLICATION_ID || secrets.DEV_APPLICATION_ID }}
