@@ -1,4 +1,4 @@
-FROM cgr.dev/chainguard/busybox:latest@sha256:ecc152fe3dece44e60d1aa0fbbefb624902b4af0e2ed8c2c84dfbce653ff064f
+FROM cgr.dev/chainguard/busybox:latest@sha256:48561a67b5d7120d6fdaeaa8b6f7d9d251a5665f90b5e05b1dc1be4c17850db4
 ARG TARGETPLATFORM
 USER root
 ENTRYPOINT ["/usr/bin/bookfeed"]
