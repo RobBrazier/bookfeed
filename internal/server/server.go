@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/RobBrazier/bookfeed/config"
-	"github.com/RobBrazier/bookfeed/internal/cache"
 	"github.com/RobBrazier/bookfeed/internal/feed"
 	"github.com/go-co-op/gocron/v2"
 	_ "github.com/joho/godotenv/autoload"
@@ -67,13 +66,6 @@ func NewServer() *http.Server {
 	port := config.Port()
 	log.Info().Int("port", port).Msg("Started server")
 	scheduler, _ := gocron.NewScheduler()
-	_, err := scheduler.NewJob(
-		gocron.DurationJob(1*time.Hour),
-		gocron.NewTask(cache.SaveCache),
-	)
-	if err != nil {
-		log.Error().Err(err).Msg("Unable to start scheduler")
-	}
 	scheduler.Start()
 
 	NewServer := &Server{
@@ -96,8 +88,6 @@ func NewServer() *http.Server {
 			log.Error().Err(err).Msg("Unable to shutdown scheduler")
 		}
 	})
-
-	cache.LoadCache()
 
 	return server
 }

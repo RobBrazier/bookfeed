@@ -19,7 +19,7 @@ type config struct {
 		Hardcover string `envconfig:"HARDCOVER_TOKEN"`
 	}
 	Cache struct {
-		StoragePath string `default:"." envconfig:"CACHE_STORAGE_PATH"`
+		RedisURL string `default:"" envconfig:"REDIS_URL"`
 	}
 }
 
@@ -77,6 +77,6 @@ func HardcoverToken() string {
 	return cfg.Tokens.Hardcover
 }
 
-func CacheStorage() string {
-	return cfg.Cache.StoragePath
+func RedisURL() string {
+	return cfg.Cache.RedisURL
 }

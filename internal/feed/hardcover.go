@@ -101,7 +101,7 @@ func (b *hardcoverBuilder) GetRecentReleases(ctx context.Context) (feeds.Feed, e
 			return model.NewCollection("Recent", "upcoming/recent", books), nil
 		},
 	)
-	collection, err := cache.CollectionCache.Get(ctx, "hardcover/releases", loader)
+	collection, err := cache.GetCollection(ctx, "hardcover/releases", loader)
 	if err != nil {
 		return feeds.Feed{}, err
 	}
@@ -121,7 +121,7 @@ func (b *hardcoverBuilder) authorLoader(ids ...int) cache.BulkCollectionLoaderFu
 			result := make(map[string]model.Collection)
 			now := time.Now()
 			earliest := now.AddDate(-1, 0, 0)
-			uncachedKeys := b.uncachedKeys(keys)
+			uncachedKeys := b.uncachedKeys(ctx, keys)
 			slugMapping := b.extractSlugs(uncachedKeys)
 			slugs := slices.Collect(maps.Keys(slugMapping))
 			log := log.With().
@@ -191,18 +191,17 @@ func (b *hardcoverBuilder) GetAuthorReleases(
 ) (feed feeds.Feed, err error) {
 	loader := b.authorLoader()
 	key := fmt.Sprintf("hardcover/authors/%s", slug)
-	collections, err := cache.CollectionCache.BulkGet(
+	collections, err := cache.BulkGetCollection(
 		ctx,
 		[]string{key},
 		loader,
 	)
 	if err != nil {
 		log.Error().Err(err).Msgf("error retrieving author via cache, key=%s", key)
-		_, invalidated := cache.CollectionCache.Invalidate(key)
-		if invalidated {
-			log.Info().Msgf("Invalidated cache for key=%s", key)
-		} else {
+		if invalidateErr := cache.InvalidateCollection(ctx, key); invalidateErr != nil {
 			log.Info().Msgf("Unable to invalidate cache for key=%s", key)
+		} else {
+			log.Info().Msgf("Invalidated cache for key=%s", key)
 		}
 		return feed, err
 	}
@@ -233,7 +232,7 @@ func (b *hardcoverBuilder) seriesLoader(ids ...int) cache.BulkCollectionLoaderFu
 			earliest := now.AddDate(-1, 0, 0)
 			uncachedKeys := keys
 			if len(keys) > 1 {
-				uncachedKeys = b.uncachedKeys(keys)
+				uncachedKeys = b.uncachedKeys(ctx, keys)
 			}
 			slugMapping := b.extractSlugs(uncachedKeys)
 			slugs := slices.Collect(maps.Keys(slugMapping))
@@ -302,18 +301,17 @@ func (b *hardcoverBuilder) GetSeriesReleases(
 ) (feed feeds.Feed, err error) {
 	loader := b.seriesLoader()
 	key := fmt.Sprintf("hardcover/series/%s", slug)
-	collections, err := cache.CollectionCache.BulkGet(
+	collections, err := cache.BulkGetCollection(
 		ctx,
 		[]string{key},
 		loader,
 	)
 	if err != nil {
 		log.Error().Err(err).Msgf("error retrieving series via cache, key=%s", key)
-		_, invalidated := cache.CollectionCache.Invalidate(key)
-		if invalidated {
-			log.Info().Msgf("Invalidated cache for key=%s", key)
-		} else {
+		if invalidateErr := cache.InvalidateCollection(ctx, key); invalidateErr != nil {
 			log.Info().Msgf("Unable to invalidate cache for key=%s", key)
+		} else {
+			log.Info().Msgf("Invalidated cache for key=%s", key)
 		}
 	}
 
@@ -404,16 +402,11 @@ func (b *hardcoverBuilder) getUserInterests(
 			}, nil
 		},
 	)
-	return cache.UserCache.Get(ctx, fmt.Sprintf("hardcover/user/%s", username), loader)
+	return cache.GetUser(ctx, fmt.Sprintf("hardcover/user/%s", username), loader)
 }
 
-func (b hardcoverBuilder) uncachedKeys(keys []string) (result []string) {
-	for _, key := range keys {
-		if _, ok := cache.CollectionCache.GetIfPresent(key); !ok {
-			result = append(result, key)
-		}
-	}
-	return result
+func (b hardcoverBuilder) uncachedKeys(ctx context.Context, keys []string) []string {
+	return cache.UncachedKeys(ctx, keys)
 }
 
 func (b hardcoverBuilder) extractSlugs(keys []string) map[string]string {
@@ -512,7 +505,7 @@ func (b *hardcoverBuilder) GetUserReleases(
 	for _, job := range jobs {
 		go func() {
 			defer wg.Done()
-			result, err := cache.CollectionCache.BulkGet(ctx, job.keys, job.loader)
+			result, err := cache.BulkGetCollection(ctx, job.keys, job.loader)
 			if err != nil {
 				log.Error().Err(err).Msgf("Unable to fetch %s data", job.key)
 			}
