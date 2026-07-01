@@ -1,4 +1,4 @@
-// templui component input - version: v0.101.0 installed by templui v0.101.0
+// templui component input - version: v1.12.1 installed by templui v1.12.1
 // 📚 Documentation: https://templui.io/docs/components/input
 package input
 
@@ -38,6 +38,7 @@ type Props struct {
 	Value            string
 	Disabled         bool
 	Readonly         bool
+	Required         bool
 	FileAccept       string
 	HasError         bool
 	NoTogglePassword bool
@@ -75,6 +76,7 @@ templ Input(props ...Props) {
 			}
 			disabled?={ p.Disabled }
 			readonly?={ p.Readonly }
+			required?={ p.Required }
 			if p.HasError {
 				aria-invalid="true"
 			}
@@ -111,20 +113,20 @@ templ Input(props ...Props) {
 				Attributes: templ.Attributes{"data-tui-input-toggle-password": p.ID},
 			}) {
 				<span class="icon-open block">
-					@icon.Eye(icon.Props{
-						Size: 18,
-					})
+					@icon.Eye(icon.Props{Class: "size-[18px]"})
 				</span>
 				<span class="icon-closed hidden">
-					@icon.EyeOff(icon.Props{
-						Size: 18,
-					})
+					@icon.EyeOff(icon.Props{Class: "size-[18px]"})
 				</span>
 			}
 		}
 	</div>
 }
 
+var scriptOnce = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ "/static/js/input.min.js?v=" + utils.ScriptVersion }></script>
+	@scriptOnce.Once() {
+		@utils.ComponentScript("input")
+	}
 }

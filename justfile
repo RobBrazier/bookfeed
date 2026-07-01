@@ -1,5 +1,6 @@
 set dotenv-load := true
 set unstable := true
+set lists := true
 
 name := "bookfeed"
 main := "cmd" / name / "main.go"
@@ -59,7 +60,7 @@ templui *args:
 
 # Update all TemplUI components
 templui-update:
-    @just templui -f add $(ls internal/view/components)
+    @just templui -force add $(ls internal/view/components)
     @just fmt
 
 # Download the Hardcover GraphQL Schema

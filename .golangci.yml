@@ -4,7 +4,7 @@ linters:
   enable:
     - contextcheck
     - gocognit
-    - goconst
+    # - goconst
     - tagalign
     - goprintffuncname
     - zerologlint

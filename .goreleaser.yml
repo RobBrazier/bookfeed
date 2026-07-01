@@ -39,14 +39,6 @@ archives:
 snapshot:
   version_template: "{{incpatch .Version}}-{{.ShortCommit}}"
 
-# dockers_v2:
-#   - images:
-#       - ghcr.io/robbrazier/{{.ProjectName}}
-#     tags:
-#       - "{{if .IsSnapshot}}develop{{else}}latest{{end}}"
-#       - "{{if not .IsSnapshot}}v{{.Version}}{{end}}"
-#       - "{{if not .IsSnapshot}}v{{.Major}}{{end}}"
-
 kos:
   - repositories:
       - ghcr.io/robbrazier/{{.ProjectName}}

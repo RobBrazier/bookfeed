@@ -1,4 +1,4 @@
-// templui component toast - version: v0.101.0 installed by templui v0.101.0
+// templui component toast - version: v1.12.1 installed by templui v1.12.1
 // 📚 Documentation: https://templui.io/docs/components/toast
 package toast
 
@@ -109,13 +109,13 @@ templ Toast(props ...Props) {
 			if p.Icon {
 				switch p.Variant {
 					case VariantSuccess:
-						@icon.CircleCheck(icon.Props{Size: 22, Class: "text-green-500 mr-3 flex-shrink-0"})
+						@icon.CircleCheck(icon.Props{Class: "size-[22px] text-green-500 mr-3 flex-shrink-0"})
 					case VariantError:
-						@icon.CircleX(icon.Props{Size: 22, Class: "text-red-500 mr-3 flex-shrink-0"})
+						@icon.CircleX(icon.Props{Class: "size-[22px] text-red-500 mr-3 flex-shrink-0"})
 					case VariantWarning:
-						@icon.TriangleAlert(icon.Props{Size: 22, Class: "text-yellow-500 mr-3 flex-shrink-0"})
+						@icon.TriangleAlert(icon.Props{Class: "size-[22px] text-yellow-500 mr-3 flex-shrink-0"})
 					case VariantInfo:
-						@icon.Info(icon.Props{Size: 22, Class: "text-blue-500 mr-3 flex-shrink-0"})
+						@icon.Info(icon.Props{Class: "size-[22px] text-blue-500 mr-3 flex-shrink-0"})
 				}
 			}
 			// Content
@@ -138,16 +138,17 @@ templ Toast(props ...Props) {
 						"type":                   "button",
 					},
 				}) {
-					@icon.X(icon.Props{
-						Size:  18,
-						Class: "opacity-75 hover:opacity-100",
-					})
+					@icon.X(icon.Props{Class: "size-[18px] opacity-75 hover:opacity-100"})
 				}
 			}
 		</div>
 	</div>
 }
 
+var scriptOnce = templ.NewOnceHandle()
+
 templ Script() {
-	<script defer nonce={ templ.GetNonce(ctx) } src={ "/static/js/toast.min.js?v=" + utils.ScriptVersion }></script>
+	@scriptOnce.Once() {
+		@utils.ComponentScript("toast")
+	}
 }
