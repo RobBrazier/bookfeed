@@ -43,9 +43,8 @@ snapshot:
 
 kos:
   - repositories:
-      - ghcr.io/robbrazier/{{.ProjectName}}
+      - ghcr.io/robbrazier/bookfeed
     base_image: cgr.dev/chainguard/busybox
-    user: 0:0
     local_domain: ko.local
     tags:
       - "{{if .IsSnapshot}}develop{{else}}latest{{end}}"
