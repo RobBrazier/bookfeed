@@ -90,7 +90,9 @@ jobs:
           just release-snapshot
           image="ghcr.io/${GITHUB_REPOSITORY@L}"
           docker tag ko.local:develop $image:develop
+          docker tag ko.local:develop $image:${GITHUB_SHA}
           docker push $image:develop --platform linux/amd64
+          docker push $image:${GITHUB_SHA} --platform linux/amd64
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Release Version
@@ -99,28 +101,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-  deploy-develop:
+  deploy:
     needs:
       - release
     runs-on: ubuntu-24.04
-    if: github.ref == 'refs/heads/main' && github.repository == 'RobBrazier/bookfeed'
+    if: github.event_name != 'pull_request' && github.repository == 'RobBrazier/bookfeed'
+    environment:
+      name: ${{ startsWith(github.ref, 'refs/tags/') && 'production' || 'develop' }}
+      url: ${{ vars.DEPLOY_URL }}
     steps:
       - name: Deploy
         uses: dokku/github-action@v1.10.0
         with:
-          git_remote_url: "ssh://dokku@${{ secrets.DEPLOY_HOST }}/${{ secrets.DEV_APPNAME }}"
+          git_remote_url: "ssh://dokku@${{ secrets.DEPLOY_HOST }}/${{ secrets.APPNAME }}"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          deploy_docker_image: ghcr.io/robbrazier/bookfeed:develop
-
-  deploy-prod:
-    needs:
-      - release
-    runs-on: ubuntu-24.04
-    if: startsWith(github.ref, 'refs/tags/') && github.repository == 'RobBrazier/bookfeed'
-    steps:
-      - name: Deploy
-        uses: dokku/github-action@v1.10.0
-        with:
-          git_remote_url: "ssh://dokku@${{ secrets.DEPLOY_HOST }}/${{ secrets.PROD_APPNAME }}"
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          deploy_docker_image: ghcr.io/robbrazier/bookfeed:latest
+          deploy_docker_image: ghcr.io/robbrazier/bookfeed:${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
