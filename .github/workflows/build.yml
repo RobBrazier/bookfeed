@@ -113,6 +113,6 @@ jobs:
       - name: Deploy
         uses: dokku/github-action@v1.10.0
         with:
-          git_remote_url: "ssh://dokku@${{ secrets.DEPLOY_HOST }}/${{ secrets.APPNAME }}"
+          git_remote_url: "ssh://dokku@${{ secrets.DEPLOY_HOST }}/${{ vars.APPNAME }}"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           deploy_docker_image: ghcr.io/robbrazier/bookfeed:${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
