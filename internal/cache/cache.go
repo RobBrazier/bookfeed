@@ -8,6 +8,7 @@ import (
 	"github.com/RobBrazier/bookfeed/config"
 	"github.com/RobBrazier/bookfeed/internal/model"
 	"github.com/eko/gocache/lib/v4/cache"
+	"github.com/eko/gocache/lib/v4/marshaler"
 	"github.com/eko/gocache/lib/v4/store"
 	goCacheStore "github.com/eko/gocache/store/go_cache/v4"
 	redisStore "github.com/eko/gocache/store/redis/v4"
@@ -22,8 +23,8 @@ const (
 )
 
 var (
-	collectionCache *cache.Cache[model.Collection]
-	userCache       *cache.Cache[model.UserInterests]
+	collectionCache *marshaler.Marshaler
+	userCache       *marshaler.Marshaler
 )
 
 type (
@@ -34,9 +35,10 @@ type (
 
 func Init() {
 	s := newStore()
+	c := cache.New[any](s)
 
-	collectionCache = cache.New[model.Collection](s)
-	userCache = cache.New[model.UserInterests](s)
+	collectionCache = marshaler.New(c)
+	userCache = marshaler.New(c)
 }
 
 func newStore() store.StoreInterface {
@@ -62,32 +64,32 @@ func isNotFound(err error) bool {
 
 func GetOrLoad[T any](
 	ctx context.Context,
-	c *cache.Cache[T],
+	m *marshaler.Marshaler,
 	key string,
 	ttl time.Duration,
 	load func(ctx context.Context, key string) (T, error),
 ) (T, error) {
-	val, err := c.Get(ctx, key)
+	var val T
+	_, err := m.Get(ctx, key, &val)
 	if err == nil {
 		log.Debug().Str("key", key).Msg("Cache hit")
 		return val, nil
 	}
 	if !isNotFound(err) {
-		var zero T
-		return zero, err
+		return val, err
 	}
 	log.Debug().Str("key", key).Msg("Cache miss, loading")
 	val, err = load(ctx, key)
 	if err != nil {
 		return val, err
 	}
-	_ = c.Set(ctx, key, val, store.WithExpiration(ttl))
+	_ = m.Set(ctx, key, val, store.WithExpiration(ttl))
 	return val, nil
 }
 
 func BulkGetOrLoad[T any](
 	ctx context.Context,
-	c *cache.Cache[T],
+	m *marshaler.Marshaler,
 	keys []string,
 	ttl time.Duration,
 	load func(ctx context.Context, keys []string) (map[string]T, error),
@@ -96,7 +98,8 @@ func BulkGetOrLoad[T any](
 	var missing []string
 
 	for _, key := range keys {
-		val, err := c.Get(ctx, key)
+		var val T
+		_, err := m.Get(ctx, key, &val)
 		if err == nil {
 			log.Debug().Str("key", key).Msg("Cache hit")
 			result[key] = val
@@ -120,17 +123,17 @@ func BulkGetOrLoad[T any](
 
 	for key, val := range loaded {
 		result[key] = val
-		_ = c.Set(ctx, key, val, store.WithExpiration(ttl))
+		_ = m.Set(ctx, key, val, store.WithExpiration(ttl))
 	}
 
 	return result, nil
 }
 
-func GetIfPresent[T any](ctx context.Context, c *cache.Cache[T], key string) (T, bool) {
-	val, err := c.Get(ctx, key)
+func GetIfPresent[T any](ctx context.Context, m *marshaler.Marshaler, key string) (T, bool) {
+	var val T
+	_, err := m.Get(ctx, key, &val)
 	if err != nil {
-		var zero T
-		return zero, false
+		return val, false
 	}
 	return val, true
 }
@@ -158,7 +161,7 @@ func GetUser(ctx context.Context, key string, loader UserLoaderFunc) (model.User
 func UncachedKeys(ctx context.Context, keys []string) []string {
 	var result []string
 	for _, key := range keys {
-		if _, ok := GetIfPresent(ctx, collectionCache, key); !ok {
+		if _, ok := GetIfPresent[model.Collection](ctx, collectionCache, key); !ok {
 			result = append(result, key)
 		}
 	}
