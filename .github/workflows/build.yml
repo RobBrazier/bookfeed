@@ -109,6 +109,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: dokku/github-action@v1.10.0
         with:
-          git_remote_url: "ssh://${DEPLOY_HOST}/${{ startsWith(github.ref, 'refs/tags/') && secrets.PROD_APPNAME || secrets.DEV_APPNAME }}"
+          git_remote_url: "ssh://dokku@${DEPLOY_HOST}/${{ startsWith(github.ref, 'refs/tags/') && secrets.PROD_APPNAME || secrets.DEV_APPNAME }}"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           deploy_docker_image: ghcr.io/robbrazier/bookfeed:${{ startsWith(github.ref, 'refs/tags/') && "latest" || "develop" }}
