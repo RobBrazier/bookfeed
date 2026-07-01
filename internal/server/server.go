@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/RobBrazier/bookfeed/config"
+	"github.com/RobBrazier/bookfeed/internal/cache"
 	"github.com/RobBrazier/bookfeed/internal/feed"
 	"github.com/go-co-op/gocron/v2"
 	_ "github.com/joho/godotenv/autoload"
@@ -63,6 +64,7 @@ func getLogger() *zerolog.Logger {
 
 func NewServer() *http.Server {
 	logger := getLogger()
+	cache.Init()
 	port := config.Port()
 	log.Info().Int("port", port).Msg("Started server")
 	scheduler, _ := gocron.NewScheduler()

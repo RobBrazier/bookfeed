@@ -32,7 +32,7 @@ type (
 	UserLoaderFunc           func(ctx context.Context, key string) (model.UserInterests, error)
 )
 
-func init() {
+func Init() {
 	s := newStore()
 
 	collectionCache = cache.New[model.Collection](s)
@@ -46,10 +46,12 @@ func newStore() store.StoreInterface {
 			log.Fatal().Err(err).Str("url", redisURL).Msg("Unable to parse REDIS_URL")
 		}
 		client := redis.NewClient(opt)
+		log.Info().Msg("Using Redis cache store")
 		return redisStore.NewRedis(client)
 	}
 
 	client := gocache.New(gocache.DefaultExpiration, 10*time.Minute)
+	log.Info().Msg("Using in-memory cache store (no REDIS_URL configured)")
 	return goCacheStore.NewGoCache(client)
 }
 
