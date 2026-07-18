@@ -89,8 +89,8 @@ jobs:
         run: |
           just release-snapshot
           image="ghcr.io/${GITHUB_REPOSITORY@L}"
-          docker tag ko.local:develop $image:develop
-          docker tag ko.local:develop $image:${GITHUB_SHA}
+          docker tag $image:develop-amd64 $image:develop
+          docker tag $image:develop $image:${GITHUB_SHA}
           docker push $image:develop --platform linux/amd64
           docker push $image:${GITHUB_SHA} --platform linux/amd64
         env:

@@ -41,20 +41,18 @@ archives:
 snapshot:
   version_template: "{{incpatch .Version}}-{{.ShortCommit}}"
 
-kos:
-  - repositories:
+dockers_v2:
+  - images:
       - ghcr.io/robbrazier/bookfeed
-    base_image: cgr.dev/chainguard/busybox
-    local_domain: ko.local
     tags:
       - "{{if .IsSnapshot}}develop{{else}}latest{{end}}"
       - "{{if not .IsSnapshot}}v{{.Version}}{{end}}"
       - "{{if not .IsSnapshot}}v{{.Major}}{{end}}"
-    bare: true
-    preserve_import_paths: false
+    extra_files:
+      - assets/build
     platforms:
       - linux/amd64
-      - linux/arm64
+      - "{{if not .IsSnapshot}}linux/arm64{{end}}"
 
 checksum:
   name_template: "checksums.txt"
