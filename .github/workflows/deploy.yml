@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows:
+      - Build & Release
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Target environment
+        required: true
+        type: choice
+        default: develop
+        options:
+          - develop
+          - production
+      image_tag:
+        description: Image tag to deploy (sha or v1.2.3)
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && inputs.env || github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-dev:
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.env == 'develop') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event != 'pull_request' &&
+       github.repository == 'RobBrazier/bookfeed' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    environment:
+      name: develop
+      url: ${{ vars.DEPLOY_URL }}
+    steps:
+      - uses: superfly/flyctl-actions/setup@1
+      - name: Deploy
+        run: flyctl deploy --image ghcr.io/robbrazier/bookfeed:${{ github.event_name == 'workflow_dispatch' && inputs.image_tag || github.event.workflow_run.head_sha }} --app bookfeed-dev --yes
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-prod:
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.env == 'production') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event != 'pull_request' &&
+       github.repository == 'RobBrazier/bookfeed' &&
+       startsWith(github.event.workflow_run.head_branch, 'v'))
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: ${{ vars.DEPLOY_URL }}
+    steps:
+      - uses: superfly/flyctl-actions/setup@1
+      - name: Deploy
+        run: flyctl deploy --image ghcr.io/robbrazier/bookfeed:${{ github.event_name == 'workflow_dispatch' && inputs.image_tag || github.event.workflow_run.head_branch }} --app bookfeed --yes
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

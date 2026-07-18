@@ -1,4 +1,4 @@
-name: Build & Deploy
+name: Build & Release
 
 on:
   push:
@@ -100,19 +100,3 @@ jobs:
         run: just release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-  deploy:
-    needs:
-      - release
-    runs-on: ubuntu-24.04
-    if: github.event_name != 'pull_request' && github.repository == 'RobBrazier/bookfeed'
-    environment:
-      name: ${{ startsWith(github.ref, 'refs/tags/') && 'production' || 'develop' }}
-      url: ${{ vars.DEPLOY_URL }}
-    steps:
-      - name: Deploy
-        uses: dokku/github-action@v1.10.0
-        with:
-          git_remote_url: "ssh://dokku@${{ secrets.DEPLOY_HOST }}/${{ vars.APPNAME }}"
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          deploy_docker_image: ghcr.io/robbrazier/bookfeed:${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.sha }}
