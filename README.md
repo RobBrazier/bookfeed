@@ -42,7 +42,7 @@ cp .env.example .env
 - `PORT`: The port to run the server on (default: 8000)
 - `HARDCOVER_TOKEN`: Your Hardcover API token (required for development)
 
-To generate a Hardcover API token, visit [https://hardcover.app/account/api/keys/new?scope=read%3Acatalog%3Adata+read%3Alibrary%3Apublic+read%3Ausers+read%3Asocial] to create a new token with the required permissions pre-selected.
+To generate a Hardcover API token, visit [https://hardcover.app/account/api/keys/new?scope=read%3Acatalog%3Adata+read%3Alibrary%3Apublic+read%3Ausers+read%3Asocial]() to create a new token with the required permissions pre-selected.
 
 ### Installation
 
