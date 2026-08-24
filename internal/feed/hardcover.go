@@ -344,13 +344,13 @@ func (b *hardcoverBuilder) getUserInterests(
 			earliest := now.AddDate(-2, 0, 0)
 			log.Info().Msg("Fetching user interests")
 			data, err := hardcover.UserInterests(ctx, b.client, username, earliest)
+			if err != nil {
+				return interests, err
+			}
 			log.Info().
 				Dur("elapsed", time.Since(now)).
 				Int("count", len(data.UserBooks)).
 				Msg("Retrieved user interests")
-			if err != nil {
-				return interests, err
-			}
 			if len(data.Users) == 0 {
 				return interests, nil
 			}
