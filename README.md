@@ -38,9 +38,11 @@ Copy the example environment file and configure your settings:
 cp .env.example .env
 ```
 
-Edit the `.env` file to set your configuration:
+ Edit the `.env` file to set your configuration:
 - `PORT`: The port to run the server on (default: 8000)
 - `HARDCOVER_TOKEN`: Your Hardcover API token (required for development)
+
+To generate a Hardcover API token, visit [https://hardcover.app/account/api/keys/new?scope=read%3Acatalog%3Adata+read%3Alibrary%3Apublic+read%3Ausers+read%3Asocial] to create a new token with the required permissions pre-selected.
 
 ### Installation
 
